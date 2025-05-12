@@ -14,6 +14,11 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
+  <branding>
+    <color type="primary" scheme_preference="light">#8dd3a4</color>
+    <color type="primary" scheme_preference="dark">#6c8c79</color>
+  </branding>
+
   <description>
     <p>
       Kontainer is a graphical user interface (GUI) application built with KDE Kirigami that
