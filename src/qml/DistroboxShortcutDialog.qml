@@ -35,7 +35,7 @@ Kirigami.Dialog {
 
         Controls.CheckBox {
             id: allCheckbox
-            text: "Create shortcuts for all containers"
+            text: i18n("Create shortcuts for all containers")
             checked: false
             onCheckedChanged: if (checked) containerCombo.currentIndex = -1
         }

@@ -13,7 +13,7 @@ import org.kde.kirigami.templates.private as KT
 
 Kirigami.Dialog {
     id: createDialog
-    title: "Create New Container"
+    title: i18n("Create New Container")
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     
@@ -61,7 +61,7 @@ Kirigami.Dialog {
             // Use a timer to allow the UI to update before starting the creation process
             createTimer.start()
         } else {
-            errorDialog.text = "Name and Image fields are required."
+            errorDialog.text = i18n("Name and Image fields are required.")
             errorDialog.open()
         }
     }
@@ -80,14 +80,14 @@ Kirigami.Dialog {
             
             Controls.TextField {
                 id: nameField
-                Kirigami.FormData.label: "Name:"
-                placeholderText: "Fedora"
+                Kirigami.FormData.label: i18n("Name")
+                placeholderText: i18n("Fedora")
                 Layout.fillWidth: true
             }
             
             Controls.ComboBox {
                 id: imageField
-                Kirigami.FormData.label: "Image:"
+                Kirigami.FormData.label: i18n("Image")
                 model: []
                 editable: false
                 Layout.fillWidth: true
@@ -121,8 +121,8 @@ Kirigami.Dialog {
             
             Controls.TextField {
                 id: argsField
-                Kirigami.FormData.label: "Arguments:"
-                placeholderText: "--home=/path/to/home (optional)"
+                Kirigami.FormData.label: i18n("Arguments")
+                placeholderText: i18n("--home=/path/to/home (optional)")
                 Layout.fillWidth: true
             }
         }
@@ -138,7 +138,7 @@ Kirigami.Dialog {
             spacing: Kirigami.Units.smallSpacing
             
             Controls.Label {
-                text: "Command preview:"
+                text: i18n("Command preview:")
                 font.bold: true
             }
             
@@ -170,7 +170,7 @@ Kirigami.Dialog {
                 }
                 
                 Controls.Label {
-                    text: "Creating container..."
+                    text: i18n("Creating container...")
                 }
             }
         }

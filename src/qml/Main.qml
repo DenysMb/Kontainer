@@ -118,7 +118,7 @@ Kirigami.ApplicationWindow {
                 onTriggered: createDialog.open()
             },
             Kirigami.Action {
-                text: "Refresh"
+                text: i18n("Refresh")
                 icon.name: "view-refresh"
                 onTriggered: refresh()
             }

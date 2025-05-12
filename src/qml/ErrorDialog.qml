@@ -12,7 +12,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: errorDialog
-    title: "Error"
+    title: i18n("Error")
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Ok
     
