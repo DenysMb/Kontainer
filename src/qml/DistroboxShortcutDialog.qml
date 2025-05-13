@@ -6,8 +6,11 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: shortcutDialog
-    title: "Create Distrobox Shortcuts"
+        
     padding: Kirigami.Units.largeSpacing
+    implicitWidth: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 20)
+
+    title: "Create Distrobox Shortcuts"
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     
     property string selectedContainer: ""
@@ -23,16 +26,20 @@ Kirigami.Dialog {
     
     ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
-        
+
         Controls.CheckBox {
             id: allCheckbox
             text: "Create shortcuts for all containers"
             checked: false
             onCheckedChanged: if (checked) containerCombo.currentIndex = -1
         }
-        
+
+        Kirigami.Separator {
+            Layout.fillWidth: true
+        }
+
         Controls.Label {
-            text: "Or, select a specific container:"
+            text: "Alternatively, select a specific container:"
             enabled: !allCheckbox.checked
         }
         

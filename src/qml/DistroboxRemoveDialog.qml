@@ -31,22 +31,15 @@ Kirigami.Dialog {
         
         Kirigami.Heading {
             level: 4
-            text: "Are you sure you want to remove this container?"
+            text: "Are you sure you want to remove " + removeDialog.containerName + "?"
             wrapMode: Text.Wrap
             Layout.fillWidth: true
-        }
-        
-        Controls.Label {
-            text: "Container: " + removeDialog.containerName
-            Layout.fillWidth: true
-            wrapMode: Text.Wrap
         }
         
         Controls.Label {
             text: "This action cannot be undone."
             Layout.fillWidth: true
             wrapMode: Text.Wrap
-            font.italic: true
         }
     }
 }

@@ -70,7 +70,7 @@ Kirigami.Dialog {
         Kirigami.FormLayout {
             Layout.fillWidth: true
             enabled: !createDialog.isCreating
-            wideMode: false
+            //wideMode: false
             
             Controls.TextField {
                 id: nameField
