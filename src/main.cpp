@@ -1,15 +1,15 @@
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QtQml>
-#include <QUrl>
-#include <QQuickStyle>
-#include <QIcon>
+#include "distroboxmanager.h"
+#include "version-kontainer.h"
+#include <KAboutData>
+#include <KIconTheme>
 #include <KLocalizedContext>
 #include <KLocalizedString>
-#include <KIconTheme>
-#include <KAboutData>
-#include "version-kontainer.h"
-#include "distroboxmanager.h"
+#include <QApplication>
+#include <QIcon>
+#include <QQmlApplicationEngine>
+#include <QQuickStyle>
+#include <QUrl>
+#include <QtQml>
 
 int main(int argc, char *argv[])
 {
@@ -17,8 +17,7 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE"))
-    {
+    if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
         QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
     }
 
@@ -59,8 +58,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.loadFromModule("io.github.DenysMb.Kontainer", "Main");
 
-    if (engine.rootObjects().isEmpty())
-    {
+    if (engine.rootObjects().isEmpty()) {
         return -1;
     }
 
