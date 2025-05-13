@@ -14,7 +14,17 @@ Kirigami.ApplicationWindow {
     title: "Kontainer"
 
     About { 
-        id: aboutPage 
+        id: aboutPage
+        visible: false
+    }
+
+    property bool refreshing: false
+
+    function refresh() {  
+        refreshing = true
+        var result = distroBoxManager.listContainers()
+        mainPage.containersList = JSON.parse(result)
+        refreshing = false
     }
     
     globalDrawer: Kirigami.GlobalDrawer {
@@ -89,8 +99,7 @@ Kirigami.ApplicationWindow {
         supportsRefreshing: true
         onRefreshingChanged: {
             if (refreshing) {
-                var result = distroBoxManager.listContainers()
-                mainPage.containersList = JSON.parse(result)
+                refresh()
             }
         }
 
@@ -105,17 +114,12 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: "Refresh"
                 icon.name: "view-refresh"
-                onTriggered: {
-                    var result = distroBoxManager.listContainers()
-                    mainPage.containersList = JSON.parse(result)
-                }
+                onTriggered: refresh()
             }
         ]
         
         Component.onCompleted: {
-            var result = distroBoxManager.listContainers()
-            console.log("Containers:", result)
-            mainPage.containersList = JSON.parse(result)
+            refresh()
         }
         
         ColumnLayout {
@@ -215,13 +219,31 @@ Kirigami.ApplicationWindow {
 
                 Kirigami.PlaceholderMessage {
                     anchors.centerIn: parent
-                    visible: containersListView.count === 0
+                    visible: containersListView.count === 0 && !refreshing
                     text: "No containers found. Create a new container now?"
                     helpfulAction: Kirigami.Action {
                         text: "Create Container"
                         icon.name: "list-add"
                         onTriggered: createDialog.open()
                     }
+                }
+
+                // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh
+                // that the distroboxes are being loaded -- rather than freezing the application.
+                Controls.BusyIndicator {
+                    anchors.centerIn: parent
+                    visible: containersListView.count === 0 && refreshing && !loadingTimer.running
+                }
+
+                // Avoids flickering when distroboxes load quickly.
+                Timer {
+                    id: loadingTimer
+                    interval: 100 // 100ms
+                    repeat: false
+                }
+
+                Component.onCompleted: {
+                    loadingTimer.start()
                 }
             }
         }

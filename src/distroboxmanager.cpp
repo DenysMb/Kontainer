@@ -1,5 +1,6 @@
 #include "distroboxmanager.h"
 #include <QDir>
+#include <QEventLoop>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -7,6 +8,7 @@
 #include <QProcess>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <qtimer.h>
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -27,14 +29,24 @@ QString DistroboxManager::runCommand(const QString &command, bool &success) cons
         actualCommand = u"flatpak-spawn --host "_s + command;
     }
 
-    QProcess process;
-    // Use sh -c to execute the command to support shell features like pipes
-    process.start(u"sh"_s, QStringList() << QLatin1String("-c") << actualCommand);
-    process.waitForFinished();
+    QString output;
+    bool finished = false;
 
-    // Command is successful if it exits with code 0
-    success = (process.exitCode() == 0);
-    return QString::fromUtf8(process.readAllStandardOutput());
+    QProcess *process = new QProcess();
+    connect(process, &QProcess::finished, this, [&](int exitCode, QProcess::ExitStatus) {
+        output = QString::fromUtf8(process->readAllStandardOutput());
+        success = (exitCode == 0);
+        finished = true;
+    });
+
+    process->start(u"sh"_s, QStringList() << QLatin1String("-c") << actualCommand);
+
+    // Local event loop - ensures UI isn't blocked while function is blocking
+    QEventLoop loop;
+    connect(process, &QProcess::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    return output;
 }
 
 // Gets list of available container images that can be created
