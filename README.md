@@ -3,6 +3,14 @@ A simple Kirigami GUI for Distrobox
 
 ![Kontainer](https://github.com/user-attachments/assets/219b68f0-f8f6-41c5-9a7c-9ef631e5354e)
 
+### Build instructions
+This can be built and installed with the following commands:
+```
+mkdir -p build && cd build
+cmake .. -G "Kate - Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+sudo ninja-build -C . install
+```
+
 ### Requirements:
 Those are required even for Flatpak version:
 - Distrobox
