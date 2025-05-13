@@ -12,6 +12,10 @@ Kirigami.ApplicationWindow {
     height: 500
 
     title: "Kontainer"
+
+    About { 
+        id: aboutPage 
+    }
     
     globalDrawer: Kirigami.GlobalDrawer {
         isMenu: true
@@ -39,6 +43,16 @@ Kirigami.ApplicationWindow {
                 text: "Open Distrobox Useful Tips"
                 icon.name: "help-hint"
                 onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
+            },
+            Kirigami.Action {
+                separator: true
+            },
+            Kirigami.Action {
+                text: "About Kontainer"
+                icon.name: "io.github.DenysMb.Kontainer"
+                onTriggered: {
+                    root.pageStack.layers.push(aboutPage)
+                }
             }
         ]
     }
