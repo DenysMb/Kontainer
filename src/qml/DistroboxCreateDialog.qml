@@ -13,8 +13,6 @@ Kirigami.Dialog {
     width: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 30)
     
     property bool isCreating: false
-    
-    // Reference to the error dialog
     property var errorDialog
     
     // Timer for container creation
@@ -22,13 +20,10 @@ Kirigami.Dialog {
         id: createTimer
         interval: 0
         onTriggered: {
-            // Get the image name - use fullImageName if available, otherwise use currentText
             var imageName = imageField.fullImageName || imageField.currentText;
             
-            // Call the Python function to create the container
             var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text)
             
-            // Reset dialog state
             createDialog.isCreating = false
             createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
             
@@ -41,7 +36,6 @@ Kirigami.Dialog {
                 argsField.text = ""
                 createDialog.close()
             } else {
-                // Show error message
                 errorDialog.text = "Failed to create container. Please check your inputs and try again."
                 errorDialog.open()
             }
@@ -49,7 +43,6 @@ Kirigami.Dialog {
     }
     
     onAccepted: {
-        // Get the image name - use fullImageName if available, otherwise use currentText
         var imageName = imageField.fullImageName || imageField.currentText;
         
         if (nameField.text && imageName) {

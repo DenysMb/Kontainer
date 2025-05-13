@@ -1,25 +1,18 @@
-// Includes relevant modules used by the QML
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+
 import QtQuick.Dialogs
 
-// Import local components
-import "." as Local
-
-// Provides basic features needed for all kirigami applications
 Kirigami.ApplicationWindow {
-    // Unique identifier to reference this object
     id: root
 
     width: 600
     height: 500
 
-    // Window title
     title: "Kontainer"
     
-    // Add a global action for creating a new container
     globalDrawer: Kirigami.GlobalDrawer {
         isMenu: true
         actions: [
@@ -49,8 +42,7 @@ Kirigami.ApplicationWindow {
             }
         ]
     }
-    
-    // Import dialog components
+
     ErrorDialog {
         id: errorDialog
     }
@@ -73,8 +65,6 @@ Kirigami.ApplicationWindow {
         id: packageFileDialog
     }
     
-    // Set the first page that will be loaded when the app opens
-    // This can also be set to an id of a Kirigami.Page
     pageStack.initialPage: Kirigami.Page {
         id: mainPage
         
