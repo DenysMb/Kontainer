@@ -89,3 +89,4 @@ compile_commands.json
 build/
 .vscode/
 .flatpak-builder/
+.cache/
