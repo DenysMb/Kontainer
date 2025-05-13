@@ -97,7 +97,6 @@ Kirigami.ApplicationWindow {
         
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.largeSpacing
             spacing: Kirigami.Units.largeSpacing
             
             Kirigami.CardsListView {
