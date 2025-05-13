@@ -11,6 +11,8 @@
 #include <QUrl>
 #include <QtQml>
 
+using namespace Qt::Literals::StringLiterals;
+
 int main(int argc, char *argv[])
 {
     KIconTheme::initTheme();
@@ -18,18 +20,18 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
-        QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
+        QQuickStyle::setStyle(u"org.kde.desktop"_s);
     }
 
     KLocalizedString::setApplicationDomain("kontainer");
-    QApplication::setOrganizationName(QStringLiteral("DenysMb"));
-    QApplication::setOrganizationDomain(QStringLiteral("io.github.DenysMb"));
-    QApplication::setApplicationName(QStringLiteral("Kontainer"));
-    QApplication::setDesktopFileName(QStringLiteral("io.github.DenysMb.Kontainer"));
+    QApplication::setOrganizationName(u"DenysMb"_s);
+    QApplication::setOrganizationDomain(u"io.github.DenysMb"_s);
+    QApplication::setApplicationName(u"Kontainer"_s);
+    QApplication::setDesktopFileName(u"io.github.DenysMb.Kontainer"_s);
 
     KAboutData aboutData(
         // The program name used internally.
-        QStringLiteral("kontainer"),
+        u"kontainer"_s,
         // A displayable program name string.
         i18nc("@title", "Kontainer"),
         // The program version string.
@@ -42,18 +44,18 @@ int main(int argc, char *argv[])
         i18n("Denys Madureira (c) 2025"));
     aboutData.addAuthor(i18nc("@info:credit", "Denys Madureira"),
                         i18nc("@info:credit", "Author"),
-                        QStringLiteral("denysmb@zoho.com"),
-                        QStringLiteral("https://github.com/DenysMb/Kontainer"));
+                        u"denysmb@zoho.com"_s,
+                        u"https://github.com/DenysMb/Kontainer"_s);
     aboutData.setTranslator(i18nc("NAME OF TRANSLATORS", "Your names"), i18nc("EMAIL OF TRANSLATORS", "Your emails"));
     KAboutData::setApplicationData(aboutData);
 
-    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("io.github.DenysMb.Kontainer")));
+    QGuiApplication::setWindowIcon(QIcon::fromTheme(u"io.github.DenysMb.Kontainer"_s));
 
     QQmlApplicationEngine engine;
 
     // Create and register the DistroboxManager instance
     DistroboxManager *distroBoxManager = new DistroboxManager(&engine);
-    engine.rootContext()->setContextProperty(QStringLiteral("distroBoxManager"), distroBoxManager);
+    engine.rootContext()->setContextProperty(u"distroBoxManager"_s, distroBoxManager);
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.loadFromModule("io.github.DenysMb.Kontainer", "Main");
