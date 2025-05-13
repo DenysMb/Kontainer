@@ -17,12 +17,12 @@ Kirigami.ApplicationWindow {
         isMenu: true
         actions: [
             Kirigami.Action {
-                text: "Create Container"
+                text: "Create Container…"
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
             Kirigami.Action {
-                text: "Create distrobox shortcut"
+                text: "Create Distrobox Shortcut…"
                 icon.name: "document-new"
                 enabled: mainPage.containersList.length > 0
                 onTriggered: shortcutDialog.open()
@@ -31,12 +31,12 @@ Kirigami.ApplicationWindow {
                 separator: true
             },
             Kirigami.Action {
-                text: "Distrobox documentation"
+                text: "Open Distrobox Documentation"
                 icon.name: "help-contents"
                 onTriggered: Qt.openUrlExternally("https://distrobox.it/#distrobox")
             },
             Kirigami.Action {
-                text: "Distrobox useful tips"
+                text: "Open Distrobox Useful Tips"
                 icon.name: "help-hint"
                 onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
             }
@@ -75,7 +75,7 @@ Kirigami.ApplicationWindow {
         
         actions: [
             Kirigami.Action {
-                text: "Create"
+                text: "Create…"
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
@@ -150,7 +150,7 @@ Kirigami.ApplicationWindow {
                                     icon.color: Kirigami.Theme.negativeTextColor
                                     
                                     Controls.ToolTip {
-                                        text: "Remove container"
+                                        text: "Remove Container"
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -165,7 +165,7 @@ Kirigami.ApplicationWindow {
                                     icon.name: "system-software-update"
                                     
                                     Controls.ToolTip {
-                                        text: "Upgrade container"
+                                        text: "Upgrade Container"
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -179,7 +179,7 @@ Kirigami.ApplicationWindow {
                                     icon.name: "install-symbolic"
                                     
                                     Controls.ToolTip {
-                                        text: "Install package file"
+                                        text: "Install Package"
                                         visible: parent.hovered
                                         delay: 500
                                     }
@@ -195,7 +195,7 @@ Kirigami.ApplicationWindow {
                                     icon.name: "utilities-terminal-symbolic"
                                     
                                     Controls.ToolTip {
-                                        text: "Open terminal"
+                                        text: "Open Terminal"
                                         visible: parent.hovered
                                         delay: 500
                                     }

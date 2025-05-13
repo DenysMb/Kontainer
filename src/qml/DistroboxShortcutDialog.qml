@@ -32,15 +32,15 @@ Kirigami.Dialog {
         }
         
         Controls.Label {
-            text: "Or select a specific container:"
-            visible: !allCheckbox.checked
+            text: "Or, select a specific container:"
+            enabled: !allCheckbox.checked
         }
         
         Controls.ComboBox {
             id: containerCombo
             model: shortcutDialog.containersList
             textRole: "name"
-            visible: !allCheckbox.checked
+            enabled: !allCheckbox.checked
             Layout.fillWidth: true
             onCurrentIndexChanged: {
                 if (currentIndex >= 0) {

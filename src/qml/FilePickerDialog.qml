@@ -3,7 +3,7 @@ import QtQuick.Dialogs
 
 FileDialog {
     id: packageFileDialog
-    title: "Choose Package File"
+    title: "Choose Package"
     nameFilters: ["Package files (*.deb *.rpm *.pkg.tar.zst *.apk *.xbps)"]
     
     property string containerName
