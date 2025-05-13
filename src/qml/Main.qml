@@ -130,87 +130,68 @@ Kirigami.ApplicationWindow {
                             Layout.margins: Kirigami.Units.smallSpacing
                             
                             ColumnLayout {
-                                Layout.fillWidth: true
                                 spacing: 0
+                                Layout.maximumWidth: implicitWidth
                                 
                                 Controls.Label {
                                     text: modelData.name.charAt(0).toUpperCase() + modelData.name.slice(1)
-                                    Layout.fillWidth: true
                                     elide: Text.ElideRight
+                                    Layout.fillWidth: true
                                     font.bold: true
                                 }
                                 
                                 Controls.Label {
                                     text: modelData.image
-                                    Layout.fillWidth: true
                                     elide: Text.ElideRight
+                                    Layout.fillWidth: true
                                     font.pointSize: Kirigami.Theme.smallFont.pointSize
                                     opacity: 0.7
                                 }
                             }
-                            
-                            RowLayout {
+
+                            Kirigami.ActionToolBar {
+                                id: actionToolBar
+                                
+                                Layout.fillWidth: true
                                 spacing: Kirigami.Units.smallSpacing
 
-                                Controls.Button {
-                                    icon.name: "delete"
-                                    icon.color: Kirigami.Theme.negativeTextColor
-                                    
-                                    Controls.ToolTip {
+                                alignment: Qt.AlignRight
+                                display: Controls.Button.IconOnly
+                                flat: false
+
+                                actions: [
+                                    Kirigami.Action {
+                                        icon.name: "delete"
                                         text: "Remove Container"
-                                        visible: parent.hovered
-                                        delay: 500
-                                    }
-                                    
-                                    onClicked: {
-                                        removeDialog.containerName = modelData.name
-                                        removeDialog.open()
-                                    }
-                                }
-                                
-                                Controls.Button {
-                                    icon.name: "system-software-update"
-                                    
-                                    Controls.ToolTip {
+                                        onTriggered: {
+                                            removeDialog.containerName = modelData.name
+                                            removeDialog.open()
+                                        }
+                                    },
+                                    Kirigami.Action {
+                                        icon.name: "system-software-update"
                                         text: "Upgrade Container"
-                                        visible: parent.hovered
-                                        delay: 500
-                                    }
-                                    
-                                    onClicked: {
-                                        distroBoxManager.upgradeContainer(modelData.name)
-                                    }
-                                }
-                                
-                                Controls.Button {
-                                    icon.name: "install-symbolic"
-                                    
-                                    Controls.ToolTip {
+                                        onTriggered: {
+                                            distroBoxManager.upgradeContainer(modelData.name)
+                                        }
+                                    },
+                                    Kirigami.Action {
+                                        icon.name: "install-symbolic"
                                         text: "Install Package"
-                                        visible: parent.hovered
-                                        delay: 500
-                                    }
-                                    
-                                    onClicked: {
-                                        packageFileDialog.containerName = modelData.name
-                                        packageFileDialog.containerImage = modelData.image
-                                        packageFileDialog.open()
-                                    }
-                                }
-                                
-                                Controls.Button {
-                                    icon.name: "utilities-terminal-symbolic"
-                                    
-                                    Controls.ToolTip {
+                                        onTriggered: {
+                                            packageFileDialog.containerName = modelData.name
+                                            packageFileDialog.containerImage = modelData.image
+                                            packageFileDialog.open()
+                                        }
+                                    },
+                                    Kirigami.Action {
+                                        icon.name: "utilities-terminal-symbolic"
                                         text: "Open Terminal"
-                                        visible: parent.hovered
-                                        delay: 500
+                                        onTriggered: {
+                                            distroBoxManager.enterContainer(modelData.name)
+                                        }
                                     }
-                                    
-                                    onClicked: {
-                                        distroBoxManager.enterContainer(modelData.name)
-                                    }
-                                }
+                                ]
                             }
                         }
                     }
