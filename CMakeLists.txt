@@ -48,6 +48,8 @@ ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
 ecm_find_qmlmodule(org.kde.kirigamiaddons.formcard 1.0)
 
 qt_policy(SET QTP0001 NEW)
+set(QT_QML_GENERATE_QMLLS_INI ON)
+
 add_subdirectory(src)
 
 # Install desktop file
