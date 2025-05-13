@@ -9,4 +9,4 @@ Type=Application
 Terminal=false
 Categories=Utility
 Keywords=container;podman;distrobox;
-Comment="A Graphical Interface For Managing Distroboxes
+Comment=Manage Distrobox containers

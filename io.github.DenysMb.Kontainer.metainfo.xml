@@ -3,7 +3,7 @@
   <id>io.github.DenysMb.Kontainer</id>
 
   <name>Kontainer</name>
-  <summary>A simple Kirigami GUI for Distrobox</summary>
+  <summary>Manage Distrobox containers</summary>
 
   <developer id="io.github.denysmb">
     <name>Denys Madureira</name>

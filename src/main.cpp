@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
         // The program version string.
         QStringLiteral(KONTAINER_VERSION_STRING),
         // Short description of what the app does.
-        i18n("Manage Distrobox containers."),
+        i18n("Manage Distrobox containers"),
         // The license this code is released under.
         KAboutLicense::GPL_V3,
         // Copyright Statement.
