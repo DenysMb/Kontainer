@@ -12,7 +12,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: removeDialog
-    title: i18n("Remove Container")
+    title: i18n("Remove container")
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Yes | Kirigami.Dialog.No
 
@@ -26,7 +26,7 @@ Kirigami.Dialog {
                 var result = distroBoxManager.listContainers()
                 mainPage.containersList = JSON.parse(result)
             } else {
-                errorDialog.text = i18n("Failed to remove container.")
+                errorDialog.text = i18n("Failed to remove container")
                 errorDialog.open()
             }
         }

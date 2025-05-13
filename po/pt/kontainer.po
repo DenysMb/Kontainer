@@ -1,0 +1,153 @@
+# Portuguese translations for Kontainer package.
+# Copyright (C) 2025 This file is copyright:
+# This file is distributed under the same license as the Kontainer package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kontainer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-12 21:26+0100\n"
+"PO-Revision-Date: 2025-05-12 21:26+0100\n"
+"Last-Translator: Denys Madureira <denysmb@zoho.com>\n"
+"Language-Team: Portuguese <kde-i18n-pt@kde.org>\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/qml/FilePickerDialog.qml:6
+msgid "Choose package file"
+msgstr "Escolher arquivo"
+
+#: src/qml/DistroboxCreateDialog.qml:9
+msgid "Create new container"
+msgstr "Criar novo container"
+
+#: src/qml/DistroboxCreateDialog.qml:64
+msgid "Name and Image fields are required"
+msgstr "Os campos Nome e Imagem são obrigatórios."
+
+#: src/qml/DistroboxCreateDialog.qml:83
+msgid "Name"
+msgstr "Nome"
+
+#: src/qml/DistroboxCreateDialog.qml:84
+msgid "Fedora"
+msgstr "Fedora"
+
+#: src/qml/DistroboxCreateDialog.qml:90
+msgid "Image"
+msgstr "Imagem"
+
+#: src/qml/DistroboxCreateDialog.qml:124
+msgid "Arguments"
+msgstr "Argumentos"
+
+#: src/qml/DistroboxCreateDialog.qml:125
+msgid "--home=/path/to/home (optional)"
+msgstr "--home=/caminho/para/home (opcional)"
+
+#: src/qml/DistroboxCreateDialog.qml:141
+msgid "Command preview"
+msgstr "Prévia do comando"
+
+#: src/qml/DistroboxCreateDialog.qml:173
+msgid "Creating container..."
+msgstr "Criando container..."
+
+#: src/qml/DistroboxRemoveDialog.qml:8
+msgid "Remove container"
+msgstr "Remover container"
+
+#: src/qml/DistroboxRemoveDialog.qml:22
+msgid "Failed to remove container"
+msgstr "Falha ao remover container"
+
+#: src/qml/DistroboxRemoveDialog.qml:33
+msgid "Are you sure you want to remove this container?"
+msgstr "Tem certeza que deseja remover este container?"
+
+#: src/qml/DistroboxRemoveDialog.qml:39
+msgid "Container: %1"
+msgstr "Container: %1"
+
+#: src/qml/DistroboxRemoveDialog.qml:45
+msgid "This action cannot be undone"
+msgstr "Esta ação não pode ser desfeita"
+
+#: src/qml/DistroboxShortcutDialog.qml:8
+msgid "Create distrobox shortcuts"
+msgstr "Criar atalhos do distrobox"
+
+#: src/qml/DistroboxShortcutDialog.qml:28
+msgid "Create shortcuts for all containers"
+msgstr "Criar atalhos para todos os containers"
+
+#: src/qml/DistroboxShortcutDialog.qml:34
+msgid "Or select a specific container"
+msgstr "Ou selecione um container específico"
+
+#: src/qml/ErrorDialog.qml:8
+msgid "Error"
+msgstr "Erro"
+
+#: src/qml/ErrorDialog.qml:12
+msgid ""
+"Failed to create container.\n"
+"Please check your inputs and try again."
+msgstr ""
+"Falha ao criar container.\n"
+"Por favor, verifique os campos de texto e tente novamente."
+
+#: src/qml/Main.qml:20
+msgid "Kontainer"
+msgstr "Kontainer"
+
+#: src/qml/Main.qml:27
+msgid "Create container"
+msgstr "Criar container"
+
+#: src/qml/Main.qml:32
+msgid "Create distrobox shortcut"
+msgstr "Criar atalho do distrobox"
+
+#: src/qml/Main.qml:41
+msgid "Distrobox documentation"
+msgstr "Documentação do Distrobox"
+
+#: src/qml/Main.qml:46
+msgid "Distrobox useful tips"
+msgstr "Dicas úteis do Distrobox"
+
+#: src/qml/Main.qml:85
+msgid "Create"
+msgstr "Criar"
+
+#: src/qml/Main.qml:90
+msgid "Refresh"
+msgstr "Atualizar"
+
+#: src/qml/Main.qml:112
+msgid "Distrobox containers"
+msgstr "Containers do Distrobox"
+
+#: src/qml/Main.qml:166
+msgid "Remove container"
+msgstr "Remover container"
+
+#: src/qml/Main.qml:181
+msgid "Upgrade container"
+msgstr "Atualizar container"
+
+#: src/qml/Main.qml:195
+msgid "Install package file"
+msgstr "Instalar arquivo"
+
+#: src/qml/Main.qml:211
+msgid "Open terminal"
+msgstr "Abrir terminal"
+
+#: src/qml/Main.qml:228
+msgid "No containers found"
+msgstr "Nenhum container encontrado"

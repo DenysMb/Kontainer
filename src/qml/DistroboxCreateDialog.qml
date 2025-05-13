@@ -13,7 +13,7 @@ import org.kde.kirigami.templates.private as KT
 
 Kirigami.Dialog {
     id: createDialog
-    title: i18n("Create New Container")
+    title: i18n("Create new container")
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     
@@ -61,7 +61,7 @@ Kirigami.Dialog {
             // Use a timer to allow the UI to update before starting the creation process
             createTimer.start()
         } else {
-            errorDialog.text = i18n("Name and Image fields are required.")
+            errorDialog.text = i18n("Name and Image fields are required")
             errorDialog.open()
         }
     }
@@ -138,7 +138,7 @@ Kirigami.Dialog {
             spacing: Kirigami.Units.smallSpacing
             
             Controls.Label {
-                text: i18n("Command preview:")
+                text: i18n("Command preview")
                 font.bold: true
             }
             
