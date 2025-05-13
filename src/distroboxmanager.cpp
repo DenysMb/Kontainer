@@ -18,6 +18,8 @@
 
 using namespace Qt::Literals::StringLiterals;
 
+using namespace Qt::Literals::StringLiterals;
+
 // Constructor: Initializes the manager and populates available images lists
 DistroboxManager::DistroboxManager(QObject *parent)
     : QObject(parent)
