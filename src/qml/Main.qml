@@ -72,7 +72,7 @@ Kirigami.ApplicationWindow {
     FilePickerDialog {
         id: packageFileDialog
     }
-
+    
     // Set the first page that will be loaded when the app opens
     // This can also be set to an id of a Kirigami.Page
     pageStack.initialPage: Kirigami.Page {
@@ -221,12 +221,16 @@ Kirigami.ApplicationWindow {
                         }
                     }
                 }
-                
-                Controls.Label {
+
+                Kirigami.PlaceholderMessage {
                     anchors.centerIn: parent
                     visible: containersListView.count === 0
-                    text: "No containers found"
-                    font.italic: true
+                    text: "No containers found. Create a new container now?"
+                    helpfulAction: Kirigami.Action {
+                        text: "Create Container"
+                        icon.name: "list-add"
+                        onTriggered: createDialog.open()
+                    }
                 }
             }
         }
