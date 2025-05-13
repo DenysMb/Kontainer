@@ -65,12 +65,20 @@ Kirigami.ApplicationWindow {
         id: packageFileDialog
     }
     
-    pageStack.initialPage: Kirigami.Page {
+    pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
         spacing: Kirigami.Units.smallSpacing
 
         title: "Distrobox Containers"
         
+        supportsRefreshing: true
+        onRefreshingChanged: {
+            if (refreshing) {
+                var result = distroBoxManager.listContainers()
+                mainPage.containersList = JSON.parse(result)
+            }
+        }
+
         property var containersList: []
         
         actions: [
