@@ -3,6 +3,7 @@
 #include <QtQml>
 #include <QUrl>
 #include <QQuickStyle>
+#include <QIcon>
 #include <KLocalizedContext>
 #include <KLocalizedString>
 #include <KIconTheme>
@@ -23,6 +24,8 @@ int main(int argc, char *argv[])
     {
         QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
     }
+
+    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("io.github.DenysMb.Kontainer")));
 
     QQmlApplicationEngine engine;
 
