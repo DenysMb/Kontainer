@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+# SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 cmake_minimum_required(VERSION 3.20)
 project(kontainer VERSION 1.0.0)
 
