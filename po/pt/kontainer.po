@@ -56,7 +56,7 @@ msgstr "Prévia do comando"
 msgid "Creating container..."
 msgstr "Criando container..."
 
-#: src/qml/DistroboxRemoveDialog.qml:8
+#: src/qml/DistroboxRemoveDialog.qml:8 src/qml/Main.qml:166
 msgid "Remove container"
 msgstr "Remover container"
 
@@ -131,10 +131,6 @@ msgstr "Atualizar"
 #: src/qml/Main.qml:112
 msgid "Distrobox containers"
 msgstr "Containers do Distrobox"
-
-#: src/qml/Main.qml:166
-msgid "Remove container"
-msgstr "Remover container"
 
 #: src/qml/Main.qml:181
 msgid "Upgrade container"
