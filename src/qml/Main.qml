@@ -67,6 +67,9 @@ Kirigami.ApplicationWindow {
     
     pageStack.initialPage: Kirigami.Page {
         id: mainPage
+        spacing: Kirigami.Units.smallSpacing
+
+        title: "Distrobox Containers"
         
         property var containersList: []
         
@@ -96,12 +99,6 @@ Kirigami.ApplicationWindow {
             anchors.fill: parent
             anchors.margins: Kirigami.Units.largeSpacing
             spacing: Kirigami.Units.largeSpacing
-            
-            Kirigami.Heading {
-                Layout.alignment: Qt.AlignHCenter
-                text: "Distrobox Containers"
-                level: 2
-            }
             
             Kirigami.CardsListView {
                 id: containersListView
