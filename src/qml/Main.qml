@@ -68,6 +68,7 @@ Kirigami.ApplicationWindow {
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
         spacing: Kirigami.Units.smallSpacing
+        padding: Kirigami.Units.smallSpacing
 
         title: "Distrobox Containers"
         
@@ -130,13 +131,14 @@ Kirigami.ApplicationWindow {
                             Layout.margins: Kirigami.Units.smallSpacing
                             
                             ColumnLayout {
-                                spacing: 0
+                                spacing: Kirigami.Units.smallSpacing
                                 Layout.maximumWidth: implicitWidth
                                 
                                 Controls.Label {
                                     text: modelData.name.charAt(0).toUpperCase() + modelData.name.slice(1)
                                     elide: Text.ElideRight
                                     Layout.fillWidth: true
+                                    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
                                     font.bold: true
                                 }
                                 
