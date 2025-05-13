@@ -251,6 +251,24 @@ Kirigami.ApplicationWindow {
                 Component.onCompleted: {
                     loadingTimer.start()
                 }
+
+                // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh
+                // that the distroboxes are being loaded -- rather than freezing the application.
+                Controls.BusyIndicator {
+                    anchors.centerIn: parent
+                    visible: containersListView.count === 0 && refreshing && !loadingTimer.running
+                }
+
+                // Avoids flickering when distroboxes load quickly.
+                Timer {
+                    id: loadingTimer
+                    interval: 100 // 100ms
+                    repeat: false
+                }
+
+                Component.onCompleted: {
+                    loadingTimer.start()
+                }
             }
         }
     }
