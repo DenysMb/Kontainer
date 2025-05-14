@@ -67,7 +67,9 @@ Kirigami.ApplicationWindow {
                 text: i18n("About Kontainer")
                 icon.name: "io.github.DenysMb.Kontainer"
                 onTriggered: {
-                    root.pageStack.layers.push(aboutPage)
+                    if (root.pageStack.layers.currentItem !== aboutPage) {
+                        root.pageStack.layers.push(aboutPage)
+                    }
                 }
             }
         ]
