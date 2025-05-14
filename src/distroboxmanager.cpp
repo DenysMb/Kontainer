@@ -175,7 +175,8 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString homeDir = QDir::homePath();
     // Run upgrade command and wait for user input before closing
-    QString upgradeCmd = u"distrobox upgrade %1; echo ''; echo 'Press any key to close this terminal…'; read -n 1"_s.arg(name);
+    QString message = i18n("Press any key to close this terminal…");
+    QString upgradeCmd = u"distrobox upgrade %1; echo ''; echo '%2'; read -n 1"_s.arg(name, message);
     QString command = u"konsole --workdir %1 -e bash -c '%2'"_s.arg(homeDir, upgradeCmd);
 
     bool success;
