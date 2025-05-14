@@ -299,8 +299,8 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     // Run installation command in container and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
-    QString fullCmd = u"distrobox enter %1 -- %2; echo ''; echo '%3'; read -n 1"_s.arg(name, installCmd, message);
-    QString command = u"konsole --workdir %1 -e bash -c '%2'"_s.arg(homeDir, fullCmd);
+    QString fullCmd = u"distrobox enter %1 -- %2 && echo '' && echo '%3' && read -n 1"_s.arg(name, installCmd, message);
+    QString command = u"konsole --workdir %1 -e bash -c \"%2\""_s.arg(homeDir, fullCmd);
 
     bool success;
     runCommand(command, success);
