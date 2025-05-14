@@ -1,152 +1,256 @@
-# English translations for Kontainer package.
-# Copyright (C) 2025 This file is copyright:
+# Kontainer translations.
+# Copyright (C) 2025 Kontainer contributors
 # This file is distributed under the same license as the Kontainer package.
-# Denys Madureira <denysmb@zoho.com>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: kontainer\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 21:26+0100\n"
-"PO-Revision-Date: 2025-05-12 21:26+0100\n"
-"Last-Translator: Denys Madureira <denysmb@zoho.com>\n"
-"Language-Team: English <kde-i18n-en@kde.org>\n"
-"Language: en\n"
+"Project-Id-Version: Kontainer 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/DenysMb/Kontainer \n"
+"POT-Creation-Date: 2025-05-14 12:14+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/qml/FilePickerDialog.qml:6
-msgid "Choose package file"
+#: io.github.DenysMb.Kontainer.desktop:5 src/qml/Main.qml:20
+#, kde-format
+msgid "Kontainer"
 msgstr ""
 
-#: src/qml/DistroboxCreateDialog.qml:9
+#: io.github.DenysMb.Kontainer.desktop:11
+msgid "container;podman;distrobox;"
+msgstr ""
+
+#: io.github.DenysMb.Kontainer.desktop:12 src/main.cpp:46
+#, kde-format
+msgid "Manage Distrobox containers"
+msgstr ""
+
+#: po/rc.cpp:1 src/main.cpp:55 rc.cpp:1
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr ""
+
+#: po/rc.cpp:2 src/main.cpp:55 rc.cpp:2
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr ""
+
+#: src/distroboxmanager.cpp:292
+#, kde-format
+msgid ""
+"Cannot automatically install packages for this distribution. Please enter "
+"the distrobox manually and install it using the appropriate package manager."
+msgstr ""
+
+#: src/distroboxmanager.cpp:300
+#, kde-format
+msgid "Press any key to close this terminal…"
+msgstr ""
+
+#: src/main.cpp:42
+#, kde-format
+msgctxt "@title"
+msgid "Kontainer"
+msgstr ""
+
+#: src/main.cpp:50
+#, kde-format
+msgid "Denys Madureira (c) 2025"
+msgstr ""
+
+#: src/main.cpp:51
+#, kde-format
+msgctxt "@info:credit"
+msgid "Denys Madureira"
+msgstr ""
+
+#: src/main.cpp:52
+#, kde-format
+msgctxt "@info:credit"
+msgid "Author"
+msgstr ""
+
+#: src/qml/DistroboxCreateDialog.qml:16
+#, kde-format
 msgid "Create new container"
 msgstr ""
 
+#: src/qml/DistroboxCreateDialog.qml:46
+#, kde-format
+msgid "Failed to create container. Please check your inputs and try again."
+msgstr ""
+
 #: src/qml/DistroboxCreateDialog.qml:64
+#, kde-format
 msgid "Name and Image fields are required"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:83
+#, kde-format
 msgid "Name"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:84
+#, kde-format
 msgid "Fedora"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:90
+#, kde-format
 msgid "Image"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:124
+#, kde-format
 msgid "Arguments"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:125
+#, kde-format
 msgid "--home=/path/to/home (optional)"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:141
+#, kde-format
 msgid "Command preview"
 msgstr ""
 
 #: src/qml/DistroboxCreateDialog.qml:173
-msgid "Creating container..."
+#, kde-format
+msgid "Creating container…"
 msgstr ""
 
-#: src/qml/DistroboxRemoveDialog.qml:8
+#: src/qml/DistroboxRemoveDialog.qml:15
+#, kde-format
 msgid "Remove container"
 msgstr ""
 
-#: src/qml/DistroboxRemoveDialog.qml:22
+#: src/qml/DistroboxRemoveDialog.qml:29
+#, kde-format
 msgid "Failed to remove container"
 msgstr ""
 
-#: src/qml/DistroboxRemoveDialog.qml:33
-msgid "Are you sure you want to remove this container?"
+#: src/qml/DistroboxRemoveDialog.qml:40
+#, kde-format
+msgid "Are you sure you want to remove %1?"
 msgstr ""
 
-#: src/qml/DistroboxRemoveDialog.qml:39
-msgid "Container: %1"
+#: src/qml/DistroboxRemoveDialog.qml:46
+#, kde-format
+msgid "This action cannot be undone."
 msgstr ""
 
-#: src/qml/DistroboxRemoveDialog.qml:45
-msgid "This action cannot be undone"
+#: src/qml/DistroboxShortcutDialog.qml:19
+#, kde-format
+msgid "Create Distrobox Shortcuts"
 msgstr ""
 
-#: src/qml/DistroboxShortcutDialog.qml:8
-msgid "Create distrobox shortcuts"
-msgstr ""
-
-#: src/qml/DistroboxShortcutDialog.qml:28
+#: src/qml/DistroboxShortcutDialog.qml:38
+#, kde-format
 msgid "Create shortcuts for all containers"
 msgstr ""
 
-#: src/qml/DistroboxShortcutDialog.qml:34
-msgid "Or select a specific container"
+#: src/qml/DistroboxShortcutDialog.qml:48
+#, kde-format
+msgid "Alternatively, select a specific container:"
 msgstr ""
 
-#: src/qml/ErrorDialog.qml:8
+#: src/qml/ErrorDialog.qml:15
+#, kde-format
 msgid "Error"
 msgstr ""
 
-#: src/qml/ErrorDialog.qml:12
+#: src/qml/ErrorDialog.qml:19
+#, kde-format
 msgid ""
 "Failed to create container.\n"
-"Please check your inputs and try again."
+"Please check your input and try again."
 msgstr ""
 
-#: src/qml/Main.qml:20
-msgid "Kontainer"
+#: src/qml/FilePickerDialog.qml:12
+#, kde-format
+msgid "Choose Package"
 msgstr ""
 
-#: src/qml/Main.qml:27
-msgid "Create container"
+#: src/qml/FilePickerDialog.qml:13
+#, kde-format
+msgid "Package files"
 msgstr ""
 
-#: src/qml/Main.qml:32
-msgid "Create distrobox shortcut"
+#: src/qml/Main.qml:40
+#, kde-format
+msgid "Create Container…"
 msgstr ""
 
-#: src/qml/Main.qml:41
-msgid "Distrobox documentation"
+#: src/qml/Main.qml:45
+#, kde-format
+msgid "Create Distrobox Shortcut…"
 msgstr ""
 
-#: src/qml/Main.qml:46
-msgid "Distrobox useful tips"
+#: src/qml/Main.qml:54
+#, kde-format
+msgid "Open Distrobox Documentation"
 msgstr ""
 
-#: src/qml/Main.qml:85
-msgid "Create"
+#: src/qml/Main.qml:59
+#, kde-format
+msgid "Open Distrobox Useful Tips"
 msgstr ""
 
-#: src/qml/Main.qml:90
+#: src/qml/Main.qml:67
+#, kde-format
+msgid "About Kontainer"
+msgstr ""
+
+#: src/qml/Main.qml:103
+#, kde-format
+msgid "Distrobox Containers"
+msgstr ""
+
+#: src/qml/Main.qml:116
+#, kde-format
+msgid "Create…"
+msgstr ""
+
+#: src/qml/Main.qml:121
+#, kde-format
 msgid "Refresh"
 msgstr ""
 
-#: src/qml/Main.qml:112
-msgid "Distrobox containers"
+#: src/qml/Main.qml:191
+#, kde-format
+msgid "Remove Container"
 msgstr ""
 
-#: src/qml/Main.qml:166
-msgid "Remove container"
+#: src/qml/Main.qml:199
+#, kde-format
+msgid "Upgrade Container"
 msgstr ""
 
-#: src/qml/Main.qml:181
-msgid "Upgrade container"
+#: src/qml/Main.qml:206
+#, kde-format
+msgid "Install Package"
 msgstr ""
 
-#: src/qml/Main.qml:195
-msgid "Install package file"
+#: src/qml/Main.qml:215
+#, kde-format
+msgid "Open Terminal"
 msgstr ""
 
-#: src/qml/Main.qml:211
-msgid "Open terminal"
+#: src/qml/Main.qml:229
+#, kde-format
+msgid "No containers found. Create a new container now?"
 msgstr ""
 
-#: src/qml/Main.qml:228
-msgid "No containers found"
+#: src/qml/Main.qml:231
+#, kde-format
+msgid "Create Container"
 msgstr ""

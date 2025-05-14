@@ -5,6 +5,8 @@
 */
 
 #include "distroboxmanager.h"
+#include <KLocalizedContext>
+#include <KLocalizedString>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
@@ -173,7 +175,7 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString homeDir = QDir::homePath();
     // Run upgrade command and wait for user input before closing
-    QString upgradeCmd = u"distrobox upgrade %1; echo ''; echo 'Press any key to close this terminal...'; read -n 1"_s.arg(name);
+    QString upgradeCmd = u"distrobox upgrade %1; echo ''; echo 'Press any key to close this terminal…'; read -n 1"_s.arg(name);
     QString command = u"konsole --workdir %1 -e bash -c '%2'"_s.arg(homeDir, upgradeCmd);
 
     bool success;
@@ -286,8 +288,9 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
         installCmd = u"sudo apk add --allow-untrusted %1"_s.arg(actualPackagePath);
     } else {
         // Show error message if distribution is not recognized
-        QString message =
-            u"Cannot automatically install packages for this distribution. Please enter the distrobox manually and install it using the appropriate package manager."_s;
+        QString message = i18n(
+            "Cannot automatically install packages for this distribution. Please enter the distrobox manually and install it using the appropriate package "
+            "manager.");
         QString command = u"konsole --workdir %1 -e bash -c \"echo '%2'; read -n 1\""_s.arg(homeDir, message);
         bool success;
         runCommand(command, success);
@@ -295,7 +298,8 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
     }
 
     // Run installation command in container and wait for user input before closing
-    QString fullCmd = u"distrobox enter %1 -- %2; echo ''; echo 'Press any key to close this terminal...'; read -n 1"_s.arg(name, installCmd);
+    QString message = i18n("Press any key to close this terminal…");
+    QString fullCmd = u"distrobox enter %1 -- %2; echo ''; echo '%3'; read -n 1"_s.arg(name, installCmd, message);
     QString command = u"konsole --workdir %1 -e bash -c '%2'"_s.arg(homeDir, fullCmd);
 
     bool success;

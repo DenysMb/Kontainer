@@ -16,7 +16,7 @@ Kirigami.Dialog {
     padding: Kirigami.Units.largeSpacing
     implicitWidth: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 20)
 
-    title: "Create Distrobox Shortcuts"
+    title: i18n("Create Distrobox Shortcuts")
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     
     property string selectedContainer: ""
@@ -45,7 +45,7 @@ Kirigami.Dialog {
         }
 
         Controls.Label {
-            text: "Alternatively, select a specific container:"
+            text: i18n("Alternatively, select a specific container:")
             enabled: !allCheckbox.checked
         }
         

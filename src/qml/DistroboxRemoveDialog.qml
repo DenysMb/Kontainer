@@ -37,13 +37,13 @@ Kirigami.Dialog {
         
         Kirigami.Heading {
             level: 4
-            text: "Are you sure you want to remove " + removeDialog.containerName + "?"
+            text: i18n("Are you sure you want to remove %1?", removeDialog.containerName)
             wrapMode: Text.Wrap
             Layout.fillWidth: true
         }
         
         Controls.Label {
-            text: "This action cannot be undone."
+            text: i18n("This action cannot be undone.")
             Layout.fillWidth: true
             wrapMode: Text.Wrap
         }

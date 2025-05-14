@@ -5,6 +5,13 @@
 cmake_minimum_required(VERSION 3.20)
 project(kontainer VERSION 1.0.0)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 set(QT6_MIN_VERSION 6.5.0)
 set(KF6_MIN_VERSION 6.0.0)
 
@@ -53,14 +60,18 @@ set(QT_QML_GENERATE_QMLLS_INI ON)
 qt_policy(SET QTP0001 NEW)
 add_subdirectory(src)
 
-# Install desktop file
-install(PROGRAMS io.github.DenysMb.Kontainer.desktop DESTINATION ${KDE_INSTALL_APPDIR})
-
 # Install metainfo file
 install(FILES io.github.DenysMb.Kontainer.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 
 # Install icon
 install(FILES src/assets/io.github.DenysMb.Kontainer.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
+
+set(TRANSLATION_TARGET_NAME ${PROJECT_NAME})
+add_subdirectory(po)
+ki18n_install(po)
+
+# Install desktop file -- internationalization function can be seen in po/CMakeLists.txt
+install_internationalized_desktop_file(${CMAKE_SOURCE_DIR}/io.github.DenysMb.Kontainer.desktop ${KDE_INSTALL_APPDIR})
 
 file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES src/*.cpp src/*.h)
 kde_clang_format(${ALL_CLANG_FORMAT_SOURCE_FILES})

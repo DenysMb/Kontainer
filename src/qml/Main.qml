@@ -17,7 +17,7 @@ Kirigami.ApplicationWindow {
     width: 600
     height: 500
 
-    title: "Kontainer"
+    title: i18n("Kontainer")
 
     About { 
         id: aboutPage
@@ -37,12 +37,12 @@ Kirigami.ApplicationWindow {
         isMenu: true
         actions: [
             Kirigami.Action {
-                text: "Create Container…"
+                text: i18n("Create Container…")
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
             Kirigami.Action {
-                text: "Create Distrobox Shortcut…"
+                text: i18n("Create Distrobox Shortcut…")
                 icon.name: "document-new"
                 enabled: mainPage.containersList.length > 0
                 onTriggered: shortcutDialog.open()
@@ -51,12 +51,12 @@ Kirigami.ApplicationWindow {
                 separator: true
             },
             Kirigami.Action {
-                text: "Open Distrobox Documentation"
+                text: i18n("Open Distrobox Documentation")
                 icon.name: "help-contents"
                 onTriggered: Qt.openUrlExternally("https://distrobox.it/#distrobox")
             },
             Kirigami.Action {
-                text: "Open Distrobox Useful Tips"
+                text: i18n("Open Distrobox Useful Tips")
                 icon.name: "help-hint"
                 onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
             },
@@ -64,7 +64,7 @@ Kirigami.ApplicationWindow {
                 separator: true
             },
             Kirigami.Action {
-                text: "About Kontainer"
+                text: i18n("About Kontainer")
                 icon.name: "io.github.DenysMb.Kontainer"
                 onTriggered: {
                     root.pageStack.layers.push(aboutPage)
@@ -100,7 +100,7 @@ Kirigami.ApplicationWindow {
         spacing: Kirigami.Units.smallSpacing
         padding: Kirigami.Units.smallSpacing
 
-        title: "Distrobox Containers"
+        title: i18n("Distrobox Containers")
         
         supportsRefreshing: true
         onRefreshingChanged: {
@@ -113,7 +113,7 @@ Kirigami.ApplicationWindow {
         
         actions: [
             Kirigami.Action {
-                text: "Create…"
+                text: i18n("Create…")
                 icon.name: "list-add"
                 onTriggered: createDialog.open()
             },
@@ -188,7 +188,7 @@ Kirigami.ApplicationWindow {
                                 actions: [
                                     Kirigami.Action {
                                         icon.name: "delete"
-                                        text: "Remove Container"
+                                        text: i18n("Remove Container")
                                         onTriggered: {
                                             removeDialog.containerName = modelData.name
                                             removeDialog.open()
@@ -196,14 +196,14 @@ Kirigami.ApplicationWindow {
                                     },
                                     Kirigami.Action {
                                         icon.name: "system-software-update"
-                                        text: "Upgrade Container"
+                                        text: i18n("Upgrade Container")
                                         onTriggered: {
                                             distroBoxManager.upgradeContainer(modelData.name)
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "install-symbolic"
-                                        text: "Install Package"
+                                        text: i18n("Install Package")
                                         onTriggered: {
                                             packageFileDialog.containerName = modelData.name
                                             packageFileDialog.containerImage = modelData.image
@@ -212,7 +212,7 @@ Kirigami.ApplicationWindow {
                                     },
                                     Kirigami.Action {
                                         icon.name: "utilities-terminal-symbolic"
-                                        text: "Open Terminal"
+                                        text: i18n("Open Terminal")
                                         onTriggered: {
                                             distroBoxManager.enterContainer(modelData.name)
                                         }
@@ -226,30 +226,12 @@ Kirigami.ApplicationWindow {
                 Kirigami.PlaceholderMessage {
                     anchors.centerIn: parent
                     visible: containersListView.count === 0 && !refreshing
-                    text: "No containers found. Create a new container now?"
+                    text: i18n("No containers found. Create a new container now?")
                     helpfulAction: Kirigami.Action {
-                        text: "Create Container"
+                        text: i18n("Create Container")
                         icon.name: "list-add"
                         onTriggered: createDialog.open()
                     }
-                }
-
-                // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh
-                // that the distroboxes are being loaded -- rather than freezing the application.
-                Controls.BusyIndicator {
-                    anchors.centerIn: parent
-                    visible: containersListView.count === 0 && refreshing && !loadingTimer.running
-                }
-
-                // Avoids flickering when distroboxes load quickly.
-                Timer {
-                    id: loadingTimer
-                    interval: 100 // 100ms
-                    repeat: false
-                }
-
-                Component.onCompleted: {
-                    loadingTimer.start()
                 }
 
                 // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh

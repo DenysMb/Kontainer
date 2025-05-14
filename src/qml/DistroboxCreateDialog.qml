@@ -43,7 +43,7 @@ Kirigami.Dialog {
                 argsField.text = ""
                 createDialog.close()
             } else {
-                errorDialog.text = "Failed to create container. Please check your inputs and try again."
+                errorDialog.text = i18n("Failed to create container. Please check your inputs and try again.")
                 errorDialog.open()
             }
         }
@@ -144,8 +144,8 @@ Kirigami.Dialog {
             
             Controls.Label {
                 Layout.fillWidth: true
-                text: "distrobox create --name " + (nameField.text || "...") + 
-                      " --image " + (imageField.fullImageName || imageField.currentText || "...") + 
+                text: "distrobox create --name " + (nameField.text || "…") + 
+                      " --image " + (imageField.fullImageName || imageField.currentText || "…") + 
                       (argsField.text ? " " + argsField.text : "")
                 wrapMode: Text.Wrap
                 font.family: "monospace"
@@ -170,7 +170,7 @@ Kirigami.Dialog {
                 }
                 
                 Controls.Label {
-                    text: i18n("Creating container...")
+                    text: i18n("Creating container…")
                 }
             }
         }
