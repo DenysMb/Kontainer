@@ -43,7 +43,7 @@ Kirigami.Dialog {
                 argsField.text = ""
                 createDialog.close()
             } else {
-                errorDialog.text = i18n("Failed to create container. Please check your inputs and try again.")
+                errorDialog.text = i18n("Failed to create container. Please check your input and try again.")
                 errorDialog.open()
             }
         }
@@ -76,7 +76,6 @@ Kirigami.Dialog {
         Kirigami.FormLayout {
             Layout.fillWidth: true
             enabled: !createDialog.isCreating
-            //wideMode: false
             
             Controls.TextField {
                 id: nameField
