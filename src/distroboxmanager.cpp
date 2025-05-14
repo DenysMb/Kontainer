@@ -40,13 +40,11 @@ QString DistroboxManager::runCommand(const QString &command, bool &success) cons
     }
 
     QString output;
-    bool finished = false;
 
     QProcess *process = new QProcess();
     connect(process, &QProcess::finished, this, [&](int exitCode, QProcess::ExitStatus) {
         output = QString::fromUtf8(process->readAllStandardOutput());
         success = (exitCode == 0);
-        finished = true;
     });
 
     process->start(u"sh"_s, QStringList() << QLatin1String("-c") << actualCommand);
