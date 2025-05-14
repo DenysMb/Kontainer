@@ -64,10 +64,16 @@
       </description>
     </release>
 
-  <release version="1.0.0" date="2025-05-11">
-    <description>
-      <p>Initial release</p>
-    </description>
-  </release>
-</releases>
+    <release version="1.0.1" date="2025-05-13">
+      <description>
+        <p>Added translation support and portuguese translation</p>
+      </description>
+    </release>
+
+    <release version="1.0.0" date="2025-05-11">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
 </component>
