@@ -11,7 +11,7 @@ msgstr ""
 "POT-Creation-Date: 2025-05-14 13:37+0000\n"
 "PO-Revision-Date: 2025-05-15 11:24+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
-"Language-Team: English <kde-i18n-en@kde.org>\n"
+"Language-Team: Dutch\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -210,7 +210,7 @@ msgstr "Distrobox-documentatie openen"
 #: src/qml/Main.qml:59
 #, kde-format
 msgid "Open Distrobox Useful Tips"
-msgstr "Bekijk nuttige Distrobox-tips"
+msgstr "Nuttige Distrobox-tips"
 
 #: src/qml/Main.qml:67
 #, kde-format
