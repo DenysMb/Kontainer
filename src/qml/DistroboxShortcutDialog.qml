@@ -1,12 +1,22 @@
+/*
+    SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+*/
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
+
 import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: shortcutDialog
-    title: i18n("Create distrobox shortcuts")
+        
     padding: Kirigami.Units.largeSpacing
+    implicitWidth: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 20)
+
+    title: i18n("Create Distrobox Shortcuts")
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     
     property string selectedContainer: ""
@@ -22,24 +32,28 @@ Kirigami.Dialog {
     
     ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
-        
+
         Controls.CheckBox {
             id: allCheckbox
             text: i18n("Create shortcuts for all containers")
             checked: false
             onCheckedChanged: if (checked) containerCombo.currentIndex = -1
         }
-        
+
+        Kirigami.Separator {
+            Layout.fillWidth: true
+        }
+
         Controls.Label {
-            text: i18n("Or select a specific container")
-            visible: !allCheckbox.checked
+            text: i18n("Alternatively, select a specific container:")
+            enabled: !allCheckbox.checked
         }
         
         Controls.ComboBox {
             id: containerCombo
             model: shortcutDialog.containersList
             textRole: "name"
-            visible: !allCheckbox.checked
+            enabled: !allCheckbox.checked
             Layout.fillWidth: true
             onCurrentIndexChanged: {
                 if (currentIndex >= 0) {

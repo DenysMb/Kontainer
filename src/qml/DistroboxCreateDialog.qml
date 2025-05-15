@@ -1,6 +1,13 @@
+/*
+    SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+*/
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
+
 import org.kde.kirigami as Kirigami
 import org.kde.kirigami.templates.private as KT
 
@@ -13,8 +20,6 @@ Kirigami.Dialog {
     width: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 30)
     
     property bool isCreating: false
-    
-    // Reference to the error dialog
     property var errorDialog
     
     // Timer for container creation
@@ -22,13 +27,10 @@ Kirigami.Dialog {
         id: createTimer
         interval: 0
         onTriggered: {
-            // Get the image name - use fullImageName if available, otherwise use currentText
             var imageName = imageField.fullImageName || imageField.currentText;
             
-            // Call the Python function to create the container
             var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text)
             
-            // Reset dialog state
             createDialog.isCreating = false
             createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
             
@@ -41,15 +43,13 @@ Kirigami.Dialog {
                 argsField.text = ""
                 createDialog.close()
             } else {
-                // Show error message
-                errorDialog.text = "Failed to create container. Please check your inputs and try again."
+                errorDialog.text = i18n("Failed to create container. Please check your input and try again.")
                 errorDialog.open()
             }
         }
     }
     
     onAccepted: {
-        // Get the image name - use fullImageName if available, otherwise use currentText
         var imageName = imageField.fullImageName || imageField.currentText;
         
         if (nameField.text && imageName) {
@@ -76,7 +76,6 @@ Kirigami.Dialog {
         Kirigami.FormLayout {
             Layout.fillWidth: true
             enabled: !createDialog.isCreating
-            wideMode: false
             
             Controls.TextField {
                 id: nameField
@@ -144,8 +143,8 @@ Kirigami.Dialog {
             
             Controls.Label {
                 Layout.fillWidth: true
-                text: "distrobox create --name " + (nameField.text || "...") + 
-                      " --image " + (imageField.fullImageName || imageField.currentText || "...") + 
+                text: "distrobox create --name " + (nameField.text || "…") + 
+                      " --image " + (imageField.fullImageName || imageField.currentText || "…") + 
                       (argsField.text ? " " + argsField.text : "")
                 wrapMode: Text.Wrap
                 font.family: "monospace"
@@ -170,7 +169,7 @@ Kirigami.Dialog {
                 }
                 
                 Controls.Label {
-                    text: i18n("Creating container...")
+                    text: i18n("Creating container…")
                 }
             }
         }

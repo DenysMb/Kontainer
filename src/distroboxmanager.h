@@ -1,13 +1,18 @@
+/*
+    SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+*/
+
 #pragma once
 
 #include <QObject>
-#include <QString>
 #include <QProcess>
+#include <QString>
 
 /**
  * @class DistroboxManager
  * @brief Manages interactions with Distrobox containers
- * 
+ *
  * This class provides a Qt-based interface to manage Distrobox containers.
  * It handles container creation, deletion, listing, and various container operations.
  * Distrobox allows running Linux distributions as containers with full integration
@@ -21,7 +26,7 @@ public:
     /**
      * @brief Constructs a DistroboxManager object
      * @param parent The parent QObject (optional)
-     * 
+     *
      * During construction, it initializes the list of available images
      * that can be used to create containers.
      */
@@ -100,8 +105,8 @@ public Q_SLOTS:
     bool isFlatpak() const;
 
 private:
-    QStringList m_availableImages;    ///< List of available container base images
-    QStringList m_fullImageNames;     ///< List of full image names/URLs
+    QStringList m_availableImages; ///< List of available container base images
+    QStringList m_fullImageNames; ///< List of full image names/URLs
 
     /**
      * @brief Executes a shell command and returns its output

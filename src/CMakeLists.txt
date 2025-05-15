@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+# SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 add_executable(kontainer)
 
 ecm_add_qml_module(kontainer
@@ -15,6 +19,7 @@ target_sources(kontainer
 ecm_target_qml_sources(kontainer
     SOURCES
     qml/Main.qml
+    qml/About.qml
     qml/DistroboxCreateDialog.qml
     qml/DistroboxRemoveDialog.qml
     qml/DistroboxShortcutDialog.qml

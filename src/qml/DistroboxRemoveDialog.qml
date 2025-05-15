@@ -1,6 +1,13 @@
+/*
+    SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+*/
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
+
 import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
@@ -30,22 +37,15 @@ Kirigami.Dialog {
         
         Kirigami.Heading {
             level: 4
-            text: i18n("Are you sure you want to remove this container?")
+            text: i18n("Are you sure you want to remove %1?", removeDialog.containerName)
             wrapMode: Text.Wrap
             Layout.fillWidth: true
         }
         
         Controls.Label {
-            text: i18n("Container: %1", removeDialog.containerName)
+            text: i18n("This action cannot be undone.")
             Layout.fillWidth: true
             wrapMode: Text.Wrap
-        }
-        
-        Controls.Label {
-            text: i18n("This action cannot be undone")
-            Layout.fillWidth: true
-            wrapMode: Text.Wrap
-            font.italic: true
         }
     }
 }

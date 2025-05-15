@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+# SPDX-License-Identifier: CC0-1.0
+
 [Desktop Entry]
 Name=Kontainer
 Exec=kontainer
@@ -6,4 +9,4 @@ Type=Application
 Terminal=false
 Categories=Utility
 Keywords=container;podman;distrobox;
-Comment=A Graphical Interface For Managing Distroboxes
+Comment=Manage Distrobox containers
