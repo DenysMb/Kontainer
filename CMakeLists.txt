@@ -71,7 +71,7 @@ add_subdirectory(po)
 ki18n_install(po)
 
 # Install desktop file -- internationalization function can be seen in po/CMakeLists.txt
-install_internationalized_desktop_file(${CMAKE_SOURCE_DIR}/io.github.DenysMb.Kontainer.desktop ${KDE_INSTALL_APPDIR})
+install_i18n_desktop_file(${CMAKE_SOURCE_DIR}/io.github.DenysMb.Kontainer.desktop ${KDE_INSTALL_APPDIR})
 
 file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES src/*.cpp src/*.h)
 kde_clang_format(${ALL_CLANG_FORMAT_SOURCE_FILES})
