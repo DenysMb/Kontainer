@@ -232,7 +232,7 @@ msgstr "Stwórz..."
 #: src/qml/Main.qml:123
 #, kde-format
 msgid "Refresh"
-msgstr "Odświerz"
+msgstr "Odśwież"
 
 #: src/qml/Main.qml:193
 #, kde-format
