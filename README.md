@@ -1,7 +1,7 @@
 # Kontainer
 A simple Kirigami GUI for Distrobox
 
-![Kontainer](https://github.com/user-attachments/assets/219b68f0-f8f6-41c5-9a7c-9ef631e5354e)
+![Kontainer](https://github.com/user-attachments/assets/1273dade-5026-4ffb-b5d1-4f5a332ba0af)
 
 ### Installation:
 
@@ -35,3 +35,5 @@ Those are required even for Flatpak version:
 ![Screenshot_20250508_193644](https://github.com/user-attachments/assets/2fe98ce4-8898-4d3e-a793-021a4af1db4b)
 
 </details>
+
+> Icon by [@Micro856](https://github.com/Micro856). Thank you for the contribution!

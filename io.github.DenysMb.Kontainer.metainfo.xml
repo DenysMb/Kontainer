@@ -54,6 +54,14 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="1.0.5" date="2025-06-01">
+      <description>
+        <p>
+          Added Polish translation.
+        </p>
+      </description>
+    </release>
+
     <release version="1.0.4" date="2025-05-16">
       <description>
         <p>
