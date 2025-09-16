@@ -5,11 +5,11 @@
 # SPDX-FileCopyrightText: 2025 Marcel Mrówka <micro.mail88@gmail.com>
 msgid ""
 msgstr ""
-"Project-Id-Version: Kontainer 1.0.4\n"
+"Project-Id-Version: Kontainer 1.0.3\n"
 "Report-Msgid-Bugs-To: https://github.com/DenysMb/Kontainer \n"
 "POT-Creation-Date: 2025-05-14 13:37+0000\n"
-"PO-Revision-Date: 2025-05-30 14:38+0200\n"
-"Last-Translator: Marcel Mrówka <micro.mail88@gmail.com>\n"
+"PO-Revision-Date: 2025-07-09 10:13+0200\n"
+"Last-Translator: Microwave <micro.mail88@gmail.com>\n"
 "Language-Team: Polish <kde-i18n-doc@kde.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 |"
 "| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 25.04.1\n"
+"X-Generator: Lokalize 25.04.3\n"
 
 #: io.github.DenysMb.Kontainer.desktop:5 src/qml/Main.qml:20
 #, kde-format
@@ -232,7 +232,7 @@ msgstr "Stwórz..."
 #: src/qml/Main.qml:123
 #, kde-format
 msgid "Refresh"
-msgstr "Odświerz"
+msgstr "Odśwież"
 
 #: src/qml/Main.qml:193
 #, kde-format
