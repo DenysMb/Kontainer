@@ -14,6 +14,12 @@ target_sources(kontainer
     main.cpp
     distroboxmanager.cpp
     distroboxmanager.h
+    distroboxcli.cpp
+    distroboxcli.h
+    distrocolors.cpp
+    distrocolors.h
+    packageinstallcommand.cpp
+    packageinstallcommand.h
     terminallauncher.cpp
     terminallauncher.h
 )

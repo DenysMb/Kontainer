@@ -7,8 +7,8 @@
 
 #include <QDir>
 #include <QObject>
-#include <QProcess>
 #include <QString>
+#include <QStringList>
 
 /**
  * @class DistroboxManager
@@ -116,24 +116,4 @@ private:
      * @return true if the terminal was successfully launched, false otherwise
      */
     bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QDir::homePath());
-
-    /**
-     * @brief Executes a shell command and returns its output
-     * @param command Command to execute
-     * @param success Set to true if command succeeded, false otherwise
-     * @return Command output as string
-     */
-    QString runCommand(const QString &command, bool &success) const;
-
-    /**
-     * @brief Gets list of available container images
-     * @return List of available image names
-     */
-    QStringList getAvailableImages() const;
-
-    /**
-     * @brief Gets list of full image names/URLs
-     * @return List of full image names
-     */
-    QStringList getFullImageNames() const;
 };
