@@ -7,6 +7,7 @@
 #include "distroboxmanager.h"
 #include <KLocalizedContext>
 #include <KLocalizedString>
+#include <KShell>
 #include <KTerminalLauncherJob>
 #include <QDir>
 #include <QEventLoop>
@@ -168,7 +169,7 @@ bool DistroboxManager::removeContainer(const QString &name)
 bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
-    QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -n 1"_s.arg(name, message);
+    QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
     QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
@@ -309,20 +310,16 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
         QString message = i18n(
             "Cannot automatically install packages for this distribution. Please enter the distrobox manually and install it using the appropriate package "
             "manager.");
-        QString command = u"konsole --workdir %1 -e bash -c \"echo '%2'; read -n 1\""_s.arg(homeDir, message);
-        bool success;
-        runCommand(command, success);
-        return success;
+        QString script = u"echo "_s + KShell::quoteArg(message) + u"; read -n 1"_s;
+        QString command = u"bash -c "_s + KShell::quoteArg(script);
+        return launchCommandInTerminal(command, homeDir);
     }
 
     // Run installation command in container and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
-    QString fullCmd = u"distrobox enter %1 -- bash -c \"%2 && echo '' && echo '%3' && read -n 1\""_s.arg(name, installCmd, message);
-    QString command = u"konsole --workdir %1 -e bash -c \"%2\""_s.arg(homeDir, fullCmd);
-
-    bool success;
-    runCommand(command, success);
-    return success;
+    QString fullCmd = u"distrobox enter %1 -- bash -c \"%2 && echo '' && echo '%3' && read -s -n 1\""_s.arg(name, installCmd, message);
+    QString command = u"bash -c "_s + KShell::quoteArg(fullCmd);
+    return launchCommandInTerminal(command, homeDir);
 }
 
 bool DistroboxManager::isFlatpak() const
