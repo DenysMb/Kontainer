@@ -5,10 +5,13 @@
 */
 
 #include "distroboxmanager.h"
+#include <KConfigGroup>
+#include <KIO/CommandLauncherJob>
 #include <KLocalizedContext>
 #include <KLocalizedString>
+#include <KService>
+#include <KSharedConfig>
 #include <KShell>
-#include <KTerminalLauncherJob>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
@@ -18,11 +21,78 @@
 #include <QProcess>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QStandardPaths>
 #include <qtimer.h>
 
 using namespace Qt::Literals::StringLiterals;
 
 using namespace Qt::Literals::StringLiterals;
+
+namespace
+{
+struct TerminalLaunchConfig {
+    QString commandLine;
+    QString desktopName;
+    bool valid = false;
+};
+
+TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QString &workingDirectory)
+{
+    TerminalLaunchConfig config;
+
+    const KConfigGroup confGroup(KSharedConfig::openConfig(), QStringLiteral("General"));
+    const QString terminalExec = confGroup.readEntry("TerminalApplication");
+    const QString terminalService = confGroup.readEntry("TerminalService");
+
+    KService::Ptr service;
+    if (!terminalService.isEmpty()) {
+        service = KService::serviceByStorageId(terminalService);
+    } else if (!terminalExec.isEmpty()) {
+        service = KService::Ptr(new KService(QStringLiteral("terminal"), terminalExec, QStringLiteral("utilities-terminal")));
+    }
+
+    if (!service) {
+        service = KService::serviceByStorageId(QStringLiteral("org.kde.konsole"));
+    }
+
+    QString exec;
+    if (service) {
+        config.desktopName = service->desktopEntryName();
+        exec = service->exec();
+    }
+
+    auto useIfAvailable = [&exec](const QString &terminalApp) {
+        if (!QStandardPaths::findExecutable(terminalApp).isEmpty()) {
+            exec = terminalApp;
+            return true;
+        }
+        return false;
+    };
+
+    if (exec.isEmpty()) {
+        if (!useIfAvailable(QStringLiteral("konsole")) && !useIfAvailable(QStringLiteral("xterm"))) {
+            return config;
+        }
+    }
+
+    const bool isKonsole = exec.startsWith(QLatin1String("konsole")) || config.desktopName == QStringLiteral("org.kde.konsole");
+
+    if (isKonsole && !workingDirectory.isEmpty()) {
+        exec += QStringLiteral(" --workdir %1").arg(KShell::quoteArg(workingDirectory));
+    }
+
+    if (!command.isEmpty()) {
+        if (!isKonsole && exec == QLatin1String("xterm")) {
+            exec += QLatin1String(" -hold");
+        }
+        exec += QLatin1String(" -e ") + command;
+    }
+
+    config.commandLine = exec;
+    config.valid = true;
+    return config;
+}
+}
 
 // Constructor: Initializes the manager and populates available images lists
 DistroboxManager::DistroboxManager(QObject *parent)
@@ -177,15 +247,17 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 
 bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory)
 {
-    auto *job = new KTerminalLauncherJob(command, this);
-
-    if (!workingDirectory.isEmpty()) {
-        job->setWorkingDirectory(workingDirectory);
+    const TerminalLaunchConfig config = buildTerminalLaunchConfig(command, workingDirectory);
+    if (!config.valid) {
+        return false;
     }
 
-    if (!job->prepare()) {
-        job->deleteLater();
-        return false;
+    auto *job = new KIO::CommandLauncherJob(config.commandLine, this);
+    if (!config.desktopName.isEmpty()) {
+        job->setDesktopName(config.desktopName);
+    }
+    if (!workingDirectory.isEmpty()) {
+        job->setWorkingDirectory(workingDirectory);
     }
 
     bool success = false;
@@ -221,7 +293,6 @@ QString DistroboxManager::getDistroColor(const QString &image)
                                                {QRegularExpression(u"opensuse|tumbleweed|leap"_s), u"#73ba25"_s},
                                                {QRegularExpression(u"arch|blackarch|ublue-os/arch|bazzite-arch|arch-toolbox"_s), u"#1793d1"_s},
                                                {QRegularExpression(u"centos|rhel|rocky|alma|ubi[789]?/|amazonlinux"_s), u"#262577"_s},
-
                                                // Other distributions
                                                {QRegularExpression(u"gentoo"_s), u"#54487a"_s},
                                                {QRegularExpression(u"alpine"_s), u"#0d597f"_s},
