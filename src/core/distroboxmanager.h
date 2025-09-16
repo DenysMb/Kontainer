@@ -179,5 +179,13 @@ private:
      * @param workingDirectory Directory to start the terminal in (optional)
      * @return true if the terminal was successfully launched, false otherwise
      */
+    bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QString());
+
+    /**
+     * @brief Executes a shell command and returns its output
+     * @param command Command to execute
+     * @param workingDirectory Directory to start the terminal in (optional)
+     * @return true if the terminal was successfully launched, false otherwise
+     */
     bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QDir::homePath());
 };
