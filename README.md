@@ -27,7 +27,7 @@ Those are required even for Flatpak version:
 - Install files inside distroboxes.
 
 
-<summary>Screenshots</summary>
+### Screenshots
 
 ![Screenshot_20250508_193522](https://github.com/user-attachments/assets/3d1204d9-18e0-4c0d-a188-cf8eb1c3adfd)
 ![Screenshot_20250508_193559](https://github.com/user-attachments/assets/61d1deb0-2ee8-47d4-b059-bbf301749e91)
