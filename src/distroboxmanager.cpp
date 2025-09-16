@@ -151,7 +151,7 @@ bool DistroboxManager::createContainer(const QString &name, const QString &image
 bool DistroboxManager::enterContainer(const QString &name)
 {
     const QString command = u"distrobox enter %1"_s.arg(name);
-    return launchCommandInTerminal(command, QDir::homePath());
+    return launchCommandInTerminal(command);
 }
 
 // Removes a container
@@ -171,7 +171,7 @@ bool DistroboxManager::upgradeContainer(const QString &name)
     QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -n 1"_s.arg(name, message);
     QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
 
-    return launchCommandInTerminal(command, QDir::homePath());
+    return launchCommandInTerminal(command);
 }
 
 bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory)
