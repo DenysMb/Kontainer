@@ -54,6 +54,13 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="1.0.6" date="2025-09-16">
+      <description>
+        <p>Respect the user's preferred terminal emulator while keeping Konsole windows open only when needed.</p>
+        <p>Refactored the Distrobox helpers into standalone modules and cleaned up the project structure for easier maintenance.</p>
+        <p>Improved terminal launch flows when installing packages or upgrading containers.</p>
+      </description>
+    </release>
     <release version="1.0.5" date="2025-06-01">
       <description>
         <p>
