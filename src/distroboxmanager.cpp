@@ -5,12 +5,9 @@
 */
 
 #include "distroboxmanager.h"
-#include <KConfigGroup>
-#include <KIO/CommandLauncherJob>
+#include "terminallauncher.h"
 #include <KLocalizedContext>
 #include <KLocalizedString>
-#include <KService>
-#include <KSharedConfig>
 #include <KShell>
 #include <QDir>
 #include <QEventLoop>
@@ -21,78 +18,9 @@
 #include <QProcess>
 #include <QRandomGenerator>
 #include <QRegularExpression>
-#include <QStandardPaths>
 #include <qtimer.h>
 
 using namespace Qt::Literals::StringLiterals;
-
-using namespace Qt::Literals::StringLiterals;
-
-namespace
-{
-struct TerminalLaunchConfig {
-    QString commandLine;
-    QString desktopName;
-    bool valid = false;
-};
-
-TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QString &workingDirectory)
-{
-    TerminalLaunchConfig config;
-
-    const KConfigGroup confGroup(KSharedConfig::openConfig(), QStringLiteral("General"));
-    const QString terminalExec = confGroup.readEntry("TerminalApplication");
-    const QString terminalService = confGroup.readEntry("TerminalService");
-
-    KService::Ptr service;
-    if (!terminalService.isEmpty()) {
-        service = KService::serviceByStorageId(terminalService);
-    } else if (!terminalExec.isEmpty()) {
-        service = KService::Ptr(new KService(QStringLiteral("terminal"), terminalExec, QStringLiteral("utilities-terminal")));
-    }
-
-    if (!service) {
-        service = KService::serviceByStorageId(QStringLiteral("org.kde.konsole"));
-    }
-
-    QString exec;
-    if (service) {
-        config.desktopName = service->desktopEntryName();
-        exec = service->exec();
-    }
-
-    auto useIfAvailable = [&exec](const QString &terminalApp) {
-        if (!QStandardPaths::findExecutable(terminalApp).isEmpty()) {
-            exec = terminalApp;
-            return true;
-        }
-        return false;
-    };
-
-    if (exec.isEmpty()) {
-        if (!useIfAvailable(QStringLiteral("konsole")) && !useIfAvailable(QStringLiteral("xterm"))) {
-            return config;
-        }
-    }
-
-    const bool isKonsole = exec.startsWith(QLatin1String("konsole")) || config.desktopName == QStringLiteral("org.kde.konsole");
-
-    if (isKonsole && !workingDirectory.isEmpty()) {
-        exec += QStringLiteral(" --workdir %1").arg(KShell::quoteArg(workingDirectory));
-    }
-
-    if (!command.isEmpty()) {
-        if (!isKonsole && exec == QLatin1String("xterm")) {
-            exec += QLatin1String(" -hold");
-        }
-        exec += QLatin1String(" -e ") + command;
-    }
-
-    config.commandLine = exec;
-    config.valid = true;
-    return config;
-}
-}
 
 // Constructor: Initializes the manager and populates available images lists
 DistroboxManager::DistroboxManager(QObject *parent)
@@ -247,31 +175,7 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 
 bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory)
 {
-    const TerminalLaunchConfig config = buildTerminalLaunchConfig(command, workingDirectory);
-    if (!config.valid) {
-        return false;
-    }
-
-    auto *job = new KIO::CommandLauncherJob(config.commandLine, this);
-    if (!config.desktopName.isEmpty()) {
-        job->setDesktopName(config.desktopName);
-    }
-    if (!workingDirectory.isEmpty()) {
-        job->setWorkingDirectory(workingDirectory);
-    }
-
-    bool success = false;
-    QEventLoop loop;
-    connect(job, &KJob::result, &loop, [&loop, &success](KJob *finishedJob) {
-        success = finishedJob->error() == KJob::NoError;
-        finishedJob->deleteLater();
-        loop.quit();
-    });
-
-    job->start();
-    loop.exec();
-
-    return success;
+    return TerminalLauncher::launch(command, workingDirectory, this);
 }
 
 // Returns a color associated with the distribution for UI purposes

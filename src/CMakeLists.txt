@@ -14,6 +14,8 @@ target_sources(kontainer
     main.cpp
     distroboxmanager.cpp
     distroboxmanager.h
+    terminallauncher.cpp
+    terminallauncher.h
 )
 
 ecm_target_qml_sources(kontainer
