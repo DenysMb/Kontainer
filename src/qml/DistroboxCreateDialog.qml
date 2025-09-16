@@ -142,7 +142,7 @@ Kirigami.Dialog {
 
             Controls.Label {
                 Layout.fillWidth: true
-                text: "distrobox create --name " + (nameField.text || "…") + " --image " + (imageField.fullImageName || imageField.currentText || "…") + (argsField.text ? " " + argsField.text : "")
+                text: "distrobox create --name " + (nameField.text || "…") + " --image " + (imageField.fullImageName || imageField.currentText || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
                 wrapMode: Text.Wrap
                 font.family: "monospace"
                 font.italic: true

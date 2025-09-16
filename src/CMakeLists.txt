@@ -37,6 +37,7 @@ target_link_libraries(kontainer
     KF6::I18n
     KF6::CoreAddons
     KF6::IconThemes
+    KF6::KIOGui
 )
 
 install(TARGETS kontainer ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

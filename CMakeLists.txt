@@ -48,6 +48,7 @@ find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
     CoreAddons
     QQC2DesktopStyle
     IconThemes
+    KIO
 )
 find_package(KF6 REQUIRED COMPONENTS KirigamiAddons)
 

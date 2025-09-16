@@ -28,8 +28,8 @@
       <em>Container Management</em>: Create new containers from various Linux distributions, delete
       existing containers, upgrade containers and list and view all containers. </p>
     <p>
-      <em>Terminal Integration</em>: Open terminal sessions inside containers using Konsole and
-      execute commands within containers. </p>
+      <em>Terminal Integration</em>: Open terminal sessions inside containers using the system
+      default terminal emulator and execute commands within containers. </p>
     <p>
       <em>Package Management</em>: Install package files inside containers and automatic detection
       of appropriate package managers based on container distribution. </p>

@@ -109,6 +109,14 @@ private:
     QStringList m_fullImageNames; ///< List of full image names/URLs
 
     /**
+     * @brief Launches a command in a terminal window
+     * @param command Command to execute
+     * @param workingDirectory Directory to start the terminal in (optional)
+     * @return true if the terminal was successfully launched, false otherwise
+     */
+    bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QString());
+
+    /**
      * @brief Executes a shell command and returns its output
      * @param command Command to execute
      * @param success Set to true if command succeeded, false otherwise

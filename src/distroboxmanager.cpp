@@ -7,6 +7,7 @@
 #include "distroboxmanager.h"
 #include <KLocalizedContext>
 #include <KLocalizedString>
+#include <KTerminalLauncherJob>
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
@@ -136,7 +137,7 @@ QString DistroboxManager::listAvailableImages()
 bool DistroboxManager::createContainer(const QString &name, const QString &image, const QString &args)
 {
     // Construct distrobox create command
-    QString command = u"distrobox create --name %1 --image %2"_s.arg(name, image);
+    QString command = u"distrobox create --name %1 --image %2 --yes"_s.arg(name, image);
     if (!args.isEmpty()) {
         command += QLatin1Char(' ') + args;
     }
@@ -146,16 +147,11 @@ bool DistroboxManager::createContainer(const QString &name, const QString &image
     return success;
 }
 
-// Opens an interactive shell in the specified container using Konsole
+// Opens an interactive shell in the specified container
 bool DistroboxManager::enterContainer(const QString &name)
 {
-    QString homeDir = QDir::homePath();
-    // Open Konsole and run distrobox enter
-    QString command = u"konsole --workdir %1 -e distrobox enter %2"_s.arg(homeDir, name);
-
-    bool success;
-    runCommand(command, success);
-    return success;
+    const QString command = u"distrobox enter %1"_s.arg(name);
+    return launchCommandInTerminal(command, QDir::homePath());
 }
 
 // Removes a container
@@ -171,14 +167,37 @@ bool DistroboxManager::removeContainer(const QString &name)
 // Upgrades all packages in a container
 bool DistroboxManager::upgradeContainer(const QString &name)
 {
-    QString homeDir = QDir::homePath();
-    // Run upgrade command and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -n 1"_s.arg(name, message);
-    QString command = u"konsole --workdir %1 -e bash -c \"%2\""_s.arg(homeDir, upgradeCmd);
+    QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
 
-    bool success;
-    runCommand(command, success);
+    return launchCommandInTerminal(command, QDir::homePath());
+}
+
+bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory)
+{
+    auto *job = new KTerminalLauncherJob(command, this);
+
+    if (!workingDirectory.isEmpty()) {
+        job->setWorkingDirectory(workingDirectory);
+    }
+
+    if (!job->prepare()) {
+        job->deleteLater();
+        return false;
+    }
+
+    bool success = false;
+    QEventLoop loop;
+    connect(job, &KJob::result, &loop, [&loop, &success](KJob *finishedJob) {
+        success = finishedJob->error() == KJob::NoError;
+        finishedJob->deleteLater();
+        loop.quit();
+    });
+
+    job->start();
+    loop.exec();
+
     return success;
 }
 

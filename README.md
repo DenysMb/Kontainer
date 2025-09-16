@@ -18,7 +18,7 @@ sudo ninja-build -C . install
 ### Requirements:
 Those are required even for Flatpak version:
 - Distrobox
-- Konsole
+- A terminal emulator
 
 ### Functionalities:
 - Create, delete and upgrade distroboxes;
