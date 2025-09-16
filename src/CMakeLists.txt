@@ -12,16 +12,22 @@ ecm_add_qml_module(kontainer
 target_sources(kontainer
     PRIVATE
     main.cpp
-    distroboxmanager.cpp
-    distroboxmanager.h
-    distroboxcli.cpp
-    distroboxcli.h
-    distrocolors.cpp
-    distrocolors.h
-    packageinstallcommand.cpp
-    packageinstallcommand.h
-    terminallauncher.cpp
-    terminallauncher.h
+    core/distroboxmanager.cpp
+    core/distroboxmanager.h
+    core/distroboxcli.cpp
+    core/distroboxcli.h
+    core/packageinstallcommand.cpp
+    core/packageinstallcommand.h
+    core/terminallauncher.cpp
+    core/terminallauncher.h
+    utils/distrocolors.cpp
+    utils/distrocolors.h
+)
+
+target_include_directories(kontainer
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
 )
 
 ecm_target_qml_sources(kontainer
