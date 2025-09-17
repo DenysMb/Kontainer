@@ -13,6 +13,11 @@
 #include <KLocalizedString>
 #include <KShell>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QTextStream>
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -143,4 +148,101 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 bool DistroboxManager::isFlatpak() const
 {
     return DistroboxCli::isFlatpak();
+}
+
+// Find available applications inside a container
+QList<DistroboxManager::AvailableApp> DistroboxManager::availableApps(const QString &container)
+{
+    QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
+    QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
+
+    bool success = false;
+    QString raw = DistroboxCli::runCommand(output, success);
+    QList<AvailableApp> apps;
+
+    if (!success)
+        return apps;
+
+    for (const QString &line : raw.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
+        QFileInfo fi(line);
+        if (!fi.isFile() || !line.endsWith(QStringLiteral(".desktop")))
+            continue;
+
+        QSettings desktop(line, QSettings::IniFormat);
+
+        AvailableApp app;
+        app.basename = fi.baseName();
+        app.name = desktop.value(QStringLiteral("Desktop Entry/Name"), app.basename).toString();
+        app.icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+
+        apps << app;
+    }
+
+    return apps;
+}
+
+// Find already exported applications
+QList<DistroboxManager::ExportedApp> DistroboxManager::exportedApps(const QString &container)
+{
+    QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+    if (DistroboxCli::isFlatpak()) {
+        appsPath = QDir::homePath() + QLatin1String("/.local/share/applications");
+    }
+
+    QList<ExportedApp> apps;
+    QDir dir(appsPath);
+    QStringList patterns;
+    patterns << QStringLiteral("%1-*.desktop").arg(container);
+
+    for (const QFileInfo &file : dir.entryInfoList(patterns, QDir::Files)) {
+        QString fileName = file.fileName();
+        if (!fileName.endsWith(QStringLiteral(".desktop")))
+            continue;
+        fileName.chop(8); // remove ".desktop"
+
+        ExportedApp app;
+        app.basename = fileName.mid(container.length() + 1); // remove prefix "<container>-"
+
+        QSettings desktop(file.filePath(), QSettings::IniFormat);
+        QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), app.basename).toString();
+        app.name = fullName.section(QStringLiteral(" (on "), 0, 0); // strip container suffix
+        app.icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+
+        apps << app;
+    }
+
+    return apps;
+}
+
+// Export an application from container to host
+bool DistroboxManager::exportApp(const QString &basename, const QString &container)
+{
+    QString desktopPath = QLatin1String("/usr/share/applications/") + basename + QLatin1String(".desktop");
+    QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(container, desktopPath);
+    return launchCommandInTerminal(command);
+}
+
+// Unexport an application from host
+bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
+{
+    QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+    if (DistroboxCli::isFlatpak()) {
+        appsPath = QDir::homePath() + QLatin1String("/.local/share/applications");
+    }
+
+    QString fileName = QStringLiteral("%1-%2.desktop").arg(container, basename);
+    QString exportedFile = appsPath + QLatin1Char('/') + fileName;
+
+    if (!QFile::exists(exportedFile))
+        return false;
+
+    if (!QFile::remove(exportedFile))
+        return false;
+
+    // Update desktop database
+    QString command = u"update-desktop-database "_s + KShell::quoteArg(appsPath);
+    bool success;
+    DistroboxCli::runCommand(command, success);
+
+    return success;
 }

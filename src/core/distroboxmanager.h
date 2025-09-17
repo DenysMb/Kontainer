@@ -33,6 +33,18 @@ public:
      */
     explicit DistroboxManager(QObject *parent = nullptr);
 
+    struct ExportedApp {
+        QString basename;
+        QString name;
+        QString icon;
+    };
+
+    struct AvailableApp {
+        QString basename;
+        QString name;
+        QString icon;
+    };
+
 public Q_SLOTS:
     /**
      * @brief Lists all existing Distrobox containers
@@ -104,6 +116,11 @@ public Q_SLOTS:
      * @return true if running as Flatpak, false otherwise
      */
     bool isFlatpak() const;
+
+    QList<AvailableApp> availableApps(const QString &container);
+    QList<ExportedApp> exportedApps(const QString &container);
+    bool exportApp(const QString &basename, const QString &container);
+    bool unexportApp(const QString &basename, const QString &container);
 
 private:
     QStringList m_availableImages; ///< List of available container base images
