@@ -54,6 +54,13 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="1.0.7" date="2025-09-17">
+      <description>
+        <p>Ensure terminal actions keep working when Kontainer runs inside Flatpak by spawning the host terminal appropriately.</p>
+        <p>Use the local checkout as the source in the developer Flatpak manifest to streamline packaging tweaks.</p>
+        <p>Document separate debug and release build workflows for contributors.</p>
+      </description>
+    </release>
     <release version="1.0.6" date="2025-09-16">
       <description>
         <p>Respect the user's preferred terminal emulator while keeping Konsole windows open only when needed.</p>
