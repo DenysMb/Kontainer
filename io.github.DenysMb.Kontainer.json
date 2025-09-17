@@ -1,31 +1,47 @@
 {
-    "app-id": "io.github.DenysMb.Kontainer",
-    "runtime": "org.kde.Platform",
-    "runtime-version": "6.9",
-    "sdk": "org.kde.Sdk",
-    "command": "kontainer",
-    "finish-args": [
-        "--share=ipc",
-        "--socket=fallback-x11",
-        "--socket=wayland",
-        "--device=dri",
-        "--talk-name=org.freedesktop.Flatpak"
-    ],
-    "modules": [
+  "app-id": "io.github.DenysMb.Kontainer",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "6.9",
+  "sdk": "org.kde.Sdk",
+  "command": "kontainer",
+  "finish-args": [
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--device=dri",
+    "--talk-name=org.freedesktop.Flatpak"
+  ],
+  "modules": [
+    {
+      "name": "kirigami-addons",
+      "buildsystem": "cmake-ninja",
+      "config-opts": ["-DBUILD_TESTING=OFF"],
+      "builddir": true,
+      "sources": [
         {
-            "name": "kontainer",
-            "buildsystem": "cmake-ninja",
-            "config-opts": [
-                "-DCMAKE_BUILD_TYPE=Release"
-            ],
-            "sources": [
-                {
-                    "type": "git",
-                    "url": "https://github.com/DenysMb/Kontainer.git",
-                    "tag": "1.0.0",
-                    "commit": "fd7de4b15e846b4ee5c46ff6fa935b9a28771cc6"
-                }
-            ]
+          "type": "archive",
+          "url": "https://download.kde.org/stable/kirigami-addons/kirigami-addons-1.9.0.tar.xz",
+          "sha256": "21314a91f26b1c962def3fd7ff2e762d3358b075f63f4d7e0144fb2c63b7ebc7",
+          "x-checker-data": {
+            "type": "anitya",
+            "project-id": 242933,
+            "stable-only": true,
+            "url-template": "https://download.kde.org/stable/kirigami-addons/kirigami-addons-$version.tar.xz"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "name": "kontainer",
+      "buildsystem": "cmake-ninja",
+      "config-opts": ["-DCMAKE_BUILD_TYPE=Release"],
+      "builddir": true,
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        }
+      ]
+    }
+  ]
 }
