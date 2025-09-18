@@ -4,6 +4,12 @@
     SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
 */
 
+/*
+ *    SPDX-License-Identifier: GPL-3.0-or-later
+ *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ */
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
@@ -33,11 +39,17 @@ Kirigami.ApplicationWindow {
         refreshing = false
     }
 
+    // Shows spinning cursor during async operation
     function showLoading(actionCallback) {
-        var indicator = Qt.createQmlObject('import QtQuick.Controls 2.15; BusyIndicator { running: true; visible: true; anchors.centerIn: parent }', root)
+        var previousCursor = Qt.application.cursorShape
+        Qt.application.cursorShape = Qt.WaitCursor
+
         Qt.callLater(function() {
-            actionCallback()
-            indicator.destroy()
+            try {
+                actionCallback()
+            } finally {
+                Qt.application.cursorShape = previousCursor
+            }
         })
     }
 
@@ -224,11 +236,6 @@ Kirigami.ApplicationWindow {
                         icon.name: "list-add"
                         onTriggered: { createDialog.open() }
                     }
-                }
-
-                Controls.BusyIndicator {
-                    anchors.centerIn: parent
-                    visible: containersListView.count === 0 && refreshing
                 }
             }
         }
