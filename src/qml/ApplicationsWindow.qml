@@ -40,6 +40,14 @@ Kirigami.ApplicationWindow {
         })
     }
 
+    function refreshAppLists() {
+        // Only refresh the lists without showing loading screen
+        Qt.callLater(function() {
+            exportedApps = distroBoxManager.exportedApps(containerName) || []
+            availableApps = distroBoxManager.availableApps(containerName) || []
+        })
+    }
+
     function filterApps(apps) {
         if (!searchText) return apps;
         return apps.filter(function(app) {
@@ -175,7 +183,7 @@ Kirigami.ApplicationWindow {
                                             onClicked: {
                                                 lastOperation = modelData.name || modelData.basename
                                                 var success = distroBoxManager.unexportApp(modelData.basename, containerName)
-                                                if (success) refreshTimer.start()
+                                                if (success) refreshAppLists()
                                                     else { showPassiveNotification(i18n("Failed to unexport application")); lastOperation = "" }
                                             }
                                         }
@@ -267,7 +275,7 @@ Kirigami.ApplicationWindow {
                                             onClicked: {
                                                 lastOperation = modelData.name || modelData.basename
                                                 var success = distroBoxManager.exportApp(modelData.basename, containerName)
-                                                if (success) refreshTimer.start()
+                                                if (success) refreshAppLists()
                                                     else { showPassiveNotification(i18n("Failed to export application")); lastOperation = "" }
                                             }
                                         }
@@ -296,7 +304,7 @@ Kirigami.ApplicationWindow {
                             }
                             lastOperation = i18n("%1 applications", appNames.length)
                             selectedApps = {}
-                            refreshTimer.start()
+                            refreshAppLists()
                         }
                     }
                     Controls.Button { text: i18n("Clear Selection"); icon.name: "edit-clear"; onClicked: selectedApps = {} }
