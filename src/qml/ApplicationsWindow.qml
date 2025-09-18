@@ -20,6 +20,7 @@ Kirigami.ApplicationWindow {
 
     property string containerName: ""
     property bool loading: true
+    property bool operationInProgress: false
     property var exportedApps: []
     property var availableApps: []
     property var selectedApps: ({})
@@ -79,8 +80,8 @@ Kirigami.ApplicationWindow {
     // Simple cogwheel loader without background
     Controls.BusyIndicator {
         anchors.centerIn: parent
-        running: loading
-        visible: loading
+        running: loading || operationInProgress
+        visible: loading || operationInProgress
         width: Kirigami.Units.iconSizes.huge
         height: width
         z: 1000
@@ -91,6 +92,8 @@ Kirigami.ApplicationWindow {
         id: mainContentComponent
 
         Kirigami.Page {
+            id: page
+
             title: applicationsWindow.title
 
             // Global actions for the page (refresh and close)
@@ -109,6 +112,23 @@ Kirigami.ApplicationWindow {
                     shortcut: "Ctrl+W"
                 }
             ]
+
+            header: Controls.ToolBar {
+                contentItem: RowLayout {
+                    Controls.ToolButton {
+                        action: refreshAction
+                        visible: true
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                    }
+                    Controls.ToolButton {
+                        icon.name: "window-close"
+                        text: i18n("Close")
+                        onClicked: applicationsWindow.close()
+                    }
+                }
+            }
 
             Controls.TabBar {
                 id: tabBar
@@ -152,11 +172,6 @@ Kirigami.ApplicationWindow {
                                 }
                                 visible: exportedSearchField.text.length > 0
                             }
-                        }
-
-                        Controls.BusyIndicator {
-                            Layout.alignment: Qt.AlignCenter
-                            visible: false
                         }
 
                         Kirigami.PlaceholderMessage {
@@ -209,11 +224,19 @@ Kirigami.ApplicationWindow {
                                         Controls.Button {
                                             text: i18n("Unexport")
                                             icon.name: "list-remove"
+                                            enabled: !operationInProgress
                                             onClicked: {
-                                                lastOperation = modelData.name || modelData.basename
-                                                var success = distroBoxManager.unexportApp(modelData.basename, containerName)
-                                                if (success) refreshAppLists()
-                                                    else { showPassiveNotification(i18n("Failed to unexport application")); lastOperation = "" }
+                                                operationInProgress = true;
+                                                lastOperation = modelData.name || modelData.basename;
+                                                var success = distroBoxManager.unexportApp(modelData.basename, containerName);
+                                                if (success) {
+                                                    refreshAppLists();
+                                                    operationInProgress = false;
+                                                } else {
+                                                    showPassiveNotification(i18n("Failed to unexport application"));
+                                                    lastOperation = "";
+                                                    operationInProgress = false;
+                                                }
                                             }
                                         }
                                     }
@@ -247,11 +270,6 @@ Kirigami.ApplicationWindow {
                                 }
                                 visible: availableSearchField.text.length > 0
                             }
-                        }
-
-                        Controls.BusyIndicator {
-                            Layout.alignment: Qt.AlignCenter
-                            visible: false
                         }
 
                         Kirigami.PlaceholderMessage {
@@ -305,16 +323,20 @@ Kirigami.ApplicationWindow {
                                         Controls.Button {
                                             text: i18n("Export")
                                             icon.name: "list-add"
+                                            enabled: !operationInProgress
                                             onClicked: {
-                                                lastOperation = modelData.name || modelData.basename
-                                                var success = distroBoxManager.exportApp(modelData.basename, containerName)
+                                                operationInProgress = true;
+                                                lastOperation = modelData.name || modelData.basename;
+                                                var success = distroBoxManager.exportApp(modelData.basename, containerName);
                                                 if (success) {
                                                     // Switch to exported tab after exporting
                                                     tabBar.currentIndex = 0;
                                                     refreshAppLists();
+                                                    operationInProgress = false;
                                                 } else {
                                                     showPassiveNotification(i18n("Failed to export application"));
-                                                    lastOperation = ""
+                                                    lastOperation = "";
+                                                    operationInProgress = false;
                                                 }
                                             }
                                         }
@@ -335,23 +357,34 @@ Kirigami.ApplicationWindow {
                     Controls.Button {
                         text: tabBar.currentIndex === 0 ? i18n("Unexport Selected") : i18n("Export Selected")
                         icon.name: tabBar.currentIndex === 0 ? "list-remove" : "list-add"
+                        enabled: !operationInProgress
                         onClicked: {
-                            var appNames = Object.keys(selectedApps).filter(function(key) { return selectedApps[key] })
+                            operationInProgress = true;
+                            var appNames = Object.keys(selectedApps).filter(function(key) { return selectedApps[key] });
                             for (var i=0; i<appNames.length; i++) {
-                                if (tabBar.currentIndex === 0) distroBoxManager.unexportApp(appNames[i], containerName)
-                                    else distroBoxManager.exportApp(appNames[i], containerName)
+                                if (tabBar.currentIndex === 0) {
+                                    distroBoxManager.unexportApp(appNames[i], containerName);
+                                } else {
+                                    distroBoxManager.exportApp(appNames[i], containerName);
+                                }
                             }
-                            lastOperation = i18n("%1 applications", appNames.length)
-                            selectedApps = {}
+                            lastOperation = i18n("%1 applications", appNames.length);
+                            selectedApps = {};
 
                             // Switch to exported tab if we exported apps
                             if (tabBar.currentIndex === 1) {
                                 tabBar.currentIndex = 0;
                             }
-                            refreshAppLists()
+                            refreshAppLists();
+                            operationInProgress = false;
                         }
                     }
-                    Controls.Button { text: i18n("Clear Selection"); icon.name: "edit-clear"; onClicked: selectedApps = {} }
+                    Controls.Button {
+                        text: i18n("Clear Selection");
+                        icon.name: "edit-clear";
+                        onClicked: selectedApps = {};
+                        enabled: !operationInProgress
+                    }
                 }
             }
         }
