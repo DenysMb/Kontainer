@@ -1,8 +1,8 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
-*/
+ *    SPDX-License-Identifier: GPL-3.0-or-later
+ *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *    SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
+ */
 
 #pragma once
 
@@ -34,16 +34,30 @@ public:
      */
     explicit DistroboxManager(QObject *parent = nullptr);
 
+    /**
+     * @struct ExportedApp
+     * @brief Represents an application exported from a container to the host
+     *
+     * Contains information about the exported application, including
+     * its filesystem basename, display name, and icon name/path.
+     */
     struct ExportedApp {
-        QString basename;
-        QString name;
-        QString icon;
+        QString basename; ///< The binary or executable basename
+        QString name; ///< Display name of the application
+        QString icon; ///< Icon name or path
     };
 
+    /**
+     * @struct AvailableApp
+     * @brief Represents an application available inside a container
+     *
+     * Contains metadata about an application that exists inside a container,
+     * which can potentially be exported to the host system.
+     */
     struct AvailableApp {
-        QString basename;
-        QString name;
-        QString icon;
+        QString basename; ///< The binary or executable basename
+        QString name; ///< Display name of the application
+        QString icon; ///< Icon name or path
     };
 
 public Q_SLOTS:
@@ -119,9 +133,34 @@ public Q_SLOTS:
      */
     bool isFlatpak() const;
 
+    /**
+     * @brief Lists available applications inside the given container
+     * @param container Name of the container
+     * @return QVariantList of AvailableApp structs representing available applications
+     */
     Q_INVOKABLE QVariantList availableApps(const QString &container);
+
+    /**
+     * @brief Lists applications exported from the given container
+     * @param container Name of the container
+     * @return QVariantList of ExportedApp structs representing exported applications
+     */
     Q_INVOKABLE QVariantList exportedApps(const QString &container);
+
+    /**
+     * @brief Exports an application from a container to the host system
+     * @param basename Basename of the application to export
+     * @param container Name of the container
+     * @return true if export was successful, false otherwise
+     */
     Q_INVOKABLE bool exportApp(const QString &basename, const QString &container);
+
+    /**
+     * @brief Removes an exported application from the host system
+     * @param basename Basename of the exported application
+     * @param container Name of the container the application was exported from
+     * @return true if unexport was successful, false otherwise
+     */
     Q_INVOKABLE bool unexportApp(const QString &basename, const QString &container);
 
 private:
