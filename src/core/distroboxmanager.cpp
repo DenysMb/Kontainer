@@ -150,18 +150,17 @@ bool DistroboxManager::isFlatpak() const
     return DistroboxCli::isFlatpak();
 }
 
-// Find available applications inside a container
-QList<DistroboxManager::AvailableApp> DistroboxManager::availableApps(const QString &container)
+QVariantList DistroboxManager::availableApps(const QString &container)
 {
     QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
     QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
 
     bool success = false;
     QString raw = DistroboxCli::runCommand(output, success);
-    QList<AvailableApp> apps;
+    QVariantList list;
 
     if (!success)
-        return apps;
+        return list;
 
     for (const QString &line : raw.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
         QFileInfo fi(line);
@@ -169,27 +168,24 @@ QList<DistroboxManager::AvailableApp> DistroboxManager::availableApps(const QStr
             continue;
 
         QSettings desktop(line, QSettings::IniFormat);
-
-        AvailableApp app;
-        app.basename = fi.baseName();
-        app.name = desktop.value(QStringLiteral("Desktop Entry/Name"), app.basename).toString();
-        app.icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
-
-        apps << app;
+        QVariantMap app;
+        app[QStringLiteral("basename")] = fi.baseName();
+        app[QStringLiteral("name")] = desktop.value(QStringLiteral("Desktop Entry/Name"), fi.baseName()).toString();
+        app[QStringLiteral("icon")] = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+        list << app;
     }
 
-    return apps;
+    return list;
 }
 
-// Find already exported applications
-QList<DistroboxManager::ExportedApp> DistroboxManager::exportedApps(const QString &container)
+QVariantList DistroboxManager::exportedApps(const QString &container)
 {
     QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (DistroboxCli::isFlatpak()) {
-        appsPath = QDir::homePath() + QLatin1String("/.local/share/applications");
+        appsPath = QDir::homePath() + QStringLiteral("/.local/share/applications");
     }
 
-    QList<ExportedApp> apps;
+    QVariantList list;
     QDir dir(appsPath);
     QStringList patterns;
     patterns << QStringLiteral("%1-*.desktop").arg(container);
@@ -200,24 +196,21 @@ QList<DistroboxManager::ExportedApp> DistroboxManager::exportedApps(const QStrin
             continue;
         fileName.chop(8); // remove ".desktop"
 
-        ExportedApp app;
-        app.basename = fileName.mid(container.length() + 1); // remove prefix "<container>-"
-
+        QVariantMap app;
+        app[QStringLiteral("basename")] = fileName.mid(container.length() + 1); // remove "<container>-"
         QSettings desktop(file.filePath(), QSettings::IniFormat);
-        QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), app.basename).toString();
-        app.name = fullName.section(QStringLiteral(" (on "), 0, 0); // strip container suffix
-        app.icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
-
-        apps << app;
+        QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), app[QStringLiteral("basename")]).toString();
+        app[QStringLiteral("name")] = fullName.section(QStringLiteral(" (on "), 0, 0);
+        app[QStringLiteral("icon")] = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+        list << app;
     }
 
-    return apps;
+    return list;
 }
 
-// Export an application from container to host
 bool DistroboxManager::exportApp(const QString &basename, const QString &container)
 {
-    QString desktopPath = QLatin1String("/usr/share/applications/") + basename + QLatin1String(".desktop");
+    QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
     QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
 
     bool success;
@@ -231,6 +224,5 @@ bool DistroboxManager::unexportApp(const QString &basename, const QString &conta
 
     bool success;
     DistroboxCli::runCommand(command, success);
-
     return success;
 }

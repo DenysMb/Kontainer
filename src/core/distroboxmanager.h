@@ -46,6 +46,7 @@ public:
     };
 
 public Q_SLOTS:
+
     /**
      * @brief Lists all existing Distrobox containers
      * @return JSON string containing array of containers with their names and base images
@@ -117,10 +118,10 @@ public Q_SLOTS:
      */
     bool isFlatpak() const;
 
-    QList<AvailableApp> availableApps(const QString &container);
-    QList<ExportedApp> exportedApps(const QString &container);
-    bool exportApp(const QString &basename, const QString &container);
-    bool unexportApp(const QString &basename, const QString &container);
+    Q_INVOKABLE QVariantList availableApps(const QString &container);
+    Q_INVOKABLE QVariantList exportedApps(const QString &container);
+    Q_INVOKABLE bool exportApp(const QString &basename, const QString &container);
+    Q_INVOKABLE bool unexportApp(const QString &basename, const QString &container);
 
 private:
     QStringList m_availableImages; ///< List of available container base images

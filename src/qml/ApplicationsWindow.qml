@@ -1,6 +1,7 @@
 /*
  *   SPDX-License-Identifier: GPL-3.0-or-later
- *   SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
  */
 
 import QtQuick
@@ -25,20 +26,30 @@ Kirigami.ApplicationWindow {
     property var availableApps: []
 
     function refreshApplications() {
+        console.log("Refreshing applications for container:", containerName)
+
         // Refresh exported applications
         loadingExported = true
         var exported = distroBoxManager.exportedApps(containerName)
-        exportedApps = exported
+        console.log("Exported apps:", JSON.stringify(exported))
+        exportedApps = exported || []
         loadingExported = false
 
         // Refresh available applications
         loadingAvailable = true
         var available = distroBoxManager.availableApps(containerName)
-        availableApps = available
+        console.log("Available apps:", JSON.stringify(available))
+        availableApps = available || []
         loadingAvailable = false
     }
 
     onContainerNameChanged: {
+        if (containerName) {
+            refreshApplications()
+        }
+    }
+
+    Component.onCompleted: {
         if (containerName) {
             refreshApplications()
         }
@@ -111,7 +122,7 @@ Kirigami.ApplicationWindow {
                                     }
 
                                     Controls.Label {
-                                        text: modelData.name
+                                        text: modelData.name || modelData.basename || "Unknown Application"
                                         Layout.fillWidth: true
                                         elide: Text.ElideRight
                                         font.bold: true
@@ -122,7 +133,8 @@ Kirigami.ApplicationWindow {
                                         icon.name: "list-remove"
                                         onClicked: {
                                             distroBoxManager.unexportApp(modelData.basename, containerName)
-                                            refreshApplications()
+                                            // Use a timer to refresh after a short delay to allow the operation to complete
+                                            refreshTimer.start()
                                         }
                                     }
                                 }
@@ -173,7 +185,7 @@ Kirigami.ApplicationWindow {
                                     }
 
                                     Controls.Label {
-                                        text: modelData.name
+                                        text: modelData.name || modelData.basename || "Unknown Application"
                                         Layout.fillWidth: true
                                         elide: Text.ElideRight
                                         font.bold: true
@@ -184,7 +196,8 @@ Kirigami.ApplicationWindow {
                                         icon.name: "list-add"
                                         onClicked: {
                                             distroBoxManager.exportApp(modelData.basename, containerName)
-                                            refreshApplications()
+                                            // Use a timer to refresh after a short delay to allow the operation to complete
+                                            refreshTimer.start()
                                         }
                                     }
                                 }
@@ -207,5 +220,11 @@ Kirigami.ApplicationWindow {
                 onTriggered: applicationsWindow.close()
             }
         ]
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 1000 // 1 second delay to allow export/unexport operations to complete
+        onTriggered: refreshApplications()
     }
 }
