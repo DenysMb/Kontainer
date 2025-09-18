@@ -11,8 +11,8 @@ import org.kde.kirigami as Kirigami
 Kirigami.ApplicationWindow {
     id: applicationsWindow
 
-    width: 800
-    height: 600
+    width: 600
+    height: 400
     minimumWidth: 600
     minimumHeight: 400
 
@@ -104,28 +104,19 @@ Kirigami.ApplicationWindow {
                     icon.name: "view-refresh"
                     onTriggered: refreshApplications()
                     shortcut: "F5"
-                },
-                Kirigami.Action {
-                    text: i18n("Close")
-                    icon.name: "window-close"
-                    onTriggered: applicationsWindow.close()
-                    shortcut: "Ctrl+W"
                 }
             ]
 
             header: Controls.ToolBar {
                 contentItem: RowLayout {
-                    Controls.ToolButton {
-                        action: refreshAction
-                        visible: true
-                    }
                     Item {
                         Layout.fillWidth: true
                     }
-                    Controls.ToolButton {
-                        icon.name: "window-close"
-                        text: i18n("Close")
-                        onClicked: applicationsWindow.close()
+                    Row {
+                        spacing: 0 // Remove space between buttons
+                        Controls.ToolButton {
+                            action: refreshAction
+                        }
                     }
                 }
             }
