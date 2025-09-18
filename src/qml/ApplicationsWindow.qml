@@ -23,8 +23,10 @@ Kirigami.ApplicationWindow {
     property var exportedApps: []
     property var availableApps: []
     property var selectedApps: ({})
-    property string searchText: ""
     property string lastOperation: ""
+    // Separate search text for each tab
+    property string exportedSearchText: ""
+    property string availableSearchText: ""
 
     signal dataReady() // emitted when both lists are loaded
 
@@ -43,12 +45,18 @@ Kirigami.ApplicationWindow {
     function refreshAppLists() {
         // Only refresh the lists without showing loading screen
         Qt.callLater(function() {
+            var oldExportedCount = exportedApps.length;
             exportedApps = distroBoxManager.exportedApps(containerName) || []
             availableApps = distroBoxManager.availableApps(containerName) || []
+
+            // Switch to exported tab if we just exported an app and the count increased
+            if (exportedApps.length > oldExportedCount && tabBar.currentIndex === 1) {
+                tabBar.currentIndex = 0;
+            }
         })
     }
 
-    function filterApps(apps) {
+    function filterApps(apps, searchText) {
         if (!searchText) return apps;
         return apps.filter(function(app) {
             return app.name && app.name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -85,6 +93,23 @@ Kirigami.ApplicationWindow {
         Kirigami.Page {
             title: applicationsWindow.title
 
+            // Global actions for the page (refresh and close)
+            actions: [
+                Kirigami.Action {
+                    id: refreshAction
+                    text: i18n("Refresh")
+                    icon.name: "view-refresh"
+                    onTriggered: refreshApplications()
+                    shortcut: "F5"
+                },
+                Kirigami.Action {
+                    text: i18n("Close")
+                    icon.name: "window-close"
+                    onTriggered: applicationsWindow.close()
+                    shortcut: "Ctrl+W"
+                }
+            ]
+
             Controls.TabBar {
                 id: tabBar
                 width: parent.width
@@ -111,17 +136,20 @@ Kirigami.ApplicationWindow {
 
                         RowLayout {
                             Layout.fillWidth: true
-                            visible: filterApps(exportedApps).length > 0
+                            visible: filterApps(exportedApps, exportedSearchText).length > 0 || exportedSearchText.length > 0
                             Controls.TextField {
                                 id: exportedSearchField
                                 Layout.fillWidth: true
                                 placeholderText: i18n("Search exported applications...")
-                                onTextChanged: searchText = text
+                                onTextChanged: exportedSearchText = text
                             }
                             Controls.Button {
                                 icon.name: "edit-clear"
                                 text: i18n("Clear")
-                                onClicked: exportedSearchField.text = ""
+                                onClicked: {
+                                    exportedSearchField.text = ""
+                                    exportedSearchText = ""
+                                }
                                 visible: exportedSearchField.text.length > 0
                             }
                         }
@@ -133,8 +161,9 @@ Kirigami.ApplicationWindow {
 
                         Kirigami.PlaceholderMessage {
                             Layout.alignment: Qt.AlignCenter
-                            visible: filterApps(exportedApps).length === 0
-                            text: i18n("No exported applications found")
+                            visible: filterApps(exportedApps, exportedSearchText).length === 0
+                            text: exportedSearchText ? i18n("No exported applications found matching '%1'", exportedSearchText)
+                            : i18n("No exported applications found")
                             helpfulAction: Kirigami.Action {
                                 text: i18n("Switch to Available tab")
                                 icon.name: "go-next"
@@ -145,11 +174,11 @@ Kirigami.ApplicationWindow {
                         Controls.ScrollView {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            visible: filterApps(exportedApps).length > 0
+                            visible: filterApps(exportedApps, exportedSearchText).length > 0
 
                             ListView {
                                 id: exportedListView
-                                model: filterApps(exportedApps)
+                                model: filterApps(exportedApps, exportedSearchText)
                                 spacing: Kirigami.Units.smallSpacing
 
                                 delegate: Kirigami.AbstractCard {
@@ -202,17 +231,20 @@ Kirigami.ApplicationWindow {
 
                         RowLayout {
                             Layout.fillWidth: true
-                            visible: filterApps(availableApps).length > 0
+                            visible: filterApps(availableApps, availableSearchText).length > 0 || availableSearchText.length > 0
                             Controls.TextField {
                                 id: availableSearchField
                                 Layout.fillWidth: true
                                 placeholderText: i18n("Search available applications...")
-                                onTextChanged: searchText = text
+                                onTextChanged: availableSearchText = text
                             }
                             Controls.Button {
                                 icon.name: "edit-clear"
                                 text: i18n("Clear")
-                                onClicked: availableSearchField.text = ""
+                                onClicked: {
+                                    availableSearchField.text = ""
+                                    availableSearchText = ""
+                                }
                                 visible: availableSearchField.text.length > 0
                             }
                         }
@@ -224,9 +256,10 @@ Kirigami.ApplicationWindow {
 
                         Kirigami.PlaceholderMessage {
                             Layout.alignment: Qt.AlignCenter
-                            visible: filterApps(availableApps).length === 0
-                            text: i18n("No applications found in container")
-                            explanation: i18n("This container might not have desktop applications installed or they might not be detectable.")
+                            visible: filterApps(availableApps, availableSearchText).length === 0
+                            text: availableSearchText ? i18n("No applications found matching '%1'", availableSearchText)
+                            : i18n("No applications found in container")
+                            explanation: availableSearchText ? "" : i18n("This container might not have desktop applications installed or they might not be detectable.")
                             helpfulAction: Kirigami.Action {
                                 text: i18n("Open Distrobox to install applications")
                                 icon.name: "application-menu"
@@ -237,11 +270,11 @@ Kirigami.ApplicationWindow {
                         Controls.ScrollView {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            visible: filterApps(availableApps).length > 0
+                            visible: filterApps(availableApps, availableSearchText).length > 0
 
                             ListView {
                                 id: availableListView
-                                model: filterApps(availableApps)
+                                model: filterApps(availableApps, availableSearchText)
                                 spacing: Kirigami.Units.smallSpacing
 
                                 delegate: Kirigami.AbstractCard {
@@ -275,8 +308,14 @@ Kirigami.ApplicationWindow {
                                             onClicked: {
                                                 lastOperation = modelData.name || modelData.basename
                                                 var success = distroBoxManager.exportApp(modelData.basename, containerName)
-                                                if (success) refreshAppLists()
-                                                    else { showPassiveNotification(i18n("Failed to export application")); lastOperation = "" }
+                                                if (success) {
+                                                    // Switch to exported tab after exporting
+                                                    tabBar.currentIndex = 0;
+                                                    refreshAppLists();
+                                                } else {
+                                                    showPassiveNotification(i18n("Failed to export application"));
+                                                    lastOperation = ""
+                                                }
                                             }
                                         }
                                     }
@@ -304,17 +343,17 @@ Kirigami.ApplicationWindow {
                             }
                             lastOperation = i18n("%1 applications", appNames.length)
                             selectedApps = {}
+
+                            // Switch to exported tab if we exported apps
+                            if (tabBar.currentIndex === 1) {
+                                tabBar.currentIndex = 0;
+                            }
                             refreshAppLists()
                         }
                     }
                     Controls.Button { text: i18n("Clear Selection"); icon.name: "edit-clear"; onClicked: selectedApps = {} }
                 }
             }
-
-            actions: [
-                Kirigami.Action { text: i18n("Refresh"); icon.name: "view-refresh"; onTriggered: refreshApplications() },
-                Kirigami.Action { text: i18n("Close"); icon.name: "window-close"; onTriggered: applicationsWindow.close() }
-            ]
         }
     }
 
