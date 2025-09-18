@@ -11,8 +11,8 @@ import org.kde.kirigami as Kirigami
 Kirigami.ApplicationWindow {
     id: applicationsWindow
 
-    width: 800
-    height: 600
+    width: 700
+    height: 500
     minimumWidth: 600
     minimumHeight: 400
 
@@ -21,6 +21,7 @@ Kirigami.ApplicationWindow {
     property string containerName: ""
     property bool loadingExported: true
     property bool loadingAvailable: true
+    property bool operationInProgress: false // New property to track operations
     property var exportedApps: []
     property var availableApps: []
 
@@ -42,6 +43,20 @@ Kirigami.ApplicationWindow {
         loadingAvailable = false
     }
 
+    // Function to handle export operations
+    function exportApp(appBasename) {
+        operationInProgress = true
+        distroBoxManager.exportApp(appBasename, containerName)
+        refreshTimer.start()
+    }
+
+    // Function to handle unexport operations
+    function unexportApp(appBasename) {
+        operationInProgress = true
+        distroBoxManager.unexportApp(appBasename, containerName)
+        refreshTimer.start()
+    }
+
     onContainerNameChanged: {
         if (containerName) {
             refreshApplications()
@@ -54,8 +69,32 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    // Watch for changes in exportedApps to switch tabs
+    onExportedAppsChanged: {
+        if (exportedApps.length > 0 && operationInProgress) {
+            // Switch to exported tab after operation completes
+            tabBar.currentIndex = 0
+        }
+    }
+
     pageStack.initialPage: Kirigami.Page {
         title: applicationsWindow.title
+
+        // Overlay spinner for operations
+        Rectangle {
+            id: overlay
+            anchors.fill: parent
+            color: Qt.rgba(0, 0, 0, 0.3)
+            visible: operationInProgress
+            z: 9999 // Ensure it's on top
+
+            Controls.BusyIndicator {
+                anchors.centerIn: parent
+                running: parent.visible
+                width: Kirigami.Units.iconSizes.large
+                height: width
+            }
+        }
 
         Controls.TabBar {
             id: tabBar
@@ -130,11 +169,7 @@ Kirigami.ApplicationWindow {
                                     Controls.Button {
                                         text: i18n("Unexport")
                                         icon.name: "list-remove"
-                                        onClicked: {
-                                            distroBoxManager.unexportApp(modelData.basename, containerName)
-                                            // Use a timer to refresh after a short delay to allow the operation to complete
-                                            refreshTimer.start()
-                                        }
+                                        onClicked: unexportApp(modelData.basename)
                                     }
                                 }
                             }
@@ -193,11 +228,7 @@ Kirigami.ApplicationWindow {
                                     Controls.Button {
                                         text: i18n("Export")
                                         icon.name: "list-add"
-                                        onClicked: {
-                                            distroBoxManager.exportApp(modelData.basename, containerName)
-                                            // Use a timer to refresh after a short delay to allow the operation to complete
-                                            refreshTimer.start()
-                                        }
+                                        onClicked: exportApp(modelData.basename)
                                     }
                                 }
                             }
@@ -224,6 +255,9 @@ Kirigami.ApplicationWindow {
     Timer {
         id: refreshTimer
         interval: 1000 // 1 second delay to allow export/unexport operations to complete
-        onTriggered: refreshApplications()
+        onTriggered: {
+            refreshApplications()
+            operationInProgress = false // Hide the spinner after refresh
+        }
     }
 }
