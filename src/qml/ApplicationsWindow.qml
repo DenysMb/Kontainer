@@ -26,9 +26,15 @@ Kirigami.ApplicationWindow {
     property string lastOperation: ""
     property var selectedApps: ({})
     property string searchText: ""
+    property bool initialized: false
 
     function refreshApplications() {
-        console.log("Refreshing applications for container:", containerName)
+        if (!initialized) {
+            initialized = true;
+            console.log("Initializing applications window for container:", containerName)
+        } else {
+            console.log("Refreshing applications for container:", containerName)
+        }
 
         // Reset selection
         selectedApps = {}
@@ -58,19 +64,22 @@ Kirigami.ApplicationWindow {
         if (!searchText) return apps;
 
         return apps.filter(function(app) {
-            return app.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            app.basename.toLowerCase().includes(searchText.toLowerCase());
+            return app.name && app.name.toLowerCase().includes(searchText.toLowerCase()) ||
+            app.basename && app.basename.toLowerCase().includes(searchText.toLowerCase());
         });
     }
 
     onContainerNameChanged: {
         if (containerName) {
-            refreshApplications()
+            // Don't load immediately, wait for window to be shown
+            if (visible) {
+                refreshApplications()
+            }
         }
     }
 
-    Component.onCompleted: {
-        if (containerName) {
+    onVisibleChanged: {
+        if (visible && containerName && !initialized) {
             refreshApplications()
         }
     }
@@ -81,6 +90,7 @@ Kirigami.ApplicationWindow {
         Controls.TabBar {
             id: tabBar
             width: parent.width
+            visible: initialized
 
             Controls.TabButton {
                 text: i18n("Exported Applications (%1)", exportedApps.length)
@@ -92,9 +102,9 @@ Kirigami.ApplicationWindow {
 
         StackLayout {
             width: parent.width
-            height: parent.height - tabBar.height
-            anchors.top: tabBar.bottom
-            currentIndex: tabBar.currentIndex
+            height: parent.height - (tabBar.visible ? tabBar.height : 0)
+            anchors.top: tabBar.visible ? tabBar.bottom : parent.top
+            currentIndex: tabBar.visible ? tabBar.currentIndex : 0
 
             // Tab 1: Exported Applications
             Item {
@@ -104,6 +114,7 @@ Kirigami.ApplicationWindow {
 
                     RowLayout {
                         Layout.fillWidth: true
+                        visible: !loadingExported && filterApps(exportedApps).length > 0
                         Controls.TextField {
                             id: exportedSearchField
                             Layout.fillWidth: true
@@ -126,7 +137,7 @@ Kirigami.ApplicationWindow {
 
                     Kirigami.PlaceholderMessage {
                         Layout.alignment: Qt.AlignCenter
-                        visible: !loadingExported && filterApps(exportedApps).length === 0
+                        visible: !loadingExported && filterApps(exportedApps).length === 0 && initialized
                         text: i18n("No exported applications found")
                         helpfulAction: Kirigami.Action {
                             text: i18n("Switch to Available tab")
@@ -199,6 +210,7 @@ Kirigami.ApplicationWindow {
 
                     RowLayout {
                         Layout.fillWidth: true
+                        visible: !loadingAvailable && filterApps(availableApps).length > 0
                         Controls.TextField {
                             id: availableSearchField
                             Layout.fillWidth: true
@@ -221,7 +233,7 @@ Kirigami.ApplicationWindow {
 
                     Kirigami.PlaceholderMessage {
                         Layout.alignment: Qt.AlignCenter
-                        visible: !loadingAvailable && filterApps(availableApps).length === 0
+                        visible: !loadingAvailable && filterApps(availableApps).length === 0 && initialized
                         text: i18n("No applications found in container")
                         explanation: i18n("This container might not have desktop applications installed or they might not be detectable.")
                         helpfulAction: Kirigami.Action {
@@ -289,7 +301,7 @@ Kirigami.ApplicationWindow {
         }
 
         footer: Controls.ToolBar {
-            visible: Object.keys(selectedApps).length > 0
+            visible: Object.keys(selectedApps).length > 0 && initialized
             RowLayout {
                 width: parent.width
                 Controls.Label {
@@ -335,6 +347,33 @@ Kirigami.ApplicationWindow {
                 onTriggered: applicationsWindow.close()
             }
         ]
+    }
+
+    // Show a loading overlay when first opening the window
+    Rectangle {
+        id: loadingOverlay
+        anchors.fill: parent
+        color: Qt.rgba(1, 1, 1, 0.7)
+        visible: !initialized && applicationsWindow.visible
+        z: 1000 // Ensure it's on top of everything
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: Kirigami.Units.largeSpacing
+
+            Controls.BusyIndicator {
+                Layout.alignment: Qt.AlignCenter
+                running: true
+                width: Kirigami.Units.iconSizes.large
+                height: width
+            }
+
+            Controls.Label {
+                Layout.alignment: Qt.AlignCenter
+                text: i18n("Loading applications for %1...", containerName)
+                font.bold: true
+            }
+        }
     }
 
     Timer {
