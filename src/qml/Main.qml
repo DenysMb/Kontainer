@@ -5,9 +5,9 @@
 */
 
 /*
- *    SPDX-License-Identifier: GPL-3.0-or-later
- *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
- *    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
  */
 
 import QtQuick
@@ -39,46 +39,36 @@ Kirigami.ApplicationWindow {
         refreshing = false
     }
 
-    // Shows spinning cursor during async operation
-    function showLoading(actionCallback) {
-        var previousCursor = Qt.application.cursorShape
-        Qt.application.cursorShape = Qt.WaitCursor
-
-        Qt.callLater(function() {
-            try {
-                actionCallback()
-            } finally {
-                Qt.application.cursorShape = previousCursor
-            }
-        })
-    }
-
     globalDrawer: Kirigami.GlobalDrawer {
         isMenu: true
         actions: [
             Kirigami.Action {
                 text: i18n("Create Container…")
                 icon.name: "list-add"
-                onTriggered: { createDialog.open() }
+                onTriggered: createDialog.open()
             },
             Kirigami.Action {
                 text: i18n("Create Distrobox Shortcut…")
                 icon.name: "document-new"
                 enabled: mainPage.containersList.length > 0
-                onTriggered: { shortcutDialog.open() }
+                onTriggered: shortcutDialog.open()
             },
-            Kirigami.Action { separator: true },
+            Kirigami.Action {
+                separator: true
+            },
             Kirigami.Action {
                 text: i18n("Open Distrobox Documentation")
                 icon.name: "help-contents"
-                onTriggered: { Qt.openUrlExternally("https://distrobox.it/#distrobox") }
+                onTriggered: Qt.openUrlExternally("https://distrobox.it/#distrobox")
             },
             Kirigami.Action {
                 text: i18n("Open Distrobox Useful Tips")
                 icon.name: "help-hint"
-                onTriggered: { Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md") }
+                onTriggered: Qt.openUrlExternally("https://github.com/89luca89/distrobox/blob/main/docs/useful_tips.md")
             },
-            Kirigami.Action { separator: true },
+            Kirigami.Action {
+                separator: true
+            },
             Kirigami.Action {
                 text: i18n("About Kontainer")
                 icon.name: "io.github.DenysMb.Kontainer"
@@ -91,11 +81,27 @@ Kirigami.ApplicationWindow {
         ]
     }
 
-    ErrorDialog { id: errorDialog }
-    DistroboxRemoveDialog { id: removeDialog }
-    DistroboxCreateDialog { id: createDialog; errorDialog: errorDialog }
-    DistroboxShortcutDialog { id: shortcutDialog; containersList: mainPage.containersList }
-    FilePickerDialog { id: packageFileDialog }
+    ErrorDialog {
+        id: errorDialog
+    }
+
+    DistroboxRemoveDialog {
+        id: removeDialog
+    }
+
+    DistroboxCreateDialog {
+        id: createDialog
+        errorDialog: errorDialog
+    }
+
+    DistroboxShortcutDialog {
+        id: shortcutDialog
+        containersList: mainPage.containersList
+    }
+
+    FilePickerDialog {
+        id: packageFileDialog
+    }
 
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
@@ -106,17 +112,29 @@ Kirigami.ApplicationWindow {
 
         supportsRefreshing: true
         onRefreshingChanged: {
-            if (refreshing) refresh()
+            if (refreshing) {
+                refresh()
+            }
         }
 
         property var containersList: []
 
         actions: [
-            Kirigami.Action { text: i18n("Create…"); icon.name: "list-add"; onTriggered: { createDialog.open() } },
-            Kirigami.Action { text: i18n("Refresh"); icon.name: "view-refresh"; onTriggered: { refresh() } }
+            Kirigami.Action {
+                text: i18n("Create…")
+                icon.name: "list-add"
+                onTriggered: createDialog.open()
+            },
+            Kirigami.Action {
+                text: i18n("Refresh")
+                icon.name: "view-refresh"
+                onTriggered: refresh()
+            }
         ]
 
-        Component.onCompleted: { refresh() }
+        Component.onCompleted: {
+            refresh()
+        }
 
         ColumnLayout {
             anchors.fill: parent
@@ -166,8 +184,11 @@ Kirigami.ApplicationWindow {
                             }
 
                             Kirigami.ActionToolBar {
+                                id: actionToolBar
+
                                 Layout.fillWidth: true
                                 spacing: Kirigami.Units.smallSpacing
+
                                 alignment: Qt.AlignRight
                                 display: Controls.Button.IconOnly
                                 flat: false
@@ -185,41 +206,39 @@ Kirigami.ApplicationWindow {
                                         icon.name: "system-software-update"
                                         text: i18n("Upgrade Container")
                                         onTriggered: {
-                                            showLoading(function() {
-                                                distroBoxManager.upgradeContainer(modelData.name)
-                                            })
+                                            distroBoxManager.upgradeContainer(modelData.name)
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "install-symbolic"
                                         text: i18n("Install Package")
                                         onTriggered: {
-                                            showLoading(function() {
-                                                packageFileDialog.containerName = modelData.name
-                                                packageFileDialog.containerImage = modelData.image
-                                                packageFileDialog.open()
-                                            })
+                                            packageFileDialog.containerName = modelData.name
+                                            packageFileDialog.containerImage = modelData.image
+                                            packageFileDialog.open()
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "applications-other"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
-                                            showLoading(function() {
-                                                var component = Qt.createComponent("ApplicationsWindow.qml")
-                                                if (component.status === Component.Ready) {
-                                                    var window = component.createObject(root, { containerName: modelData.name })
-                                                    window.show()
-                                                } else {
-                                                    console.error("Error loading ApplicationsWindow:", component.errorString())
-                                                }
-                                            })
+                                            var component = Qt.createComponent("ApplicationsWindow.qml")
+                                            if (component.status === Component.Ready) {
+                                                var window = component.createObject(root, {
+                                                    containerName: modelData.name
+                                                })
+                                                window.show()
+                                            } else {
+                                                console.error("Error loading ApplicationsWindow:", component.errorString())
+                                            }
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "utilities-terminal-symbolic"
                                         text: i18n("Open Terminal")
-                                        onTriggered: { distroBoxManager.enterContainer(modelData.name) }
+                                        onTriggered: {
+                                            distroBoxManager.enterContainer(modelData.name)
+                                        }
                                     }
                                 ]
                             }
@@ -234,8 +253,26 @@ Kirigami.ApplicationWindow {
                     helpfulAction: Kirigami.Action {
                         text: i18n("Create Container")
                         icon.name: "list-add"
-                        onTriggered: { createDialog.open() }
+                        onTriggered: createDialog.open()
                     }
+                }
+
+                // Since the UI thread isn't blocked by runCommand anymore, this shows on refresh
+                // that the distroboxes are being loaded -- rather than freezing the application.
+                Controls.BusyIndicator {
+                    anchors.centerIn: parent
+                    visible: containersListView.count === 0 && refreshing && !loadingTimer.running
+                }
+
+                // Avoids flickering when distroboxes load quickly.
+                Timer {
+                    id: loadingTimer
+                    interval: 100 // 100ms
+                    repeat: false
+                }
+
+                Component.onCompleted: {
+                    loadingTimer.start()
                 }
             }
         }
