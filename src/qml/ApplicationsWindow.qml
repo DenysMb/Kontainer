@@ -65,7 +65,7 @@ Kirigami.ApplicationWindow {
                 text: i18n("Exported Applications (%1)", exportedApps.length)
             }
             Controls.TabButton {
-                text: i18n("Available Applications (%2)", availableApps.length)
+                text: i18n("Available Applications (%1)", availableApps.length)
             }
         }
 
