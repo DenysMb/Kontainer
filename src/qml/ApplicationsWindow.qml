@@ -60,28 +60,14 @@ Kirigami.ApplicationWindow {
         sourceComponent: mainContentComponent
     }
 
-    // Loading overlay while fetching data
-    Rectangle {
-        anchors.fill: parent
+    // Simple cogwheel loader without background
+    Controls.BusyIndicator {
+        anchors.centerIn: parent
+        running: loading
         visible: loading
-        color: Qt.rgba(1, 1, 1, 0.8)
+        width: Kirigami.Units.iconSizes.huge
+        height: width
         z: 1000
-
-        ColumnLayout {
-            anchors.centerIn: parent
-            spacing: Kirigami.Units.largeSpacing
-
-            Controls.BusyIndicator {
-                running: true
-                width: Kirigami.Units.iconSizes.large
-                height: width
-            }
-
-            Controls.Label {
-                text: i18n("Loading applications for %1...", containerName)
-                font.bold: true
-            }
-        }
     }
 
     // Main content component loaded after data
