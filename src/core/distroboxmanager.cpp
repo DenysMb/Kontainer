@@ -16,6 +16,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTextStream>
@@ -155,27 +156,54 @@ QVariantList DistroboxManager::availableApps(const QString &container)
 {
     QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
     QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
-
     bool success = false;
     QString raw = DistroboxCli::runCommand(output, success);
     QVariantList list;
-
     if (!success)
         return list;
 
     for (const QString &line : raw.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
-        QFileInfo fi(line);
-        if (!fi.isFile() || !line.endsWith(QStringLiteral(".desktop")))
+        if (!line.endsWith(QStringLiteral(".desktop")))
             continue;
 
-        QSettings desktop(line, QSettings::IniFormat);
+        // Extract basename from the full path (remove /usr/share/applications/ and .desktop)
+        QString basename = line;
+        if (basename.startsWith(QStringLiteral("/usr/share/applications/"))) {
+            basename.remove(0, 24); // Remove "/usr/share/applications/"
+        }
+        if (basename.endsWith(QStringLiteral(".desktop"))) {
+            basename.chop(8); // Remove ".desktop"
+        }
+
+        // Read desktop file from container
+        QString readCmd = QStringLiteral("cat %1").arg(KShell::quoteArg(line));
+        QString desktopOutput = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(readCmd));
+        bool readSuccess = false;
+        QString desktopContent = DistroboxCli::runCommand(desktopOutput, readSuccess);
+
+        if (!readSuccess)
+            continue;
+
+        // Parse desktop file content line by line
         QVariantMap app;
-        app[QStringLiteral("basename")] = fi.baseName();
-        app[QStringLiteral("name")] = desktop.value(QStringLiteral("Desktop Entry/Name"), fi.baseName()).toString();
-        app[QStringLiteral("icon")] = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+        app[QStringLiteral("basename")] = basename;
+
+        QString name = basename;
+        QString icon;
+
+        for (const QString &desktopLine : desktopContent.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
+            if (desktopLine.startsWith(QStringLiteral("Name="))) {
+                name = desktopLine.mid(5); // Remove "Name="
+            } else if (desktopLine.startsWith(QStringLiteral("Icon="))) {
+                icon = desktopLine.mid(5); // Remove "Icon="
+            }
+        }
+
+        app[QStringLiteral("name")] = name;
+        app[QStringLiteral("icon")] = icon;
+
         list << app;
     }
-
     return list;
 }
 
@@ -195,25 +223,35 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
         QString fileName = file.fileName();
         if (!fileName.endsWith(QStringLiteral(".desktop")))
             continue;
-        fileName.chop(8); // remove ".desktop"
 
-        QVariantMap app;
-        app[QStringLiteral("basename")] = fileName.mid(container.length() + 1); // remove "<container>-"
+        // Extract basename (remove container prefix and .desktop suffix)
+        QString basename = fileName;
+        QString prefix = container + QLatin1String("-");
+        if (basename.startsWith(prefix)) {
+            basename.remove(0, prefix.length());
+        }
+        if (basename.endsWith(QStringLiteral(".desktop"))) {
+            basename.chop(8);
+        }
+
         QSettings desktop(file.filePath(), QSettings::IniFormat);
-        QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), app[QStringLiteral("basename")]).toString();
+        QVariantMap app;
+        app[QStringLiteral("basename")] = basename;
+
+        QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), basename).toString();
         app[QStringLiteral("name")] = fullName.section(QStringLiteral(" (on "), 0, 0);
         app[QStringLiteral("icon")] = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+
         list << app;
     }
-
     return list;
 }
 
 bool DistroboxManager::exportApp(const QString &basename, const QString &container)
 {
+    // Construct the full path to the desktop file in the container
     QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
     QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
-
     bool success;
     DistroboxCli::runCommand(command, success);
     return success;
@@ -221,8 +259,8 @@ bool DistroboxManager::exportApp(const QString &basename, const QString &contain
 
 bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
 {
+    // Use the basename directly (distrobox-export will handle the container path internally)
     QString command = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(basename));
-
     bool success;
     DistroboxCli::runCommand(command, success);
     return success;
