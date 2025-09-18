@@ -14,7 +14,7 @@ import org.kde.kirigami as Kirigami
 Kirigami.ApplicationWindow {
     id: root
 
-    width: 600
+    width: 700
     height: 500
 
     title: i18n("Kontainer")
@@ -120,6 +120,11 @@ Kirigami.ApplicationWindow {
                 onTriggered: createDialog.open()
             },
             Kirigami.Action {
+                text: i18n("Upgrade all…")
+                icon.name: "system-software-update"
+                onTriggered: distroBoxManager.upgradeAllContainer()
+            },
+            Kirigami.Action {
                 text: i18n("Refresh")
                 icon.name: "view-refresh"
                 onTriggered: refresh()
@@ -204,7 +209,7 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
-                                        icon.name: "install-symbolic"
+                                        icon.name: "package-x-generic"
                                         text: i18n("Install Package")
                                         onTriggered: {
                                             packageFileDialog.containerName = modelData.name
