@@ -213,6 +213,21 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
+                                        icon.name: "applications-other"
+                                        text: i18n("Manage Applications")
+                                        onTriggered: {
+                                            var component = Qt.createComponent("ApplicationsWindow.qml")
+                                            if (component.status === Component.Ready) {
+                                                var window = component.createObject(root, {
+                                                    containerName: modelData.name
+                                                })
+                                                window.show()
+                                            } else {
+                                                console.error("Error loading ApplicationsWindow:", component.errorString())
+                                            }
+                                        }
+                                    },
+                                    Kirigami.Action {
                                         icon.name: "utilities-terminal-symbolic"
                                         text: i18n("Open Terminal")
                                         onTriggered: {
