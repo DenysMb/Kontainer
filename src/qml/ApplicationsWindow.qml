@@ -93,7 +93,7 @@ Kirigami.ApplicationWindow {
                         Layout.fillHeight: true
                         visible: !loadingExported && exportedApps.length > 0
 
-                        Controls.ListView {
+                        ListView {
                             id: exportedListView
                             model: exportedApps
                             spacing: Kirigami.Units.smallSpacing
@@ -155,7 +155,7 @@ Kirigami.ApplicationWindow {
                         Layout.fillHeight: true
                         visible: !loadingAvailable && availableApps.length > 0
 
-                        Controls.ListView {
+                        ListView {
                             id: availableListView
                             model: availableApps
                             spacing: Kirigami.Units.smallSpacing
