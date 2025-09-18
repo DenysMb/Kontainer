@@ -13,6 +13,7 @@
 #include <KLocalizedContext>
 #include <KLocalizedString>
 #include <KShell>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -154,17 +155,25 @@ bool DistroboxManager::isFlatpak() const
 
 QVariantList DistroboxManager::availableApps(const QString &container)
 {
+    qDebug() << "=== availableApps for container:" << container << "===";
+
     QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
     QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
     bool success = false;
     QString raw = DistroboxCli::runCommand(output, success);
     QVariantList list;
-    if (!success)
+    if (!success) {
+        qDebug() << "Find command failed for container:" << container;
         return list;
+    }
+
+    qDebug() << "Raw find output:" << raw;
 
     for (const QString &line : raw.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
-        if (!line.endsWith(QStringLiteral(".desktop")))
+        if (!line.endsWith(QStringLiteral(".desktop"))) {
+            qDebug() << "Skipping non-desktop file:" << line;
             continue;
+        }
 
         // Extract basename from the full path (remove /usr/share/applications/ and .desktop)
         QString basename = line;
@@ -175,14 +184,21 @@ QVariantList DistroboxManager::availableApps(const QString &container)
             basename.chop(8); // Remove ".desktop"
         }
 
+        qDebug() << "Processing desktop file:" << line;
+        qDebug() << "Extracted basename:" << basename;
+
         // Read desktop file from container
         QString readCmd = QStringLiteral("cat %1").arg(KShell::quoteArg(line));
         QString desktopOutput = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(readCmd));
         bool readSuccess = false;
         QString desktopContent = DistroboxCli::runCommand(desktopOutput, readSuccess);
 
-        if (!readSuccess)
+        if (!readSuccess) {
+            qDebug() << "Failed to read desktop file:" << line;
             continue;
+        }
+
+        qDebug() << "Desktop file content:" << desktopContent;
 
         // Parse desktop file content line by line
         QVariantMap app;
@@ -190,39 +206,57 @@ QVariantList DistroboxManager::availableApps(const QString &container)
 
         QString name = basename;
         QString icon;
+        QString exec;
 
         for (const QString &desktopLine : desktopContent.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
             if (desktopLine.startsWith(QStringLiteral("Name="))) {
                 name = desktopLine.mid(5); // Remove "Name="
+                qDebug() << "Found Name:" << name;
             } else if (desktopLine.startsWith(QStringLiteral("Icon="))) {
                 icon = desktopLine.mid(5); // Remove "Icon="
+                qDebug() << "Found Icon:" << icon;
+            } else if (desktopLine.startsWith(QStringLiteral("Exec="))) {
+                exec = desktopLine.mid(5); // Remove "Exec="
+                qDebug() << "Found Exec:" << exec;
             }
         }
 
         app[QStringLiteral("name")] = name;
         app[QStringLiteral("icon")] = icon;
+        app[QStringLiteral("exec")] = exec; // For debugging
 
+        qDebug() << "Final app entry:" << app;
         list << app;
     }
+
+    qDebug() << "Total apps found:" << list.size();
     return list;
 }
 
 QVariantList DistroboxManager::exportedApps(const QString &container)
 {
+    qDebug() << "=== exportedApps for container:" << container << "===";
+
     QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
     if (DistroboxCli::isFlatpak()) {
         appsPath = QDir::homePath() + QStringLiteral("/.local/share/applications");
     }
+
+    qDebug() << "Looking for exported apps in:" << appsPath;
 
     QVariantList list;
     QDir dir(appsPath);
     QStringList patterns;
     patterns << QStringLiteral("%1-*.desktop").arg(container);
 
+    qDebug() << "Search pattern:" << patterns;
+
     for (const QFileInfo &file : dir.entryInfoList(patterns, QDir::Files)) {
         QString fileName = file.fileName();
-        if (!fileName.endsWith(QStringLiteral(".desktop")))
+        if (!fileName.endsWith(QStringLiteral(".desktop"))) {
+            qDebug() << "Skipping non-desktop file:" << fileName;
             continue;
+        }
 
         // Extract basename (remove container prefix and .desktop suffix)
         QString basename = fileName;
@@ -234,34 +268,72 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
             basename.chop(8);
         }
 
+        qDebug() << "Processing exported file:" << fileName;
+        qDebug() << "Extracted basename:" << basename;
+
         QSettings desktop(file.filePath(), QSettings::IniFormat);
         QVariantMap app;
         app[QStringLiteral("basename")] = basename;
 
         QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), basename).toString();
-        app[QStringLiteral("name")] = fullName.section(QStringLiteral(" (on "), 0, 0);
-        app[QStringLiteral("icon")] = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+        QString icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+        QString exec = desktop.value(QStringLiteral("Desktop Entry/Exec"), QString()).toString();
 
+        app[QStringLiteral("name")] = fullName.section(QStringLiteral(" (on "), 0, 0);
+        app[QStringLiteral("icon")] = icon;
+        app[QStringLiteral("fullName")] = fullName; // For debugging
+        app[QStringLiteral("exec")] = exec; // For debugging
+
+        qDebug() << "Exported app entry:" << app;
         list << app;
     }
+
+    qDebug() << "Total exported apps found:" << list.size();
     return list;
 }
 
 bool DistroboxManager::exportApp(const QString &basename, const QString &container)
 {
+    qDebug() << "=== exportApp:" << basename << "from container:" << container << "===";
+
     // Construct the full path to the desktop file in the container
     QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
     QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
+
+    qDebug() << "Export command:" << command;
+
     bool success;
-    DistroboxCli::runCommand(command, success);
+    QString output = DistroboxCli::runCommand(command, success);
+
+    qDebug() << "Export result - success:" << success << "output:" << output;
     return success;
 }
 
 bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
 {
+    qDebug() << "=== unexportApp:" << basename << "from container:" << container << "===";
+
     // Use the basename directly (distrobox-export will handle the container path internally)
     QString command = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(basename));
+
+    qDebug() << "Unexport command:" << command;
+
     bool success;
-    DistroboxCli::runCommand(command, success);
+    QString output = DistroboxCli::runCommand(command, success);
+
+    qDebug() << "Unexport result - success:" << success << "output:" << output;
+
+    if (!success) {
+        // Try alternative approach - maybe the basename needs the full path?
+        qDebug() << "Trying alternative unexport approach...";
+        QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
+        QString altCommand = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
+
+        qDebug() << "Alternative command:" << altCommand;
+
+        output = DistroboxCli::runCommand(altCommand, success);
+        qDebug() << "Alternative result - success:" << success << "output:" << output;
+    }
+
     return success;
 }
