@@ -218,29 +218,17 @@ QList<DistroboxManager::ExportedApp> DistroboxManager::exportedApps(const QStrin
 bool DistroboxManager::exportApp(const QString &basename, const QString &container)
 {
     QString desktopPath = QLatin1String("/usr/share/applications/") + basename + QLatin1String(".desktop");
-    QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(container, desktopPath);
-    return launchCommandInTerminal(command);
+    QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
+
+    bool success;
+    DistroboxCli::runCommand(command, success);
+    return success;
 }
 
-// Unexport an application from host
 bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
 {
-    QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
-    if (DistroboxCli::isFlatpak()) {
-        appsPath = QDir::homePath() + QLatin1String("/.local/share/applications");
-    }
+    QString command = QStringLiteral("distrobox-export --app %1 --delete --name %2").arg(KShell::quoteArg(basename), KShell::quoteArg(container));
 
-    QString fileName = QStringLiteral("%1-%2.desktop").arg(container, basename);
-    QString exportedFile = appsPath + QLatin1Char('/') + fileName;
-
-    if (!QFile::exists(exportedFile))
-        return false;
-
-    if (!QFile::remove(exportedFile))
-        return false;
-
-    // Update desktop database
-    QString command = u"update-desktop-database "_s + KShell::quoteArg(appsPath);
     bool success;
     DistroboxCli::runCommand(command, success);
 
