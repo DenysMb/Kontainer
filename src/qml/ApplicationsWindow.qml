@@ -133,6 +133,7 @@ Kirigami.ApplicationWindow {
                 }
             }
 
+            // This container will hold the search bar and list view for each tab
             StackLayout {
                 width: parent.width
                 height: parent.height - tabBar.height
@@ -145,8 +146,11 @@ Kirigami.ApplicationWindow {
                         anchors.fill: parent
                         spacing: Kirigami.Units.smallSpacing
 
+                        // Search bar for exported apps - now fixed at the top
                         RowLayout {
+                            id: exportedSearchBar
                             Layout.fillWidth: true
+                            z: 10 // Ensure it stays above the list
                             visible: filterApps(exportedApps, exportedSearchText).length > 0 || exportedSearchText.length > 0
                             Controls.TextField {
                                 id: exportedSearchField
@@ -186,6 +190,9 @@ Kirigami.ApplicationWindow {
                                 id: exportedListView
                                 model: filterApps(exportedApps, exportedSearchText)
                                 spacing: Kirigami.Units.smallSpacing
+
+                                // Add top margin to prevent items from overlapping the search bar
+                                topMargin: exportedSearchBar.visible ? exportedSearchBar.height + Kirigami.Units.smallSpacing : 0
 
                                 delegate: Kirigami.AbstractCard {
                                     width: exportedListView.width - Kirigami.Units.smallSpacing * 2
@@ -243,8 +250,11 @@ Kirigami.ApplicationWindow {
                         anchors.fill: parent
                         spacing: Kirigami.Units.smallSpacing
 
+                        // Search bar for available apps - now fixed at the top
                         RowLayout {
+                            id: availableSearchBar
                             Layout.fillWidth: true
+                            z: 10 // Ensure it stays above the list
                             visible: filterApps(availableApps, availableSearchText).length > 0 || availableSearchText.length > 0
                             Controls.TextField {
                                 id: availableSearchField
@@ -285,6 +295,9 @@ Kirigami.ApplicationWindow {
                                 id: availableListView
                                 model: filterApps(availableApps, availableSearchText)
                                 spacing: Kirigami.Units.smallSpacing
+
+                                // Add top margin to prevent items from overlapping the search bar
+                                topMargin: availableSearchBar.visible ? availableSearchBar.height + Kirigami.Units.smallSpacing : 0
 
                                 delegate: Kirigami.AbstractCard {
                                     width: availableListView.width - Kirigami.Units.smallSpacing * 2
