@@ -227,7 +227,9 @@ bool DistroboxManager::exportApp(const QString &basename, const QString &contain
 
 bool DistroboxManager::unexportApp(const QString &basename, const QString &container)
 {
-    QString command = QStringLiteral("distrobox-export --app %1 --delete --name %2").arg(KShell::quoteArg(basename), KShell::quoteArg(container));
+    Q_UNUSED(container) // not needed for unexport
+
+    QString command = QStringLiteral("distrobox-export --app %1 --delete").arg(KShell::quoteArg(basename));
 
     bool success;
     DistroboxCli::runCommand(command, success);
