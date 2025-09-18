@@ -39,25 +39,25 @@ Kirigami.ApplicationWindow {
         // Reset selection
         selectedApps = {}
 
-        // Refresh exported applications
+        // Show busy indicators immediately
         loadingExported = true
-        var exported = distroBoxManager.exportedApps(containerName)
-        console.log("Exported apps:", JSON.stringify(exported))
-        exportedApps = exported || []
-        loadingExported = false
-
-        // Refresh available applications
         loadingAvailable = true
-        var available = distroBoxManager.availableApps(containerName)
-        console.log("Available apps:", JSON.stringify(available))
-        availableApps = available || []
-        loadingAvailable = false
 
-        // Show notification if there was a recent operation
-        if (lastOperation) {
-            showPassiveNotification(i18n("Operation completed for %1", lastOperation))
-            lastOperation = ""
-        }
+        // Let QML paint the window first
+        Qt.callLater(function() {
+            // Fetch exported apps (blocking call is still there, but deferred)
+            exportedApps = distroBoxManager.exportedApps(containerName) || []
+            loadingExported = false
+
+            // Fetch available apps
+            availableApps = distroBoxManager.availableApps(containerName) || []
+            loadingAvailable = false
+
+            if (lastOperation) {
+                showPassiveNotification(i18n("Operation completed for %1", lastOperation))
+                lastOperation = ""
+            }
+        })
     }
 
     function filterApps(apps) {
@@ -71,15 +71,6 @@ Kirigami.ApplicationWindow {
 
     onContainerNameChanged: {
         if (containerName) {
-            // Don't load immediately, wait for window to be shown
-            if (visible) {
-                refreshApplications()
-            }
-        }
-    }
-
-    onVisibleChanged: {
-        if (visible && containerName && !initialized) {
             refreshApplications()
         }
     }
@@ -90,7 +81,6 @@ Kirigami.ApplicationWindow {
         Controls.TabBar {
             id: tabBar
             width: parent.width
-            visible: initialized
 
             Controls.TabButton {
                 text: i18n("Exported Applications (%1)", exportedApps.length)
@@ -102,11 +92,11 @@ Kirigami.ApplicationWindow {
 
         StackLayout {
             width: parent.width
-            height: parent.height - (tabBar.visible ? tabBar.height : 0)
-            anchors.top: tabBar.visible ? tabBar.bottom : parent.top
-            currentIndex: tabBar.visible ? tabBar.currentIndex : 0
+            height: parent.height - tabBar.height
+            anchors.top: tabBar.bottom
+            currentIndex: tabBar.currentIndex
 
-            // Tab 1: Exported Applications
+            // Exported Applications Tab
             Item {
                 ColumnLayout {
                     anchors.fill: parent
@@ -137,7 +127,7 @@ Kirigami.ApplicationWindow {
 
                     Kirigami.PlaceholderMessage {
                         Layout.alignment: Qt.AlignCenter
-                        visible: !loadingExported && filterApps(exportedApps).length === 0 && initialized
+                        visible: !loadingExported && filterApps(exportedApps).length === 0
                         text: i18n("No exported applications found")
                         helpfulAction: Kirigami.Action {
                             text: i18n("Switch to Available tab")
@@ -158,7 +148,6 @@ Kirigami.ApplicationWindow {
 
                             delegate: Kirigami.AbstractCard {
                                 width: exportedListView.width - Kirigami.Units.smallSpacing * 2
-
                                 contentItem: RowLayout {
                                     spacing: Kirigami.Units.largeSpacing
 
@@ -187,12 +176,8 @@ Kirigami.ApplicationWindow {
                                         onClicked: {
                                             lastOperation = modelData.name || modelData.basename
                                             var success = distroBoxManager.unexportApp(modelData.basename, containerName)
-                                            if (success) {
-                                                refreshTimer.start()
-                                            } else {
-                                                showPassiveNotification(i18n("Failed to unexport application"))
-                                                lastOperation = ""
-                                            }
+                                            if (success) refreshTimer.start()
+                                                else { showPassiveNotification(i18n("Failed to unexport application")); lastOperation = "" }
                                         }
                                     }
                                 }
@@ -202,7 +187,7 @@ Kirigami.ApplicationWindow {
                 }
             }
 
-            // Tab 2: Available Applications
+            // Available Applications Tab
             Item {
                 ColumnLayout {
                     anchors.fill: parent
@@ -233,7 +218,7 @@ Kirigami.ApplicationWindow {
 
                     Kirigami.PlaceholderMessage {
                         Layout.alignment: Qt.AlignCenter
-                        visible: !loadingAvailable && filterApps(availableApps).length === 0 && initialized
+                        visible: !loadingAvailable && filterApps(availableApps).length === 0
                         text: i18n("No applications found in container")
                         explanation: i18n("This container might not have desktop applications installed or they might not be detectable.")
                         helpfulAction: Kirigami.Action {
@@ -255,7 +240,6 @@ Kirigami.ApplicationWindow {
 
                             delegate: Kirigami.AbstractCard {
                                 width: availableListView.width - Kirigami.Units.smallSpacing * 2
-
                                 contentItem: RowLayout {
                                     spacing: Kirigami.Units.largeSpacing
 
@@ -284,12 +268,8 @@ Kirigami.ApplicationWindow {
                                         onClicked: {
                                             lastOperation = modelData.name || modelData.basename
                                             var success = distroBoxManager.exportApp(modelData.basename, containerName)
-                                            if (success) {
-                                                refreshTimer.start()
-                                            } else {
-                                                showPassiveNotification(i18n("Failed to export application"))
-                                                lastOperation = ""
-                                            }
+                                            if (success) refreshTimer.start()
+                                                else { showPassiveNotification(i18n("Failed to export application")); lastOperation = "" }
                                         }
                                     }
                                 }
@@ -301,7 +281,7 @@ Kirigami.ApplicationWindow {
         }
 
         footer: Controls.ToolBar {
-            visible: Object.keys(selectedApps).length > 0 && initialized
+            visible: Object.keys(selectedApps).length > 0
             RowLayout {
                 width: parent.width
                 Controls.Label {
@@ -315,11 +295,8 @@ Kirigami.ApplicationWindow {
                         var appNames = Object.keys(selectedApps).filter(function(key) { return selectedApps[key] });
 
                         for (var i = 0; i < appNames.length; i++) {
-                            if (tabBar.currentIndex === 0) {
-                                distroBoxManager.unexportApp(appNames[i], containerName)
-                            } else {
-                                distroBoxManager.exportApp(appNames[i], containerName)
-                            }
+                            if (tabBar.currentIndex === 0) distroBoxManager.unexportApp(appNames[i], containerName)
+                                else distroBoxManager.exportApp(appNames[i], containerName)
                         }
 
                         lastOperation = i18n("%1 applications", appNames.length)
@@ -349,13 +326,12 @@ Kirigami.ApplicationWindow {
         ]
     }
 
-    // Show a loading overlay when first opening the window
     Rectangle {
         id: loadingOverlay
         anchors.fill: parent
         color: Qt.rgba(1, 1, 1, 0.7)
-        visible: !initialized && applicationsWindow.visible
-        z: 1000 // Ensure it's on top of everything
+        visible: loadingExported || loadingAvailable
+        z: 1000
 
         ColumnLayout {
             anchors.centerIn: parent
@@ -378,7 +354,7 @@ Kirigami.ApplicationWindow {
 
     Timer {
         id: refreshTimer
-        interval: 1000 // 1 second delay to allow export/unexport operations to complete
+        interval: 1000
         onTriggered: refreshApplications()
     }
 }
