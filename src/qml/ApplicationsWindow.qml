@@ -23,9 +23,15 @@ Kirigami.ApplicationWindow {
     property bool loadingAvailable: true
     property var exportedApps: []
     property var availableApps: []
+    property string lastOperation: ""
+    property var selectedApps: ({})
+    property string searchText: ""
 
     function refreshApplications() {
         console.log("Refreshing applications for container:", containerName)
+
+        // Reset selection
+        selectedApps = {}
 
         // Refresh exported applications
         loadingExported = true
@@ -40,6 +46,21 @@ Kirigami.ApplicationWindow {
         console.log("Available apps:", JSON.stringify(available))
         availableApps = available || []
         loadingAvailable = false
+
+        // Show notification if there was a recent operation
+        if (lastOperation) {
+            showPassiveNotification(i18n("Operation completed for %1", lastOperation))
+            lastOperation = ""
+        }
+    }
+
+    function filterApps(apps) {
+        if (!searchText) return apps;
+
+        return apps.filter(function(app) {
+            return app.name.toLowerCase().includes(searchText.toLowerCase()) ||
+            app.basename.toLowerCase().includes(searchText.toLowerCase());
+        });
     }
 
     onContainerNameChanged: {
@@ -81,6 +102,22 @@ Kirigami.ApplicationWindow {
                     anchors.fill: parent
                     spacing: Kirigami.Units.smallSpacing
 
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Controls.TextField {
+                            id: exportedSearchField
+                            Layout.fillWidth: true
+                            placeholderText: i18n("Search exported applications...")
+                            onTextChanged: searchText = text
+                        }
+                        Controls.Button {
+                            icon.name: "edit-clear"
+                            text: i18n("Clear")
+                            onClicked: exportedSearchField.text = ""
+                            visible: exportedSearchField.text.length > 0
+                        }
+                    }
+
                     Controls.BusyIndicator {
                         Layout.alignment: Qt.AlignCenter
                         visible: loadingExported
@@ -89,7 +126,7 @@ Kirigami.ApplicationWindow {
 
                     Kirigami.PlaceholderMessage {
                         Layout.alignment: Qt.AlignCenter
-                        visible: !loadingExported && exportedApps.length === 0
+                        visible: !loadingExported && filterApps(exportedApps).length === 0
                         text: i18n("No exported applications found")
                         helpfulAction: Kirigami.Action {
                             text: i18n("Switch to Available tab")
@@ -101,11 +138,11 @@ Kirigami.ApplicationWindow {
                     Controls.ScrollView {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        visible: !loadingExported && exportedApps.length > 0
+                        visible: !loadingExported && filterApps(exportedApps).length > 0
 
                         ListView {
                             id: exportedListView
-                            model: exportedApps
+                            model: filterApps(exportedApps)
                             spacing: Kirigami.Units.smallSpacing
 
                             delegate: Kirigami.AbstractCard {
@@ -113,6 +150,12 @@ Kirigami.ApplicationWindow {
 
                                 contentItem: RowLayout {
                                     spacing: Kirigami.Units.largeSpacing
+
+                                    Controls.CheckBox {
+                                        checked: selectedApps[modelData.basename] || false
+                                        onCheckedChanged: selectedApps[modelData.basename] = checked
+                                        visible: Object.keys(selectedApps).length > 0 || checked
+                                    }
 
                                     Kirigami.Icon {
                                         source: modelData.icon || "application-x-executable"
@@ -131,9 +174,14 @@ Kirigami.ApplicationWindow {
                                         text: i18n("Unexport")
                                         icon.name: "list-remove"
                                         onClicked: {
-                                            distroBoxManager.unexportApp(modelData.basename, containerName)
-                                            // Use a timer to refresh after a short delay to allow the operation to complete
-                                            refreshTimer.start()
+                                            lastOperation = modelData.name || modelData.basename
+                                            var success = distroBoxManager.unexportApp(modelData.basename, containerName)
+                                            if (success) {
+                                                refreshTimer.start()
+                                            } else {
+                                                showPassiveNotification(i18n("Failed to unexport application"))
+                                                lastOperation = ""
+                                            }
                                         }
                                     }
                                 }
@@ -149,6 +197,22 @@ Kirigami.ApplicationWindow {
                     anchors.fill: parent
                     spacing: Kirigami.Units.smallSpacing
 
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Controls.TextField {
+                            id: availableSearchField
+                            Layout.fillWidth: true
+                            placeholderText: i18n("Search available applications...")
+                            onTextChanged: searchText = text
+                        }
+                        Controls.Button {
+                            icon.name: "edit-clear"
+                            text: i18n("Clear")
+                            onClicked: availableSearchField.text = ""
+                            visible: availableSearchField.text.length > 0
+                        }
+                    }
+
                     Controls.BusyIndicator {
                         Layout.alignment: Qt.AlignCenter
                         visible: loadingAvailable
@@ -157,18 +221,24 @@ Kirigami.ApplicationWindow {
 
                     Kirigami.PlaceholderMessage {
                         Layout.alignment: Qt.AlignCenter
-                        visible: !loadingAvailable && availableApps.length === 0
+                        visible: !loadingAvailable && filterApps(availableApps).length === 0
                         text: i18n("No applications found in container")
+                        explanation: i18n("This container might not have desktop applications installed or they might not be detectable.")
+                        helpfulAction: Kirigami.Action {
+                            text: i18n("Open Distrobox to install applications")
+                            icon.name: "application-menu"
+                            onTriggered: distroBoxManager.enterContainer(containerName)
+                        }
                     }
 
                     Controls.ScrollView {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        visible: !loadingAvailable && availableApps.length > 0
+                        visible: !loadingAvailable && filterApps(availableApps).length > 0
 
                         ListView {
                             id: availableListView
-                            model: availableApps
+                            model: filterApps(availableApps)
                             spacing: Kirigami.Units.smallSpacing
 
                             delegate: Kirigami.AbstractCard {
@@ -177,8 +247,14 @@ Kirigami.ApplicationWindow {
                                 contentItem: RowLayout {
                                     spacing: Kirigami.Units.largeSpacing
 
+                                    Controls.CheckBox {
+                                        checked: selectedApps[modelData.basename] || false
+                                        onCheckedChanged: selectedApps[modelData.basename] = checked
+                                        visible: Object.keys(selectedApps).length > 0 || checked
+                                    }
+
                                     Kirigami.Icon {
-                                        source: modelData.icon || "application-x-executable"
+                                        source: modelData.icon || "package-x-generic"
                                         width: Kirigami.Units.iconSizes.medium
                                         height: width
                                     }
@@ -194,15 +270,55 @@ Kirigami.ApplicationWindow {
                                         text: i18n("Export")
                                         icon.name: "list-add"
                                         onClicked: {
-                                            distroBoxManager.exportApp(modelData.basename, containerName)
-                                            // Use a timer to refresh after a short delay to allow the operation to complete
-                                            refreshTimer.start()
+                                            lastOperation = modelData.name || modelData.basename
+                                            var success = distroBoxManager.exportApp(modelData.basename, containerName)
+                                            if (success) {
+                                                refreshTimer.start()
+                                            } else {
+                                                showPassiveNotification(i18n("Failed to export application"))
+                                                lastOperation = ""
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+        }
+
+        footer: Controls.ToolBar {
+            visible: Object.keys(selectedApps).length > 0
+            RowLayout {
+                width: parent.width
+                Controls.Label {
+                    text: i18n("%1 selected", Object.keys(selectedApps).length)
+                }
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    text: tabBar.currentIndex === 0 ? i18n("Unexport Selected") : i18n("Export Selected")
+                    icon.name: tabBar.currentIndex === 0 ? "list-remove" : "list-add"
+                    onClicked: {
+                        var appNames = Object.keys(selectedApps).filter(function(key) { return selectedApps[key] });
+
+                        for (var i = 0; i < appNames.length; i++) {
+                            if (tabBar.currentIndex === 0) {
+                                distroBoxManager.unexportApp(appNames[i], containerName)
+                            } else {
+                                distroBoxManager.exportApp(appNames[i], containerName)
+                            }
+                        }
+
+                        lastOperation = i18n("%1 applications", appNames.length)
+                        selectedApps = {}
+                        refreshTimer.start()
+                    }
+                }
+                Controls.Button {
+                    text: i18n("Clear Selection")
+                    icon.name: "edit-clear"
+                    onClicked: selectedApps = {}
                 }
             }
         }
