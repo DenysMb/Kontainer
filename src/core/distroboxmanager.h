@@ -105,6 +105,12 @@ public Q_SLOTS:
     bool upgradeContainer(const QString &name);
 
     /**
+     * @brief Upgrades packages in all containers
+     * @return true if upgrades were successful, false otherwise
+     */
+    bool upgradeAllContainer();
+
+    /**
      * @brief Gets a color associated with the distribution
      * @param image Base image name to get color for
      * @return Hex color code (e.g., "#FF0000") for the distribution

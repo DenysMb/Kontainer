@@ -248,7 +248,16 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
-    QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
+
+    return launchCommandInTerminal(command);
+}
+
+bool DistroboxManager::upgradeAllContainer()
+{
+    QString message = i18n("Press any key to close this terminal…");
+    QString upgradeCmd = u"distrobox upgrade --all && echo '' && echo '%1' && read -s -n 1"_s.arg(message);
+    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -298,14 +307,14 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
             "Cannot automatically install packages for this distribution. Please enter the distrobox manually and install it using the appropriate package "
             "manager.");
         QString script = u"echo "_s + KShell::quoteArg(message) + u"; read -n 1"_s;
-        QString command = u"bash -c "_s + KShell::quoteArg(script);
+        QString command = u"/usr/bin/env bash -c "_s + KShell::quoteArg(script);
         return launchCommandInTerminal(command, homeDir);
     }
 
     // Run installation command in container and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
-    QString fullCmd = u"distrobox enter %1 -- bash -c \"%2 && echo '' && echo '%3' && read -s -n 1\""_s.arg(name, *installCmd, message);
-    QString command = u"bash -c "_s + KShell::quoteArg(fullCmd);
+    QString fullCmd = u"distrobox enter %1 -- /usr/bin/env bash -c \"%2 && echo '' && echo '%3' && read -s -n 1\""_s.arg(name, *installCmd, message);
+    QString command = u"/usr/bin/env bash -c "_s + KShell::quoteArg(fullCmd);
     return launchCommandInTerminal(command, homeDir);
 }
 
