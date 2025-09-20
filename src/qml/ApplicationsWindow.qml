@@ -66,6 +66,24 @@ Kirigami.ApplicationWindow {
         });
     }
 
+    function iconSourceForApp(app) {
+        if (!app)
+            return "";
+        if (app.iconSource)
+            return app.iconSource;
+        if (app.icon && (app.icon.startsWith("file:") || app.icon.startsWith("/") || app.icon.startsWith("data:")))
+            return app.icon;
+        return "";
+    }
+
+    function iconNameForApp(app, fallbackIcon) {
+        if (!app)
+            return fallbackIcon;
+        if (app.icon && app.icon.length > 0 && !app.icon.startsWith("/") && app.icon.indexOf("://") === -1)
+            return app.icon;
+        return fallbackIcon;
+    }
+
     onContainerNameChanged: {
         if (containerName)
             refreshApplications();
@@ -252,7 +270,8 @@ Kirigami.ApplicationWindow {
                                 }
 
                                 Kirigami.Icon {
-                                    source: modelData.icon || "application-x-executable"
+                                    readonly property string resolvedIconSource: iconSourceForApp(modelData)
+                                    source: resolvedIconSource.length > 0 ? resolvedIconSource : iconNameForApp(modelData, "application-x-executable")
                                     width: Kirigami.Units.iconSizes.medium
                                     height: width
                                 }
@@ -311,7 +330,8 @@ Kirigami.ApplicationWindow {
                                 }
 
                                 Kirigami.Icon {
-                                    source: modelData.icon || "package-x-generic"
+                                    readonly property string resolvedIconSource: iconSourceForApp(modelData)
+                                    source: resolvedIconSource.length > 0 ? resolvedIconSource : iconNameForApp(modelData, "package-x-generic")
                                     width: Kirigami.Units.iconSizes.medium
                                     height: width
                                 }
