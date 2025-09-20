@@ -66,6 +66,15 @@ Kirigami.ApplicationWindow {
         });
     }
 
+    function isAppExported(basename) {
+        if (!basename || !exportedApps || exportedApps.length === 0)
+            return false;
+
+        return exportedApps.some(function (app) {
+            return app && app.basename === basename;
+        });
+    }
+
     function iconSourceForApp(app) {
         if (!app)
             return "";
@@ -344,20 +353,23 @@ Kirigami.ApplicationWindow {
                                 }
 
                                 Controls.Button {
-                                    text: i18n("Export")
-                                    icon.name: "list-add"
+                                    text: applicationsWindow.isAppExported(modelData.basename) ? i18n("Unexport") : i18n("Export")
+                                    icon.name: applicationsWindow.isAppExported(modelData.basename) ? "list-remove" : "list-add"
                                     enabled: !operationInProgress
                                     onClicked: {
+                                        var wasExported = applicationsWindow.isAppExported(modelData.basename);
                                         operationInProgress = true;
                                         lastOperation = modelData.name || modelData.basename;
-                                        var success = distroBoxManager.exportApp(modelData.basename, containerName);
+                                        var success = wasExported ? distroBoxManager.unexportApp(modelData.basename, containerName) : distroBoxManager.exportApp(modelData.basename, containerName);
                                         if (success) {
-                                            // Switch to exported tab after exporting
-                                            currentTabIndex = 0;
+                                            if (!wasExported) {
+                                                // Switch to exported tab after exporting
+                                                currentTabIndex = 0;
+                                            }
                                             refreshAppLists();
                                             operationInProgress = false;
                                         } else {
-                                            showPassiveNotification(i18n("Failed to export application"));
+                                            showPassiveNotification(wasExported ? i18n("Failed to unexport application") : i18n("Failed to export application"));
                                             lastOperation = "";
                                             operationInProgress = false;
                                         }
