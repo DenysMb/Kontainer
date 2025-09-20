@@ -9,7 +9,10 @@
     "--socket=fallback-x11",
     "--socket=wayland",
     "--device=dri",
-    "--talk-name=org.freedesktop.Flatpak"
+    "--talk-name=org.freedesktop.Flatpak",
+    "--filesystem=~/.local/share/applications:rw",
+    "--filesystem=~/.local/share/flatpak/exports:ro",
+    "--filesystem=/var/lib/flatpak/exports:ro"
   ],
   "modules": [
     {

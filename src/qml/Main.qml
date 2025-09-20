@@ -4,6 +4,12 @@
     SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
 */
 
+/*
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ */
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
@@ -19,20 +25,20 @@ Kirigami.ApplicationWindow {
 
     title: i18n("Kontainer")
 
-    About { 
+    About {
         id: aboutPage
         visible: false
     }
 
     property bool refreshing: false
 
-    function refresh() {  
-        refreshing = true
-        var result = distroBoxManager.listContainers()
-        mainPage.containersList = JSON.parse(result)
-        refreshing = false
+    function refresh() {
+        refreshing = true;
+        var result = distroBoxManager.listContainers();
+        mainPage.containersList = JSON.parse(result);
+        refreshing = false;
     }
-    
+
     globalDrawer: Kirigami.GlobalDrawer {
         isMenu: true
         actions: [
@@ -68,7 +74,7 @@ Kirigami.ApplicationWindow {
                 icon.name: "io.github.DenysMb.Kontainer"
                 onTriggered: {
                     if (root.pageStack.layers.currentItem !== aboutPage) {
-                        root.pageStack.layers.push(aboutPage)
+                        root.pageStack.layers.push(aboutPage);
                     }
                 }
             }
@@ -78,16 +84,16 @@ Kirigami.ApplicationWindow {
     ErrorDialog {
         id: errorDialog
     }
-    
+
     DistroboxRemoveDialog {
         id: removeDialog
     }
-    
+
     DistroboxCreateDialog {
         id: createDialog
         errorDialog: errorDialog
     }
-    
+
     DistroboxShortcutDialog {
         id: shortcutDialog
         containersList: mainPage.containersList
@@ -96,23 +102,23 @@ Kirigami.ApplicationWindow {
     FilePickerDialog {
         id: packageFileDialog
     }
-    
+
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
         spacing: Kirigami.Units.smallSpacing
         padding: Kirigami.Units.smallSpacing
 
         title: i18n("Distrobox Containers")
-        
+
         supportsRefreshing: true
         onRefreshingChanged: {
             if (refreshing) {
-                refresh()
+                refresh();
             }
         }
 
         property var containersList: []
-        
+
         actions: [
             Kirigami.Action {
                 text: i18n("Create…")
@@ -130,41 +136,41 @@ Kirigami.ApplicationWindow {
                 onTriggered: refresh()
             }
         ]
-        
+
         Component.onCompleted: {
-            refresh()
+            refresh();
         }
-        
+
         ColumnLayout {
             anchors.fill: parent
             spacing: Kirigami.Units.largeSpacing
-            
+
             Kirigami.CardsListView {
                 id: containersListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 model: mainPage.containersList
-                
+
                 delegate: Kirigami.AbstractCard {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
-                        
+
                         Rectangle {
                             width: Kirigami.Units.smallSpacing
                             Layout.fillHeight: true
                             color: distroBoxManager.getDistroColor(modelData.image)
                             radius: 4
                         }
-                        
+
                         RowLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.margins: Kirigami.Units.smallSpacing
-                            
+
                             ColumnLayout {
                                 spacing: Kirigami.Units.smallSpacing
                                 Layout.maximumWidth: implicitWidth
-                                
+
                                 Controls.Label {
                                     text: modelData.name.charAt(0).toUpperCase() + modelData.name.slice(1)
                                     elide: Text.ElideRight
@@ -172,7 +178,7 @@ Kirigami.ApplicationWindow {
                                     font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
                                     font.bold: true
                                 }
-                                
+
                                 Controls.Label {
                                     text: modelData.image
                                     elide: Text.ElideRight
@@ -184,7 +190,7 @@ Kirigami.ApplicationWindow {
 
                             Kirigami.ActionToolBar {
                                 id: actionToolBar
-                                
+
                                 Layout.fillWidth: true
                                 spacing: Kirigami.Units.smallSpacing
 
@@ -197,31 +203,46 @@ Kirigami.ApplicationWindow {
                                         icon.name: "delete"
                                         text: i18n("Remove Container")
                                         onTriggered: {
-                                            removeDialog.containerName = modelData.name
-                                            removeDialog.open()
+                                            removeDialog.containerName = modelData.name;
+                                            removeDialog.open();
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "system-software-update"
                                         text: i18n("Upgrade Container")
                                         onTriggered: {
-                                            distroBoxManager.upgradeContainer(modelData.name)
+                                            distroBoxManager.upgradeContainer(modelData.name);
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "package-x-generic"
                                         text: i18n("Install Package")
                                         onTriggered: {
-                                            packageFileDialog.containerName = modelData.name
-                                            packageFileDialog.containerImage = modelData.image
-                                            packageFileDialog.open()
+                                            packageFileDialog.containerName = modelData.name;
+                                            packageFileDialog.containerImage = modelData.image;
+                                            packageFileDialog.open();
+                                        }
+                                    },
+                                    Kirigami.Action {
+                                        icon.name: "applications-other-symbolic"
+                                        text: i18n("Manage Applications")
+                                        onTriggered: {
+                                            var component = Qt.createComponent("ApplicationsWindow.qml");
+                                            if (component.status === Component.Ready) {
+                                                var window = component.createObject(root, {
+                                                    containerName: modelData.name
+                                                });
+                                                window.show();
+                                            } else {
+                                                console.error("Error loading ApplicationsWindow:", component.errorString());
+                                            }
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "utilities-terminal-symbolic"
                                         text: i18n("Open Terminal")
                                         onTriggered: {
-                                            distroBoxManager.enterContainer(modelData.name)
+                                            distroBoxManager.enterContainer(modelData.name);
                                         }
                                     }
                                 ]
@@ -256,7 +277,7 @@ Kirigami.ApplicationWindow {
                 }
 
                 Component.onCompleted: {
-                    loadingTimer.start()
+                    loadingTimer.start();
                 }
             }
         }
