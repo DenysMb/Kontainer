@@ -400,45 +400,73 @@ QVariantList DistroboxManager::allApps(const QString &container)
 
 QVariantList DistroboxManager::exportedApps(const QString &container)
 {
-    QString appsPath = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
-    if (DistroboxCli::isFlatpak()) {
-        appsPath = QDir::homePath() + QStringLiteral("/.local/share/applications");
+    QVariantList list;
+    bool isFlatpakRuntime = DistroboxCli::isFlatpak();
+    QStringList searchPaths;
+
+    if (isFlatpakRuntime) {
+        // In Flatpak, search multiple possible locations for exported desktop files
+        searchPaths = {QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/data/applications"),
+                       QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/.local/share/applications"),
+                       QStringLiteral("/var/lib/flatpak/exports/share/applications"),
+                       QDir::homePath() + QStringLiteral("/.local/share/flatpak/exports/share/applications"),
+                       QDir::homePath() + QStringLiteral("/.local/share/applications")};
+    } else {
+        searchPaths = {QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)};
     }
 
-    QVariantList list;
-    QDir dir(appsPath);
     QStringList patterns;
     patterns << QStringLiteral("%1-*.desktop").arg(container);
 
-    for (const QFileInfo &file : dir.entryInfoList(patterns, QDir::Files)) {
-        QString fileName = file.fileName();
-        if (!fileName.endsWith(QStringLiteral(".desktop"))) {
+    // Search in all possible paths
+    for (const QString &searchPath : searchPaths) {
+        QDir dir(searchPath);
+        if (!dir.exists()) {
             continue;
         }
 
-        // Extract basename
-        QString basename = fileName;
-        QString prefix = container + QLatin1String("-");
-        if (basename.startsWith(prefix)) {
-            basename.remove(0, prefix.length());
+        for (const QFileInfo &file : dir.entryInfoList(patterns, QDir::Files)) {
+            QString fileName = file.fileName();
+            if (!fileName.endsWith(QStringLiteral(".desktop"))) {
+                continue;
+            }
+
+            // Extract basename from filename
+            QString prefix = container + QLatin1String("-");
+            QString basename = fileName;
+            if (basename.startsWith(prefix)) {
+                basename.remove(0, prefix.length());
+            }
+            if (basename.endsWith(QStringLiteral(".desktop"))) {
+                basename.chop(8);
+            }
+
+            // Skip if we already found this app (avoid duplicates from multiple paths)
+            bool alreadyExists = false;
+            for (const QVariant &existingApp : list) {
+                QVariantMap existingMap = existingApp.toMap();
+                if (existingMap[QStringLiteral("basename")].toString() == basename) {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+            if (alreadyExists) {
+                continue;
+            }
+
+            QSettings desktop(file.filePath(), QSettings::IniFormat);
+            QVariantMap app;
+            app[QStringLiteral("basename")] = basename;
+
+            QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), basename).toString();
+            QString icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
+
+            app[QStringLiteral("name")] = fullName.section(QStringLiteral(" (on "), 0, 0);
+            app[QStringLiteral("icon")] = icon;
+
+            qDebug() << "Exported app:" << app[QStringLiteral("name")].toString() << "| Basename:" << basename << "| File:" << fileName;
+            list << app;
         }
-        if (basename.endsWith(QStringLiteral(".desktop"))) {
-            basename.chop(8);
-        }
-
-        QSettings desktop(file.filePath(), QSettings::IniFormat);
-        QVariantMap app;
-        app[QStringLiteral("basename")] = basename;
-
-        QString fullName = desktop.value(QStringLiteral("Desktop Entry/Name"), basename).toString();
-        QString icon = desktop.value(QStringLiteral("Desktop Entry/Icon"), QString()).toString();
-
-        app[QStringLiteral("name")] = fullName.section(QStringLiteral(" (on "), 0, 0);
-        app[QStringLiteral("icon")] = icon;
-        app[QStringLiteral("fileName")] = fileName; // For debugging
-
-        qDebug() << "Exported app:" << app[QStringLiteral("name")].toString() << "| Basename:" << basename << "| File:" << fileName;
-        list << app;
     }
 
     return list;
