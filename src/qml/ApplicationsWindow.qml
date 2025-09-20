@@ -240,7 +240,7 @@ Kirigami.ApplicationWindow {
                         spacing: Kirigami.Units.smallSpacing
 
                         delegate: Kirigami.AbstractCard {
-                            width: exportedListView.width - Kirigami.Units.smallSpacing * 2
+                            Layout.fillWidth: true
 
                             contentItem: RowLayout {
                                 spacing: Kirigami.Units.largeSpacing
@@ -299,7 +299,7 @@ Kirigami.ApplicationWindow {
                         spacing: Kirigami.Units.smallSpacing
 
                         delegate: Kirigami.AbstractCard {
-                            width: availableListView.width - Kirigami.Units.smallSpacing * 2
+                            Layout.fillWidth: true
 
                             contentItem: RowLayout {
                                 spacing: Kirigami.Units.largeSpacing
