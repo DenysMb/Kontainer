@@ -28,45 +28,47 @@ Kirigami.ApplicationWindow {
     // Separate search text for each tab
     property string exportedSearchText: ""
     property string availableSearchText: ""
+    property int currentTabIndex: 0
 
-    signal dataReady() // emitted when both lists are loaded
+    signal dataReady // emitted when both lists are loaded
 
     function refreshApplications() {
-        loading = true
+        loading = true;
 
         // Let the window paint first
-        Qt.callLater(function() {
-            exportedApps = distroBoxManager.exportedApps(containerName) || []
-            availableApps = distroBoxManager.availableApps(containerName) || []
-            loading = false
-            dataReady()
-        })
+        Qt.callLater(function () {
+            exportedApps = distroBoxManager.exportedApps(containerName) || [];
+            availableApps = distroBoxManager.availableApps(containerName) || [];
+            loading = false;
+            dataReady();
+        });
     }
 
     function refreshAppLists() {
         // Only refresh the lists without showing loading screen
-        Qt.callLater(function() {
+        Qt.callLater(function () {
             var oldExportedCount = exportedApps.length;
-            exportedApps = distroBoxManager.exportedApps(containerName) || []
-            availableApps = distroBoxManager.availableApps(containerName) || []
+            exportedApps = distroBoxManager.exportedApps(containerName) || [];
+            availableApps = distroBoxManager.availableApps(containerName) || [];
 
             // Switch to exported tab if we just exported an app and the count increased
-            if (exportedApps.length > oldExportedCount && tabBar.currentIndex === 1) {
-                tabBar.currentIndex = 0;
+            if (exportedApps.length > oldExportedCount && currentTabIndex === 1) {
+                currentTabIndex = 0;
             }
-        })
+        });
     }
 
     function filterApps(apps, searchText) {
-        if (!searchText) return apps;
-        return apps.filter(function(app) {
-            return app.name && app.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            app.basename && app.basename.toLowerCase().includes(searchText.toLowerCase());
+        if (!searchText)
+            return apps;
+        return apps.filter(function (app) {
+            return app.name && app.name.toLowerCase().includes(searchText.toLowerCase()) || app.basename && app.basename.toLowerCase().includes(searchText.toLowerCase());
         });
     }
 
     onContainerNameChanged: {
-        if (containerName) refreshApplications()
+        if (containerName)
+            refreshApplications();
     }
 
     // Loader ensures main UI is only created after data is ready
@@ -109,76 +111,61 @@ Kirigami.ApplicationWindow {
 
             header: Controls.ToolBar {
                 contentItem: RowLayout {
-                    Item {
+                    spacing: Kirigami.Units.smallSpacing
+
+                    RowLayout {
                         Layout.fillWidth: true
-                    }
-                    Row {
-                        spacing: 0 // Remove space between buttons
+                        spacing: 0
+
                         Controls.ToolButton {
-                            action: refreshAction
+                            Layout.fillWidth: true
+                            text: i18n("Exported Applications (%1)", exportedApps.length)
+                            checkable: true
+                            checked: currentTabIndex === 0
+                            onClicked: currentTabIndex = 0
+                        }
+
+                        Controls.ToolButton {
+                            Layout.fillWidth: true
+                            text: i18n("Available Applications (%1)", availableApps.length)
+                            checkable: true
+                            checked: currentTabIndex === 1
+                            onClicked: currentTabIndex = 1
                         }
                     }
+
+                    Controls.ToolButton {
+                        action: refreshAction
+                    }
                 }
             }
-
-            Controls.TabBar {
-                id: tabBar
-                width: parent.width
-
-                Controls.TabButton {
-                    text: i18n("Exported Applications (%1)", exportedApps.length)
-                }
-                Controls.TabButton {
-                    text: i18n("Available Applications (%1)", availableApps.length)
-                }
-            }
-
             // This container will hold the search bar and list view for each tab
             StackLayout {
-                width: parent.width
-                height: parent.height - tabBar.height
-                anchors.top: tabBar.bottom
-                currentIndex: tabBar.currentIndex
+                anchors.fill: parent
+                currentIndex: currentTabIndex
 
                 // Tab 1: Exported Applications
                 Item {
                     ColumnLayout {
                         anchors.fill: parent
-                        spacing: 0
+                        spacing: Kirigami.Units.largeSpacing
 
                         // Search bar for exported apps
-                        Controls.Control {
-                            id: exportedSearchControl
+                        Kirigami.SearchField {
+                            id: exportedSearchField
                             Layout.fillWidth: true
-                            Layout.preferredHeight: visible ? exportedSearchLayout.implicitHeight : 0
+                            Layout.preferredHeight: visible ? implicitHeight : 0
                             visible: filterApps(exportedApps, exportedSearchText).length > 0 || exportedSearchText.length > 0
-
-                            contentItem: RowLayout {
-                                id: exportedSearchLayout
-                                anchors.fill: parent
-
-                                Controls.TextField {
-                                    id: exportedSearchField
-                                    Layout.fillWidth: true
-                                    placeholderText: i18n("Search exported applications...")
-                                    onTextChanged: exportedSearchText = text
-                                }
-                                Controls.Button {
-                                    icon.name: "edit-clear"
-                                    text: i18n("Clear")
-                                    onClicked: {
-                                        exportedSearchField.text = ""
-                                        exportedSearchText = ""
-                                    }
-                                    visible: exportedSearchField.text.length > 0
-                                }
-                            }
+                            placeholderText: i18n("Search exported applications...")
+                            text: exportedSearchText
+                            onTextChanged: exportedSearchText = text
                         }
 
                         // Content area
                         Loader {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.topMargin: exportedSearchField.visible ? Kirigami.Units.largeSpacing : 0
 
                             sourceComponent: {
                                 if (filterApps(exportedApps, exportedSearchText).length === 0) {
@@ -195,41 +182,24 @@ Kirigami.ApplicationWindow {
                 Item {
                     ColumnLayout {
                         anchors.fill: parent
-                        spacing: 0
+                        spacing: Kirigami.Units.largeSpacing
 
                         // Search bar for available apps
-                        Controls.Control {
-                            id: availableSearchControl
+                        Kirigami.SearchField {
+                            id: availableSearchField
                             Layout.fillWidth: true
-                            Layout.preferredHeight: visible ? availableSearchLayout.implicitHeight : 0
+                            Layout.preferredHeight: visible ? implicitHeight : 0
                             visible: filterApps(availableApps, availableSearchText).length > 0 || availableSearchText.length > 0
-
-                            contentItem: RowLayout {
-                                id: availableSearchLayout
-                                anchors.fill: parent
-
-                                Controls.TextField {
-                                    id: availableSearchField
-                                    Layout.fillWidth: true
-                                    placeholderText: i18n("Search available applications...")
-                                    onTextChanged: availableSearchText = text
-                                }
-                                Controls.Button {
-                                    icon.name: "edit-clear"
-                                    text: i18n("Clear")
-                                    onClicked: {
-                                        availableSearchField.text = ""
-                                        availableSearchText = ""
-                                    }
-                                    visible: availableSearchField.text.length > 0
-                                }
-                            }
+                            placeholderText: i18n("Search available applications...")
+                            text: availableSearchText
+                            onTextChanged: availableSearchText = text
                         }
 
                         // Content area
                         Loader {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.topMargin: availableSearchField.visible ? Kirigami.Units.largeSpacing : 0
 
                             sourceComponent: {
                                 if (filterApps(availableApps, availableSearchText).length === 0) {
@@ -247,32 +217,15 @@ Kirigami.ApplicationWindow {
             Component {
                 id: exportedPlaceholderComponent
                 Kirigami.PlaceholderMessage {
-                    anchors.centerIn: parent
-                    text: exportedSearchText ?
-                    i18n("No exported applications found matching '%1'", exportedSearchText) :
-                    i18n("No exported applications found")
-                    helpfulAction: Kirigami.Action {
-                        text: i18n("Switch to Available tab")
-                        icon.name: "go-next"
-                        onTriggered: tabBar.currentIndex = 1
-                    }
+                    text: exportedSearchText ? i18n("No exported applications found matching '%1'", exportedSearchText) : i18n("No exported applications found")
                 }
             }
 
             Component {
                 id: availablePlaceholderComponent
                 Kirigami.PlaceholderMessage {
-                    anchors.centerIn: parent
-                    text: availableSearchText ?
-                    i18n("No applications found matching '%1'", availableSearchText) :
-                    i18n("No applications found in container")
-                    explanation: !availableSearchText ?
-                    i18n("This container might not have desktop applications installed or they might not be detectable.") : ""
-                    helpfulAction: Kirigami.Action {
-                        text: i18n("Open Distrobox to install applications")
-                        icon.name: "application-menu"
-                        onTriggered: distroBoxManager.enterContainer(containerName)
-                    }
+                    text: availableSearchText ? i18n("No applications found matching '%1'", availableSearchText) : i18n("No applications found in container")
+                    explanation: !availableSearchText ? i18n("This container might not have desktop applications installed or they might not be detectable.") : ""
                 }
             }
 
@@ -380,7 +333,7 @@ Kirigami.ApplicationWindow {
                                         var success = distroBoxManager.exportApp(modelData.basename, containerName);
                                         if (success) {
                                             // Switch to exported tab after exporting
-                                            tabBar.currentIndex = 0;
+                                            currentTabIndex = 0;
                                             refreshAppLists();
                                             operationInProgress = false;
                                         } else {
@@ -400,17 +353,23 @@ Kirigami.ApplicationWindow {
                 visible: Object.keys(selectedApps).length > 0
                 RowLayout {
                     width: parent.width
-                    Controls.Label { text: i18n("%1 selected", Object.keys(selectedApps).length) }
-                    Item { Layout.fillWidth: true }
+                    Controls.Label {
+                        text: i18n("%1 selected", Object.keys(selectedApps).length)
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                    }
                     Controls.Button {
-                        text: tabBar.currentIndex === 0 ? i18n("Unexport Selected") : i18n("Export Selected")
-                        icon.name: tabBar.currentIndex === 0 ? "list-remove" : "list-add"
+                        text: currentTabIndex === 0 ? i18n("Unexport Selected") : i18n("Export Selected")
+                        icon.name: currentTabIndex === 0 ? "list-remove" : "list-add"
                         enabled: !operationInProgress
                         onClicked: {
                             operationInProgress = true;
-                            var appNames = Object.keys(selectedApps).filter(function(key) { return selectedApps[key] });
-                            for (var i=0; i<appNames.length; i++) {
-                                if (tabBar.currentIndex === 0) {
+                            var appNames = Object.keys(selectedApps).filter(function (key) {
+                                return selectedApps[key];
+                            });
+                            for (var i = 0; i < appNames.length; i++) {
+                                if (currentTabIndex === 0) {
                                     distroBoxManager.unexportApp(appNames[i], containerName);
                                 } else {
                                     distroBoxManager.exportApp(appNames[i], containerName);
@@ -420,17 +379,17 @@ Kirigami.ApplicationWindow {
                             selectedApps = {};
 
                             // Switch to exported tab if we exported apps
-                            if (tabBar.currentIndex === 1) {
-                                tabBar.currentIndex = 0;
+                            if (currentTabIndex === 1) {
+                                currentTabIndex = 0;
                             }
                             refreshAppLists();
                             operationInProgress = false;
                         }
                     }
                     Controls.Button {
-                        text: i18n("Clear Selection");
-                        icon.name: "edit-clear";
-                        onClicked: selectedApps = {};
+                        text: i18n("Clear Selection")
+                        icon.name: "edit-clear"
+                        onClicked: selectedApps = {}
                         enabled: !operationInProgress
                     }
                 }

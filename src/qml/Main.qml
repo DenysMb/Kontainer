@@ -33,10 +33,10 @@ Kirigami.ApplicationWindow {
     property bool refreshing: false
 
     function refresh() {
-        refreshing = true
-        var result = distroBoxManager.listContainers()
-        mainPage.containersList = JSON.parse(result)
-        refreshing = false
+        refreshing = true;
+        var result = distroBoxManager.listContainers();
+        mainPage.containersList = JSON.parse(result);
+        refreshing = false;
     }
 
     globalDrawer: Kirigami.GlobalDrawer {
@@ -74,7 +74,7 @@ Kirigami.ApplicationWindow {
                 icon.name: "io.github.DenysMb.Kontainer"
                 onTriggered: {
                     if (root.pageStack.layers.currentItem !== aboutPage) {
-                        root.pageStack.layers.push(aboutPage)
+                        root.pageStack.layers.push(aboutPage);
                     }
                 }
             }
@@ -113,7 +113,7 @@ Kirigami.ApplicationWindow {
         supportsRefreshing: true
         onRefreshingChanged: {
             if (refreshing) {
-                refresh()
+                refresh();
             }
         }
 
@@ -133,7 +133,7 @@ Kirigami.ApplicationWindow {
         ]
 
         Component.onCompleted: {
-            refresh()
+            refresh();
         }
 
         ColumnLayout {
@@ -198,38 +198,38 @@ Kirigami.ApplicationWindow {
                                         icon.name: "delete"
                                         text: i18n("Remove Container")
                                         onTriggered: {
-                                            removeDialog.containerName = modelData.name
-                                            removeDialog.open()
+                                            removeDialog.containerName = modelData.name;
+                                            removeDialog.open();
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "system-software-update"
                                         text: i18n("Upgrade Container")
                                         onTriggered: {
-                                            distroBoxManager.upgradeContainer(modelData.name)
+                                            distroBoxManager.upgradeContainer(modelData.name);
                                         }
                                     },
                                     Kirigami.Action {
                                         icon.name: "install-symbolic"
                                         text: i18n("Install Package")
                                         onTriggered: {
-                                            packageFileDialog.containerName = modelData.name
-                                            packageFileDialog.containerImage = modelData.image
-                                            packageFileDialog.open()
+                                            packageFileDialog.containerName = modelData.name;
+                                            packageFileDialog.containerImage = modelData.image;
+                                            packageFileDialog.open();
                                         }
                                     },
                                     Kirigami.Action {
-                                        icon.name: "applications-other"
+                                        icon.name: "applications-other-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
-                                            var component = Qt.createComponent("ApplicationsWindow.qml")
+                                            var component = Qt.createComponent("ApplicationsWindow.qml");
                                             if (component.status === Component.Ready) {
                                                 var window = component.createObject(root, {
                                                     containerName: modelData.name
-                                                })
-                                                window.show()
+                                                });
+                                                window.show();
                                             } else {
-                                                console.error("Error loading ApplicationsWindow:", component.errorString())
+                                                console.error("Error loading ApplicationsWindow:", component.errorString());
                                             }
                                         }
                                     },
@@ -237,7 +237,7 @@ Kirigami.ApplicationWindow {
                                         icon.name: "utilities-terminal-symbolic"
                                         text: i18n("Open Terminal")
                                         onTriggered: {
-                                            distroBoxManager.enterContainer(modelData.name)
+                                            distroBoxManager.enterContainer(modelData.name);
                                         }
                                     }
                                 ]
@@ -272,7 +272,7 @@ Kirigami.ApplicationWindow {
                 }
 
                 Component.onCompleted: {
-                    loadingTimer.start()
+                    loadingTimer.start();
                 }
             }
         }
