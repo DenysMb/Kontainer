@@ -22,7 +22,7 @@ Kirigami.ApplicationWindow {
     property bool loading: true
     property bool operationInProgress: false
     property var exportedApps: []
-    property var availableApps: []
+    property var allApps: []
     property var selectedApps: ({})
     property string lastOperation: ""
     // Separate search text for each tab
@@ -38,7 +38,7 @@ Kirigami.ApplicationWindow {
         // Let the window paint first
         Qt.callLater(function () {
             exportedApps = distroBoxManager.exportedApps(containerName) || [];
-            availableApps = distroBoxManager.availableApps(containerName) || [];
+            allApps = distroBoxManager.allApps(containerName) || [];
             loading = false;
             dataReady();
         });
@@ -49,7 +49,7 @@ Kirigami.ApplicationWindow {
         Qt.callLater(function () {
             var oldExportedCount = exportedApps.length;
             exportedApps = distroBoxManager.exportedApps(containerName) || [];
-            availableApps = distroBoxManager.availableApps(containerName) || [];
+            allApps = distroBoxManager.allApps(containerName) || [];
 
             // Switch to exported tab if we just exported an app and the count increased
             if (exportedApps.length > oldExportedCount && currentTabIndex === 1) {
@@ -145,7 +145,7 @@ Kirigami.ApplicationWindow {
 
                         Controls.ToolButton {
                             Layout.fillWidth: true
-                            text: i18n("Available Applications (%1)", availableApps.length)
+                            text: i18n("All Applications (%1)", allApps.length)
                             checkable: true
                             checked: currentTabIndex === 1
                             onClicked: currentTabIndex = 1
@@ -207,7 +207,7 @@ Kirigami.ApplicationWindow {
                             id: availableSearchField
                             Layout.fillWidth: true
                             Layout.preferredHeight: visible ? implicitHeight : 0
-                            visible: filterApps(availableApps, availableSearchText).length > 0 || availableSearchText.length > 0
+                            visible: filterApps(allApps, availableSearchText).length > 0 || availableSearchText.length > 0
                             placeholderText: i18n("Search available applications...")
                             text: availableSearchText
                             onTextChanged: availableSearchText = text
@@ -220,7 +220,7 @@ Kirigami.ApplicationWindow {
                             Layout.topMargin: availableSearchField.visible ? Kirigami.Units.largeSpacing : 0
 
                             sourceComponent: {
-                                if (filterApps(availableApps, availableSearchText).length === 0) {
+                                if (filterApps(allApps, availableSearchText).length === 0) {
                                     return availablePlaceholderComponent;
                                 } else {
                                     return availableListViewComponent;
@@ -314,7 +314,7 @@ Kirigami.ApplicationWindow {
 
                     ListView {
                         id: availableListView
-                        model: filterApps(availableApps, availableSearchText)
+                        model: filterApps(allApps, availableSearchText)
                         spacing: Kirigami.Units.smallSpacing
 
                         delegate: Kirigami.AbstractCard {

@@ -138,7 +138,7 @@ public Q_SLOTS:
      * @param container Name of the container
      * @return QVariantList of AvailableApp structs representing available applications
      */
-    Q_INVOKABLE QVariantList availableApps(const QString &container);
+    Q_INVOKABLE QVariantList allApps(const QString &container);
 
     /**
      * @brief Lists applications exported from the given container

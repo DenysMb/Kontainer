@@ -314,9 +314,9 @@ bool DistroboxManager::isFlatpak() const
     return DistroboxCli::isFlatpak();
 }
 
-QVariantList DistroboxManager::availableApps(const QString &container)
+QVariantList DistroboxManager::allApps(const QString &container)
 {
-    qDebug() << "=== availableApps for container:" << container << "===";
+    qDebug() << "=== allApps for container:" << container << "===";
 
     QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
     QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
