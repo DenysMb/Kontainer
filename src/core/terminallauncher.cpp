@@ -1,6 +1,7 @@
 /*
     SPDX-License-Identifier: GPL-3.0-or-later
     SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+    SPDX-FileCopyrightText: 2025 Hadi Chokr <hadichokr@icloud.com>
 */
 
 #include "terminallauncher.h"
@@ -17,6 +18,32 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QStringList>
+
+namespace TerminalLauncher
+{
+
+const QMap<QString, TerminalSpec> terminalSpecs = {
+    {"konsole",      {"konsole",      {"--workdir", "$workdir", "-e", "$command"}}},
+    {"xterm",        {"xterm",        {"-hold", "-e", "$command"}}},
+    {"gnome-terminal", {"gnome-terminal", {"--", "$command"}}},
+    {"xfce4-terminal", {"xfce4-terminal", {"--command=$command"}}},
+    {"kgx",          {"kgx",          {"-e", "$command"}}},
+    {"tilix",        {"tilix",        {"-e", "$command"}}},
+    {"alacritty",    {"alacritty",    {"-e", "$command"}}},
+    {"kitty",        {"kitty",        {"-e", "$command"}}},
+    {"terminator",   {"terminator",   {"-e", "$command"}}},
+    {"urxvt",        {"urxvt",        {"-e", "$command"}}},
+    {"lxterminal",   {"lxterminal",   {"-e", "$command"}}},
+    {"eterm",        {"eterm",        {"-e", "$command"}}},
+    {"st",           {"st",           {"-e", "$command"}}},
+    {"wezterm",      {"wezterm",      {"-e", "$command"}}},
+    {"ptyxis",       {"ptyxis",       {"-x", "$command"}}},
+
+    // Flatpak variants
+    {"org.contourterminal.Contour", {"contour", {"run", "$terminal", "--", "/bin/bash", "-c", "$command"}}},
+    {"org.wezfurlong.wezterm",      {"wezterm", {"run", "$terminal", "-e", "/bin/bash", "-c", "$command"}}},
+    {"org.kde.konsole",             {"konsole", {"run", "$terminal", "-e", "/bin/bash", "-c", "$command"}}}
+};
 
 namespace
 {
@@ -47,8 +74,8 @@ bool hostExecutableExists(const QString &executable)
     }
 
     QProcess process;
-
-    process.start(QStringLiteral("flatpak-spawn"), {QStringLiteral("--host"), QStringLiteral("which"), executable});
+    process.start(QStringLiteral("flatpak-spawn"),
+                  {QStringLiteral("--host"), QStringLiteral("which"), executable});
 
     if (!process.waitForFinished(3000)) {
         process.kill();
@@ -59,6 +86,19 @@ bool hostExecutableExists(const QString &executable)
     return process.exitCode() == 0;
 }
 
+QStringList expandArgs(const QStringList &templateArgs,
+                       const QString &command,
+                       const QString &workdir)
+{
+    QStringList args;
+    for (QString arg : templateArgs) {
+        arg.replace("$command", command);
+        arg.replace("$workdir", workdir);
+        args << arg;
+    }
+    return args;
+}
+
 TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QString &workingDirectory)
 {
     TerminalLaunchConfig config;
@@ -67,108 +107,93 @@ TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QSt
     const QString terminalExec = confGroup.readEntry("TerminalApplication");
     const QString terminalService = confGroup.readEntry("TerminalService");
 
-    if (isFlatpakRuntime()) {
-        QString exec;
+    QString chosenExec = terminalExec;
+    QString desktopName;
 
-        const QStringList candidates = {terminalExec, QStringLiteral("konsole"), QStringLiteral("gnome-terminal"), QStringLiteral("xterm")};
+    if (isFlatpakRuntime()) {
+        // Flatpak: try configured terminal, else fall back through known candidates
+        QStringList candidates = {terminalExec, QStringLiteral("konsole"),
+                                  QStringLiteral("gnome-terminal"), QStringLiteral("xterm")};
 
         for (const QString &candidate : candidates) {
             if (candidate.isEmpty()) {
                 continue;
             }
-
-            const QStringList parts = KShell::splitArgs(candidate);
-
+            QStringList parts = KShell::splitArgs(candidate);
             if (parts.isEmpty()) {
                 continue;
             }
-
             if (!hostExecutableExists(parts.first())) {
                 continue;
             }
-
-            exec = candidate;
+            chosenExec = candidate;
             break;
         }
 
-        if (exec.isEmpty()) {
+        if (chosenExec.isEmpty()) {
             return config;
         }
-
-        const QStringList execParts = KShell::splitArgs(exec);
-        const QString programName = execParts.isEmpty() ? QString() : execParts.first();
-        const bool isKonsole = programName.startsWith(QLatin1String("konsole"));
-        const bool isXterm = programName == QLatin1String("xterm");
-
-        if (isKonsole && !workingDirectory.isEmpty()) {
-            exec += QStringLiteral(" --workdir %1").arg(KShell::quoteArg(workingDirectory));
+    } else {
+        // Native: use TerminalService or TerminalApplication or fallback
+        KService::Ptr service;
+        if (!terminalService.isEmpty()) {
+            service = KService::serviceByStorageId(terminalService);
+        } else if (!terminalExec.isEmpty()) {
+            service = KService::Ptr(new KService(QStringLiteral("terminal"), terminalExec,
+                                                 QStringLiteral("utilities-terminal")));
         }
 
-        if (!command.isEmpty()) {
-            if (!isKonsole && isXterm) {
-                exec += QLatin1String(" -hold");
+        if (!service) {
+            service = KService::serviceByStorageId(QStringLiteral("org.kde.konsole"));
+        }
+
+        if (service) {
+            desktopName = service->desktopEntryName();
+            chosenExec = service->exec();
+        }
+
+        if (chosenExec.isEmpty()) {
+            // fallback to konsole/xterm
+            if (!QStandardPaths::findExecutable(QStringLiteral("konsole")).isEmpty()) {
+                chosenExec = QStringLiteral("konsole");
+            } else if (!QStandardPaths::findExecutable(QStringLiteral("xterm")).isEmpty()) {
+                chosenExec = QStringLiteral("xterm");
+            } else {
+                return config;
             }
-            exec += QLatin1String(" -e ") + command;
         }
+    }
 
-        config.commandLine = QStringLiteral("flatpak-spawn --host -- %1").arg(exec);
-        config.valid = true;
+    // Build args
+    QString baseExec = chosenExec.section(' ', 0, 0);
+    QString restArgs = chosenExec.section(' ', 1);
 
+    if (!terminalSpecs.contains(baseExec)) {
         return config;
     }
 
-    KService::Ptr service;
-    if (!terminalService.isEmpty()) {
-        service = KService::serviceByStorageId(terminalService);
-    } else if (!terminalExec.isEmpty()) {
-        service = KService::Ptr(new KService(QStringLiteral("terminal"), terminalExec, QStringLiteral("utilities-terminal")));
+    TerminalSpec spec = terminalSpecs.value(baseExec);
+    QStringList args = expandArgs(spec.argsTemplate, command, workingDirectory);
+
+    QString fullCommandLine = spec.executable;
+    if (!restArgs.isEmpty()) {
+        fullCommandLine += QLatin1Char(' ') + restArgs;
+    }
+    if (!args.isEmpty()) {
+        fullCommandLine += QLatin1Char(' ') + args.join(QLatin1Char(' '));
     }
 
-    if (!service) {
-        service = KService::serviceByStorageId(QStringLiteral("org.kde.konsole"));
+    if (isFlatpakRuntime()) {
+        fullCommandLine = QStringLiteral("flatpak-spawn --host -- %1").arg(fullCommandLine);
     }
 
-    QString exec;
-    if (service) {
-        config.desktopName = service->desktopEntryName();
-        exec = service->exec();
-    }
-
-    auto useIfAvailable = [&exec](const QString &terminalApp) {
-        if (!QStandardPaths::findExecutable(terminalApp).isEmpty()) {
-            exec = terminalApp;
-            return true;
-        }
-        return false;
-    };
-
-    if (exec.isEmpty()) {
-        if (!useIfAvailable(QStringLiteral("konsole")) && !useIfAvailable(QStringLiteral("xterm"))) {
-            return config;
-        }
-    }
-
-    const bool isKonsole = exec.startsWith(QLatin1String("konsole")) || config.desktopName == QStringLiteral("org.kde.konsole");
-
-    if (isKonsole && !workingDirectory.isEmpty()) {
-        exec += QStringLiteral(" --workdir %1").arg(KShell::quoteArg(workingDirectory));
-    }
-
-    if (!command.isEmpty()) {
-        if (!isKonsole && exec == QLatin1String("xterm")) {
-            exec += QLatin1String(" -hold");
-        }
-        exec += QLatin1String(" -e ") + command;
-    }
-
-    config.commandLine = exec;
+    config.commandLine = fullCommandLine;
+    config.desktopName = desktopName;
     config.valid = true;
     return config;
 }
-}
+} // namespace
 
-namespace TerminalLauncher
-{
 bool launch(const QString &command, const QString &workingDirectory, QObject *parent)
 {
     const TerminalLaunchConfig config = buildTerminalLaunchConfig(command, workingDirectory);
@@ -197,4 +222,5 @@ bool launch(const QString &command, const QString &workingDirectory, QObject *pa
 
     return success;
 }
-}
+
+} // namespace TerminalLauncher
