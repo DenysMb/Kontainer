@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <functional>
 
 /**
  * @class DistroboxManager
@@ -176,6 +177,14 @@ public Q_SLOTS:
      */
     Q_INVOKABLE bool unexportApp(const QString &basename, const QString &container);
 
+Q_SIGNALS:
+    /**
+     * @brief Emitted when a container clone operation finishes.
+     * @param clonedName Name assigned to the cloned container.
+     * @param success Whether the command completed successfully.
+     */
+    void containerCloneFinished(const QString &clonedName, bool success);
+
 private:
     QStringList m_availableImages; ///< List of available container base images
     QStringList m_fullImageNames; ///< List of full image names/URLs
@@ -186,5 +195,5 @@ private:
      * @param workingDirectory Directory to start the terminal in (optional)
      * @return true if the terminal was successfully launched, false otherwise
      */
-    bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QDir::homePath());
+    bool launchCommandInTerminal(const QString &command, const QString &workingDirectory = QDir::homePath(), const std::function<void(bool)> &onFinished = {});
 };

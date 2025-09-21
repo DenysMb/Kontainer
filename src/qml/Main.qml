@@ -39,6 +39,15 @@ Kirigami.ApplicationWindow {
         refreshing = false;
     }
 
+    Connections {
+        target: distroBoxManager
+        function onContainerCloneFinished(clonedName, success) {
+            if (success) {
+                refresh();
+            }
+        }
+    }
+
     globalDrawer: Kirigami.GlobalDrawer {
         isMenu: true
         actions: [

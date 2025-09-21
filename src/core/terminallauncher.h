@@ -6,10 +6,11 @@
 #pragma once
 
 #include <QString>
+#include <functional>
 
 class QObject;
 
 namespace TerminalLauncher
 {
-Q_REQUIRED_RESULT bool launch(const QString &command, const QString &workingDirectory, QObject *parent);
+Q_REQUIRED_RESULT bool launch(const QString &command, const QString &workingDirectory, QObject *parent, const std::function<void(bool)> &onFinished = {});
 }

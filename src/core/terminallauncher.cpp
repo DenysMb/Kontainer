@@ -6,12 +6,9 @@
 #include "terminallauncher.h"
 
 #include <KConfigGroup>
-#include <KIO/CommandLauncherJob>
-#include <KJob>
 #include <KService>
 #include <KSharedConfig>
 #include <KShell>
-#include <QEventLoop>
 #include <QFile>
 #include <QObject>
 #include <QProcess>
@@ -169,32 +166,45 @@ TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QSt
 
 namespace TerminalLauncher
 {
-bool launch(const QString &command, const QString &workingDirectory, QObject *parent)
+bool launch(const QString &command, const QString &workingDirectory, QObject *parent, const std::function<void(bool)> &onFinished)
 {
+    Q_UNUSED(parent);
+
     const TerminalLaunchConfig config = buildTerminalLaunchConfig(command, workingDirectory);
     if (!config.valid) {
+        if (onFinished) {
+            auto callback = onFinished;
+            callback(false);
+        }
         return false;
     }
 
-    auto *job = new KIO::CommandLauncherJob(config.commandLine, parent);
-    if (!config.desktopName.isEmpty()) {
-        job->setDesktopName(config.desktopName);
-    }
+    auto *process = new QProcess();
     if (!workingDirectory.isEmpty()) {
-        job->setWorkingDirectory(workingDirectory);
+        process->setWorkingDirectory(workingDirectory);
     }
 
-    bool success = false;
-    QEventLoop loop;
-    QObject::connect(job, &KJob::result, &loop, [&loop, &success](KJob *finishedJob) {
-        success = finishedJob->error() == KJob::NoError;
-        finishedJob->deleteLater();
-        loop.quit();
-    });
+    QObject::connect(process,
+                     QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                     process,
+                     [process, callback = onFinished](int exitCode, QProcess::ExitStatus exitStatus) {
+                         process->deleteLater();
+                         if (callback) {
+                             const bool success = exitStatus == QProcess::NormalExit && exitCode == 0;
+                             callback(success);
+                         }
+                     });
 
-    job->start();
-    loop.exec();
+    process->startCommand(config.commandLine);
+    if (!process->waitForStarted()) {
+        process->deleteLater();
+        if (onFinished) {
+            auto callback = onFinished;
+            callback(false);
+        }
+        return false;
+    }
 
-    return success;
+    return true;
 }
 }

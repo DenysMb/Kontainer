@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
+#include <QPointer>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
@@ -249,8 +250,16 @@ bool DistroboxManager::cloneContainer(const QString &name)
     QString message = i18n("Press any key to close this terminal…");
     QString cloneCmd = u"distrobox create --clone %1 --name %1-Clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
     QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
+    const QString clonedName = name + QStringLiteral("-Clone");
+    QPointer<DistroboxManager> self(this);
+    auto callback = [self, clonedName](bool success) {
+        if (!self) {
+            return;
+        }
+        Q_EMIT self->containerCloneFinished(clonedName, success);
+    };
 
-    return launchCommandInTerminal(command);
+    return launchCommandInTerminal(command, QDir::homePath(), callback);
 }
 
 // Upgrades all packages in a container
@@ -272,9 +281,9 @@ bool DistroboxManager::upgradeAllContainer()
     return launchCommandInTerminal(command);
 }
 
-bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory)
+bool DistroboxManager::launchCommandInTerminal(const QString &command, const QString &workingDirectory, const std::function<void(bool)> &onFinished)
 {
-    return TerminalLauncher::launch(command, workingDirectory, this);
+    return TerminalLauncher::launch(command, workingDirectory, this, onFinished);
 }
 
 // Returns a color associated with the distribution for UI purposes
