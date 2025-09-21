@@ -244,13 +244,13 @@ bool DistroboxManager::removeContainer(const QString &name)
     return success;
 }
 
-// Clone Container to Container-Clone, genius i know
+// Clone Container to container-clone, genius i know
 bool DistroboxManager::cloneContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
-    QString cloneCmd = u"distrobox create --clone %1 --name %1-Clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
+    QString cloneCmd = u"distrobox create --clone %1 --name %1-clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
     QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
-    const QString clonedName = name + QStringLiteral("-Clone");
+    const QString clonedName = name + QStringLiteral("-clone");
     QPointer<DistroboxManager> self(this);
     auto callback = [self, clonedName](bool success) {
         if (!self) {
@@ -458,7 +458,8 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
             }
 
             // Skip clone files explicitly
-            if (fileName.endsWith(QStringLiteral("Clone.desktop")) || fileName.contains(QStringLiteral("-Clone.desktop"))) {
+            if (fileName.endsWith(QStringLiteral("clone.desktop"), Qt::CaseInsensitive)
+                || fileName.contains(QStringLiteral("-clone.desktop"), Qt::CaseInsensitive)) {
                 continue;
             }
 
