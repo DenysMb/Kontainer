@@ -105,6 +105,13 @@ public Q_SLOTS:
     bool upgradeContainer(const QString &name);
 
     /**
+     * @brief Clones an existing Distrobox container
+     * @param name Name of the container to clone
+     * @return true if the cloning process was successful, false otherwise
+     */
+    bool cloneContainer(const QString &name);
+
+    /**
      * @brief Upgrades packages in all containers
      * @return true if upgrades were successful, false otherwise
      */

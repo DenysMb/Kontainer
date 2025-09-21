@@ -224,6 +224,13 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
+                                        icon.name: "edit-copy"
+                                        text: i18n("Clone Distrobox")
+                                        onTriggered: {
+                                            distroBoxManager.cloneContainer(modelData.name);
+                                        }
+                                    },
+                                    Kirigami.Action {
                                         icon.name: "applications-other-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
