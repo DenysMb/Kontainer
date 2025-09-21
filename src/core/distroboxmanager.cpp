@@ -424,7 +424,6 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
     QStringList searchPaths;
 
     if (isFlatpakRuntime) {
-        // In Flatpak, search multiple possible locations for exported desktop files
         searchPaths = {QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/data/applications"),
                        QDir::homePath() + QStringLiteral("/.var/app/io.github.DenysMb.Kontainer/.local/share/applications"),
                        QStringLiteral("/var/lib/flatpak/exports/share/applications"),
@@ -437,7 +436,6 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
     QStringList patterns;
     patterns << QStringLiteral("%1-*.desktop").arg(container);
 
-    // Search in all possible paths
     for (const QString &searchPath : searchPaths) {
         QDir dir(searchPath);
         if (!dir.exists()) {
@@ -447,6 +445,11 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
         for (const QFileInfo &file : dir.entryInfoList(patterns, QDir::Files)) {
             QString fileName = file.fileName();
             if (!fileName.endsWith(QStringLiteral(".desktop"))) {
+                continue;
+            }
+
+            // Skip clone files explicitly
+            if (fileName.endsWith(QStringLiteral("Clone.desktop")) || fileName.contains(QStringLiteral("-Clone.desktop"))) {
                 continue;
             }
 
@@ -460,7 +463,7 @@ QVariantList DistroboxManager::exportedApps(const QString &container)
                 basename.chop(8);
             }
 
-            // Skip if we already found this app (avoid duplicates from multiple paths)
+            // Skip if we already found this app
             bool alreadyExists = false;
             for (const QVariant &existingApp : list) {
                 QVariantMap existingMap = existingApp.toMap();
