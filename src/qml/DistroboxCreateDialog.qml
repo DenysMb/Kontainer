@@ -26,20 +26,17 @@ Kirigami.Dialog {
     property string selectedImageFullName: ""
     property string selectedImageDisplay: ""
 
-    // Timer for container creation
     Timer {
         id: createTimer
         interval: 0
         onTriggered: {
-            var imageName = selectedImageFullName || selectedImageDisplay;
-
+            var imageName = selectedImageFullName;
             var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
 
             createDialog.isCreating = false;
             createDialog.standardButtons = Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel;
 
             if (success) {
-                // Refresh the container list after creation
                 var result = distroBoxManager.listContainers();
                 mainPage.containersList = JSON.parse(result);
                 nameField.text = "";
@@ -56,15 +53,11 @@ Kirigami.Dialog {
     }
 
     onAccepted: {
-        var imageName = selectedImageFullName || selectedImageDisplay;
-
+        var imageName = selectedImageFullName;
         if (nameField.text && imageName) {
             console.log("Creating container:", nameField.text, imageName, argsField.text);
-            // Show busy indicator
             isCreating = true;
             standardButtons = Kirigami.Dialog.NoButton;
-
-            // Use a timer to allow the UI to update before starting the creation process
             createTimer.start();
         } else {
             errorDialog.text = i18n("Name and Image fields are required");
@@ -91,13 +84,11 @@ Kirigami.Dialog {
                 Layout.fillWidth: true
             }
 
-            // Image selection with search and list
             ColumnLayout {
                 Kirigami.FormData.label: i18n("Image")
                 Layout.fillWidth: true
                 spacing: Kirigami.Units.smallSpacing
 
-                // Search bar
                 Controls.TextField {
                     id: searchField
                     Layout.fillWidth: true
@@ -114,18 +105,33 @@ Kirigami.Dialog {
                     }
                 }
 
-                // Selected image display
                 Controls.Label {
+                    id: selectedImageLabel
                     visible: selectedImageDisplay.length > 0
                     text: i18n("Selected: %1", selectedImageDisplay)
                     font.italic: true
                     opacity: 0.8
                     Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignLeft
+
+                    MouseArea {
+                        id: labelMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        acceptedButtons: Qt.NoButton
+                    }
+
+                    Controls.ToolTip {
+                        visible: labelMouseArea.containsMouse
+                        text: createDialog.selectedImageFullName
+                        delay: 500
+                    }
                 }
 
-                // Image list view - full width with proper border
                 Rectangle {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 25
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 8
                     border.color: Kirigami.Theme.separatorColor
                     border.width: 1
@@ -143,7 +149,7 @@ Kirigami.Dialog {
 
                         delegate: Rectangle {
                             width: imageListView.width
-                            height: Kirigami.Units.gridUnit * 2
+                            height: Kirigami.Units.gridUnit * 1.5
                             color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor :
                             mouseArea.containsMouse ? Kirigami.Theme.alternateBackgroundColor :
                             "transparent"
@@ -152,9 +158,12 @@ Kirigami.Dialog {
                                 anchors.fill: parent
                                 anchors.leftMargin: Kirigami.Units.largeSpacing
                                 anchors.rightMargin: Kirigami.Units.largeSpacing
-                                text: modelData.display
-                                verticalAlignment: Text.AlignVCenter
+                                text: modelData.full
                                 elide: Text.ElideRight
+                                verticalAlignment: Text.AlignVCenter
+                                horizontalAlignment: Text.AlignLeft
+                                font.family: "monospace"
+                                font.pointSize: Kirigami.Theme.smallFont.pointSize
                             }
 
                             MouseArea {
@@ -166,6 +175,12 @@ Kirigami.Dialog {
                                     createDialog.selectedImageFullName = modelData.full
                                     createDialog.selectedImageDisplay = modelData.display
                                 }
+                            }
+
+                            Controls.ToolTip {
+                                visible: mouseArea.containsMouse
+                                text: modelData.full
+                                delay: 500
                             }
                         }
 
@@ -208,12 +223,29 @@ Kirigami.Dialog {
 
             Controls.Label {
                 Layout.fillWidth: true
-                text: "distrobox create --name " + (nameField.text || "…") + " --image " + (selectedImageFullName || selectedImageDisplay || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
-                wrapMode: Text.Wrap
+                text: "distrobox create --name " + (nameField.text || "…")
+                + " --image " + (selectedImageFullName || "…")
+                + (argsField.text ? " " + argsField.text : "")
+                + " --yes"
+                wrapMode: Text.WrapAnywhere
+                maximumLineCount: 3    // optional: cap to 3 lines
                 font.family: "monospace"
                 font.italic: true
                 font.pointSize: Kirigami.Theme.smallFont.pointSize
                 opacity: 0.7
+
+                // Tooltip for full command if truncated
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    acceptedButtons: Qt.NoButton
+                    id: cmdPreviewArea
+                }
+                Controls.ToolTip {
+                    visible: cmdPreviewArea.containsMouse
+                    text: parent.text
+                    delay: 500
+                }
             }
         }
 
@@ -254,7 +286,6 @@ Kirigami.Dialog {
             createDialog.filteredImages = filtered;
         }
 
-        // Reset selection when filtering
         imageListView.currentIndex = -1;
         createDialog.selectedImageFullName = "";
         createDialog.selectedImageDisplay = "";
