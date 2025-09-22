@@ -221,30 +221,40 @@ Kirigami.Dialog {
                 font.bold: true
             }
 
-            Controls.Label {
+            Rectangle {
                 Layout.fillWidth: true
-                text: "distrobox create --name " + (nameField.text || "…")
-                + " --image " + (selectedImageFullName || "…")
-                + (argsField.text ? " " + argsField.text : "")
-                + " --yes"
-                wrapMode: Text.WrapAnywhere
-                maximumLineCount: 3    // optional: cap to 3 lines
-                font.family: "monospace"
-                font.italic: true
-                font.pointSize: Kirigami.Theme.smallFont.pointSize
-                opacity: 0.7
+                Layout.preferredHeight: Math.min(previewText.implicitHeight, Kirigami.Units.gridUnit * 4)
+                color: Kirigami.Theme.alternateBackgroundColor
+                radius: 4
+                border.color: Kirigami.Theme.separatorColor
+                border.width: 1
 
-                // Tooltip for full command if truncated
-                MouseArea {
+                Flickable {
+                    id: flickable
                     anchors.fill: parent
-                    hoverEnabled: true
-                    acceptedButtons: Qt.NoButton
-                    id: cmdPreviewArea
-                }
-                Controls.ToolTip {
-                    visible: cmdPreviewArea.containsMouse
-                    text: parent.text
-                    delay: 500
+                    anchors.margins: Kirigami.Units.smallSpacing
+                    contentWidth: width
+                    contentHeight: previewText.implicitHeight
+                    clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    Controls.Label {
+                        id: previewText
+                        width: flickable.width
+                        text: "distrobox create --name " + (nameField.text || "…")
+                        + " --image " + (selectedImageFullName || "…")
+                        + (argsField.text ? " " + argsField.text : "")
+                        + " --yes"
+                        wrapMode: Text.Wrap
+                        font.family: "monospace"
+                        font.italic: true
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        opacity: 0.7
+                    }
+
+                    Controls.ScrollBar.vertical: Controls.ScrollBar {
+                        policy: previewText.implicitHeight > flickable.height ? Controls.ScrollBar.AlwaysOn : Controls.ScrollBar.AlwaysOff
+                    }
                 }
             }
         }
