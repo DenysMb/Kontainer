@@ -17,7 +17,7 @@ Kirigami.Dialog {
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 
     width: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 35)
-    height: Kirigami.Units.gridUnit * 25
+    height: Math.min(Kirigami.Units.gridUnit * 30, implicitHeight)
 
     property bool isCreating: false
     property var errorDialog
@@ -151,8 +151,7 @@ Kirigami.Dialog {
                             width: imageListView.width
                             height: Kirigami.Units.gridUnit * 1.5
                             color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor :
-                            mouseArea.containsMouse ? Kirigami.Theme.alternateBackgroundColor :
-                            "transparent"
+                            (mouseArea.containsMouse ? Kirigami.Theme.alternateBackgroundColor : "transparent")
 
                             Controls.Label {
                                 anchors.fill: parent
@@ -223,38 +222,25 @@ Kirigami.Dialog {
 
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.min(previewText.implicitHeight, Kirigami.Units.gridUnit * 4)
+                implicitHeight: previewText.implicitHeight + Kirigami.Units.smallSpacing * 2
                 color: Kirigami.Theme.alternateBackgroundColor
                 radius: 4
                 border.color: Kirigami.Theme.separatorColor
                 border.width: 1
 
-                Flickable {
-                    id: flickable
+                Controls.Label {
+                    id: previewText
                     anchors.fill: parent
                     anchors.margins: Kirigami.Units.smallSpacing
-                    contentWidth: width
-                    contentHeight: previewText.implicitHeight
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    Controls.Label {
-                        id: previewText
-                        width: flickable.width
-                        text: "distrobox create --name " + (nameField.text || "…")
-                        + " --image " + (selectedImageFullName || "…")
-                        + (argsField.text ? " " + argsField.text : "")
-                        + " --yes"
-                        wrapMode: Text.Wrap
-                        font.family: "monospace"
-                        font.italic: true
-                        font.pointSize: Kirigami.Theme.smallFont.pointSize
-                        opacity: 0.7
-                    }
-
-                    Controls.ScrollBar.vertical: Controls.ScrollBar {
-                        policy: previewText.implicitHeight > flickable.height ? Controls.ScrollBar.AlwaysOn : Controls.ScrollBar.AlwaysOff
-                    }
+                    text: "distrobox create --name " + (nameField.text || "…")
+                    + " --image " + (selectedImageFullName || "…")
+                    + (argsField.text ? " " + argsField.text : "")
+                    + " --yes"
+                    wrapMode: Text.Wrap
+                    font.family: "monospace"
+                    font.italic: true
+                    font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    opacity: 0.7
                 }
             }
         }
