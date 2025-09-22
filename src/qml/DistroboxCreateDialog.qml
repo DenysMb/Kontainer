@@ -20,6 +20,7 @@ Kirigami.Dialog {
 
     property bool isCreating: false
     property var errorDialog
+    property var allImages: []    // store all available images here
 
     // Timer for container creation
     Timer {
@@ -38,6 +39,7 @@ Kirigami.Dialog {
                 var result = distroBoxManager.listContainers();
                 mainPage.containersList = JSON.parse(result);
                 nameField.text = "";
+                imageSearch.text = "";
                 imageField.currentIndex = 0;
                 argsField.text = "";
                 createDialog.close();
@@ -67,6 +69,7 @@ Kirigami.Dialog {
 
     onRejected: {
         createDialog.close();
+        imageSearch.text = ""; // reset search on cancel
     }
 
     ColumnLayout {
@@ -83,6 +86,50 @@ Kirigami.Dialog {
                 Layout.fillWidth: true
             }
 
+            Controls.TextField {
+                id: imageSearch
+                Kirigami.FormData.label: i18n("Search")
+                placeholderText: i18n("Search images…")
+                Layout.fillWidth: true
+                rightPadding: clearSearch.width + Kirigami.Units.smallSpacing
+
+                onTextChanged: {
+                    if (createDialog.allImages.length === 0) return;
+                    if (text.length === 0) {
+                        imageField.model = createDialog.allImages;
+                    } else {
+                        var filtered = [];
+                        for (var i = 0; i < createDialog.allImages.length; i++) {
+                            if (createDialog.allImages[i].display.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+                                filtered.push(createDialog.allImages[i]);
+                            }
+                        }
+                        imageField.model = filtered;
+                    }
+
+                    if (imageField.model.length > 0) {
+                        imageField.currentIndex = 0;
+                        imageField.fullImageName = imageField.model[0].full;
+                    } else {
+                        imageField.currentIndex = -1;
+                        imageField.fullImageName = "";
+                    }
+                }
+
+                // Small clear button inside the search field
+                Controls.ToolButton {
+                    id: clearSearch
+                    visible: imageSearch.text.length > 0
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: Kirigami.Units.smallSpacing
+                    icon.name: "edit-clear"
+                    onClicked: {
+                        imageSearch.text = "";
+                    }
+                }
+            }
+
             Controls.ComboBox {
                 id: imageField
                 Kirigami.FormData.label: i18n("Image")
@@ -93,10 +140,8 @@ Kirigami.Dialog {
                 // Property to store the full image name
                 property string fullImageName: ""
 
-                // Use textRole to display the simplified name
                 textRole: "display"
 
-                // Update the full image name when selection changes
                 onCurrentIndexChanged: {
                     if (currentIndex >= 0 && model.length > 0) {
                         fullImageName = model[currentIndex].full;
@@ -107,10 +152,10 @@ Kirigami.Dialog {
                 Component.onCompleted: {
                     // Populate the ComboBox with available images
                     var images = JSON.parse(distroBoxManager.listAvailableImages());
+                    createDialog.allImages = images;
                     model = images;
                     if (model.length > 0) {
                         currentIndex = 0;
-                        // Initialize fullImageName with the first item
                         fullImageName = model[0].full;
                         console.log("Initial image:", model[0].display, "Full name:", fullImageName);
                     }
