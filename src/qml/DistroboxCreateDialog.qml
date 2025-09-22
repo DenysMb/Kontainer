@@ -1,8 +1,8 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-*/
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ */
 
 import QtQuick
 import QtQuick.Layouts
@@ -16,18 +16,22 @@ Kirigami.Dialog {
     padding: Kirigami.Units.largeSpacing
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 
-    width: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 30)
+    width: Math.min(root.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 35)
+    height: Kirigami.Units.gridUnit * 25
 
     property bool isCreating: false
     property var errorDialog
-    property var allImages: []    // store all available images here
+    property var allImages: []
+    property var filteredImages: []
+    property string selectedImageFullName: ""
+    property string selectedImageDisplay: ""
 
     // Timer for container creation
     Timer {
         id: createTimer
         interval: 0
         onTriggered: {
-            var imageName = imageField.fullImageName || imageField.currentText;
+            var imageName = selectedImageFullName || selectedImageDisplay;
 
             var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
 
@@ -39,9 +43,10 @@ Kirigami.Dialog {
                 var result = distroBoxManager.listContainers();
                 mainPage.containersList = JSON.parse(result);
                 nameField.text = "";
-                imageSearch.text = "";
-                imageField.currentIndex = 0;
+                selectedImageFullName = "";
+                selectedImageDisplay = "";
                 argsField.text = "";
+                searchField.text = "";
                 createDialog.close();
             } else {
                 errorDialog.text = i18n("Failed to create container. Please check your input and try again.");
@@ -51,7 +56,7 @@ Kirigami.Dialog {
     }
 
     onAccepted: {
-        var imageName = imageField.fullImageName || imageField.currentText;
+        var imageName = selectedImageFullName || selectedImageDisplay;
 
         if (nameField.text && imageName) {
             console.log("Creating container:", nameField.text, imageName, argsField.text);
@@ -69,11 +74,11 @@ Kirigami.Dialog {
 
     onRejected: {
         createDialog.close();
-        imageSearch.text = ""; // reset search on cancel
     }
 
     ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
+        anchors.fill: parent
 
         Kirigami.FormLayout {
             Layout.fillWidth: true
@@ -86,78 +91,94 @@ Kirigami.Dialog {
                 Layout.fillWidth: true
             }
 
-            Controls.TextField {
-                id: imageSearch
-                Kirigami.FormData.label: i18n("Search")
-                placeholderText: i18n("Search images…")
+            // Image selection with search and list
+            ColumnLayout {
+                Kirigami.FormData.label: i18n("Image")
                 Layout.fillWidth: true
-                rightPadding: clearSearch.width + Kirigami.Units.smallSpacing
+                spacing: Kirigami.Units.smallSpacing
 
-                onTextChanged: {
-                    if (createDialog.allImages.length === 0) return;
-                    if (text.length === 0) {
-                        imageField.model = createDialog.allImages;
-                    } else {
-                        var filtered = [];
-                        for (var i = 0; i < createDialog.allImages.length; i++) {
-                            if (createDialog.allImages[i].display.toLowerCase().indexOf(text.toLowerCase()) !== -1) {
-                                filtered.push(createDialog.allImages[i]);
+                // Search bar
+                Controls.TextField {
+                    id: searchField
+                    Layout.fillWidth: true
+                    placeholderText: i18n("Search images...")
+                    onTextChanged: filterImages()
+
+                    Controls.ToolButton {
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.rightMargin: Kirigami.Units.smallSpacing
+                        icon.name: "edit-clear"
+                        visible: searchField.text.length > 0
+                        onClicked: searchField.text = ""
+                    }
+                }
+
+                // Selected image display
+                Controls.Label {
+                    visible: selectedImageDisplay.length > 0
+                    text: i18n("Selected: %1", selectedImageDisplay)
+                    font.italic: true
+                    opacity: 0.8
+                    Layout.fillWidth: true
+                }
+
+                // Image list view - full width with proper border
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 8
+                    border.color: Kirigami.Theme.separatorColor
+                    border.width: 1
+                    radius: 4
+                    color: Kirigami.Theme.backgroundColor
+
+                    ListView {
+                        id: imageListView
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        model: createDialog.filteredImages
+                        clip: true
+                        boundsBehavior: Flickable.StopAtBounds
+                        currentIndex: -1
+
+                        delegate: Rectangle {
+                            width: imageListView.width
+                            height: Kirigami.Units.gridUnit * 2
+                            color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor :
+                            mouseArea.containsMouse ? Kirigami.Theme.alternateBackgroundColor :
+                            "transparent"
+
+                            Controls.Label {
+                                anchors.fill: parent
+                                anchors.leftMargin: Kirigami.Units.largeSpacing
+                                anchors.rightMargin: Kirigami.Units.largeSpacing
+                                text: modelData.display
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+                            }
+
+                            MouseArea {
+                                id: mouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: {
+                                    imageListView.currentIndex = index
+                                    createDialog.selectedImageFullName = modelData.full
+                                    createDialog.selectedImageDisplay = modelData.display
+                                }
                             }
                         }
-                        imageField.model = filtered;
-                    }
 
-                    if (imageField.model.length > 0) {
-                        imageField.currentIndex = 0;
-                        imageField.fullImageName = imageField.model[0].full;
-                    } else {
-                        imageField.currentIndex = -1;
-                        imageField.fullImageName = "";
-                    }
-                }
+                        highlight: Rectangle {
+                            color: Kirigami.Theme.highlightColor
+                        }
 
-                // Small clear button inside the search field
-                Controls.ToolButton {
-                    id: clearSearch
-                    visible: imageSearch.text.length > 0
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: Kirigami.Units.smallSpacing
-                    icon.name: "edit-clear"
-                    onClicked: {
-                        imageSearch.text = "";
-                    }
-                }
-            }
-
-            Controls.ComboBox {
-                id: imageField
-                Kirigami.FormData.label: i18n("Image")
-                model: []
-                editable: false
-                Layout.fillWidth: true
-
-                // Property to store the full image name
-                property string fullImageName: ""
-
-                textRole: "display"
-
-                onCurrentIndexChanged: {
-                    if (currentIndex >= 0 && model.length > 0) {
-                        fullImageName = model[currentIndex].full;
-                        console.log("Selected image:", model[currentIndex].display, "Full name:", fullImageName);
-                    }
-                }
-
-                Component.onCompleted: {
-                    // Populate the ComboBox with available images
-                    var images = JSON.parse(distroBoxManager.listAvailableImages());
-                    createDialog.allImages = images;
-                    model = images;
-                    if (model.length > 0) {
-                        currentIndex = 0;
-                        fullImageName = model[0].full;
-                        console.log("Initial image:", model[0].display, "Full name:", fullImageName);
+                        Controls.Label {
+                            anchors.centerIn: parent
+                            text: searchField.text.length > 0 ? i18n("No images found") : i18n("No images available")
+                            visible: imageListView.count === 0
+                            opacity: 0.5
+                        }
                     }
                 }
             }
@@ -187,7 +208,7 @@ Kirigami.Dialog {
 
             Controls.Label {
                 Layout.fillWidth: true
-                text: "distrobox create --name " + (nameField.text || "…") + " --image " + (imageField.fullImageName || imageField.currentText || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
+                text: "distrobox create --name " + (nameField.text || "…") + " --image " + (selectedImageFullName || selectedImageDisplay || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
                 wrapMode: Text.Wrap
                 font.family: "monospace"
                 font.italic: true
@@ -215,5 +236,41 @@ Kirigami.Dialog {
                 }
             }
         }
+    }
+
+    function filterImages() {
+        var searchText = searchField.text.toLowerCase();
+        if (searchText === "") {
+            createDialog.filteredImages = createDialog.allImages;
+        } else {
+            var filtered = [];
+            for (var i = 0; i < createDialog.allImages.length; i++) {
+                var image = createDialog.allImages[i];
+                if (image.display.toLowerCase().includes(searchText) ||
+                    image.full.toLowerCase().includes(searchText)) {
+                    filtered.push(image);
+                    }
+            }
+            createDialog.filteredImages = filtered;
+        }
+
+        // Reset selection when filtering
+        imageListView.currentIndex = -1;
+        createDialog.selectedImageFullName = "";
+        createDialog.selectedImageDisplay = "";
+    }
+
+    Component.onCompleted: {
+        refreshImages();
+    }
+
+    function refreshImages() {
+        searchField.text = ""
+        var images = JSON.parse(distroBoxManager.listAvailableImages());
+        createDialog.allImages = images;
+        createDialog.filteredImages = images;
+        imageListView.currentIndex = -1;
+        createDialog.selectedImageFullName = "";
+        createDialog.selectedImageDisplay = "";
     }
 }
