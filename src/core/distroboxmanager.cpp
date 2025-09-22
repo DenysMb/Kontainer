@@ -248,7 +248,7 @@ bool DistroboxManager::removeContainer(const QString &name)
 bool DistroboxManager::cloneContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
-    QString cloneCmd = u"distrobox create --clone %1 --name %1-clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
+    QString cloneCmd = u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %1-clone && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
     QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
     const QString clonedName = name + QStringLiteral("-clone");
     QPointer<DistroboxManager> self(this);
