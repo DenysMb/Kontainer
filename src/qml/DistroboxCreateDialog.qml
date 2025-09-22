@@ -207,25 +207,36 @@ Kirigami.Dialog {
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: previewText.implicitHeight + Kirigami.Units.smallSpacing * 2
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.minimumHeight: Kirigami.Units.gridUnit * 3
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 3
                 color: Kirigami.Theme.alternateBackgroundColor
                 radius: 4
                 border.color: Kirigami.Theme.separatorColor
                 border.width: 1
 
-                Controls.Label {
-                    id: previewText
+                Flickable {
+                    id: previewFlickable
                     anchors.fill: parent
                     anchors.margins: Kirigami.Units.smallSpacing
-                    text: "distrobox create --name " + (nameField.text || "…")
-                    + " --image " + (selectedImageFullName || "…")
-                    + (argsField.text ? " " + argsField.text : "")
-                    + " --yes"
-                    wrapMode: Text.Wrap
-                    font.family: "monospace"
-                    font.italic: true
-                    font.pointSize: Kirigami.Theme.smallFont.pointSize
-                    opacity: 0.7
+                    contentWidth: width
+                    contentHeight: previewText.implicitHeight
+                    clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    Controls.Label {
+                        id: previewText
+                        width: previewFlickable.width
+                        text: "distrobox create --name " + (nameField.text || "…")
+                        + " --image " + (selectedImageFullName || "…")
+                        + (argsField.text ? " " + argsField.text : "")
+                        + " --yes"
+                        wrapMode: Text.Wrap
+                        font.family: "monospace"
+                        font.italic: true
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        opacity: 0.7
+                    }
                 }
             }
         }
