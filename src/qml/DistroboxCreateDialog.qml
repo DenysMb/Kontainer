@@ -196,6 +196,11 @@ Kirigami.Dialog {
             Layout.bottomMargin: Kirigami.Units.smallSpacing
         }
 
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+
         ColumnLayout {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
@@ -203,6 +208,7 @@ Kirigami.Dialog {
             Controls.Label {
                 text: i18n("Command preview")
                 font.bold: true
+                Layout.alignment: Qt.AlignHCenter
             }
 
             Rectangle {
@@ -239,6 +245,11 @@ Kirigami.Dialog {
                     }
                 }
             }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
 
         Item {
