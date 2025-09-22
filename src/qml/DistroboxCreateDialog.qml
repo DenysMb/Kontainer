@@ -114,25 +114,16 @@ Kirigami.Dialog {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignLeft
-
-                    MouseArea {
-                        id: labelMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        acceptedButtons: Qt.NoButton
-                    }
-
-                    Controls.ToolTip {
-                        visible: labelMouseArea.containsMouse
-                        text: createDialog.selectedImageFullName
-                        delay: 500
-                    }
+                    Layout.preferredHeight: visible ? implicitHeight : 0
                 }
 
                 Rectangle {
+                    id: imageListContainer
                     Layout.fillWidth: true
                     Layout.minimumWidth: Kirigami.Units.gridUnit * 25
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 8
+                    Layout.minimumHeight: Kirigami.Units.gridUnit * 8
+                    Layout.maximumHeight: Kirigami.Units.gridUnit * 8
                     border.color: Kirigami.Theme.separatorColor
                     border.width: 1
                     radius: 4
@@ -174,12 +165,6 @@ Kirigami.Dialog {
                                     createDialog.selectedImageFullName = modelData.full
                                     createDialog.selectedImageDisplay = modelData.display
                                 }
-                            }
-
-                            Controls.ToolTip {
-                                visible: mouseArea.containsMouse
-                                text: modelData.full
-                                delay: 500
                             }
                         }
 
