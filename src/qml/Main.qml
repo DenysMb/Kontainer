@@ -212,7 +212,7 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
-                                        icon.name: "view-grid-symbolic"
+                                        icon.name: "applications-all-symbolic"
                                         text: i18n("Manage Applications")
                                         onTriggered: {
                                             var component = Qt.createComponent("ApplicationsWindow.qml");
@@ -234,16 +234,8 @@ Kirigami.ApplicationWindow {
                                         }
                                     },
                                     Kirigami.Action {
-                                        text: i18n("Advanced")
-                                        icon.name: "configure"
-                                        Kirigami.Action {
-                                            icon.name: "delete"
-                                            text: i18n("Remove Container")
-                                            onTriggered: {
-                                                removeDialog.containerName = modelData.name;
-                                                removeDialog.open();
-                                            }
-                                        }
+                                        text: i18n("More options")
+                                        icon.name: "view-more-symbolic"
                                         Kirigami.Action {
                                             icon.name: "system-software-update"
                                             text: i18n("Upgrade Container")
@@ -253,9 +245,17 @@ Kirigami.ApplicationWindow {
                                         }
                                         Kirigami.Action {
                                             icon.name: "edit-copy"
-                                            text: i18n("Clone Distrobox")
+                                            text: i18n("Clone Container")
                                             onTriggered: {
                                                 distroBoxManager.cloneContainer(modelData.name);
+                                            }
+                                        }
+                                        Kirigami.Action {
+                                            icon.name: "delete"
+                                            text: i18n("Remove Container")
+                                            onTriggered: {
+                                                removeDialog.containerName = modelData.name;
+                                                removeDialog.open();
                                             }
                                         }
                                     }
