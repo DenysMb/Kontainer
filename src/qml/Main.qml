@@ -50,6 +50,15 @@ Kirigami.ApplicationWindow {
             }
         }
     }
+    Connections {
+        target: distroBoxManager
+        function onContainerAssembleFinished(success) {
+            if (success) {
+                refresh()
+            }
+        }
+    }
+
 
     globalDrawer: MainGlobalDrawer {
         hasContainers: containersPage.containersList.length > 0

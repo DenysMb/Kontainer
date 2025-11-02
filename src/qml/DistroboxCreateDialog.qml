@@ -1,12 +1,14 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
-*/
+ *    SPDX-License-Identifier: GPL-3.0-or-later
+ *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ */
 
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
+import QtQuick.Dialogs
+
 
 import org.kde.kirigami as Kirigami
 
@@ -29,6 +31,16 @@ Kirigami.Dialog {
     property string imageSearchQuery: ""
     property string pendingContainerName: ""
 
+    FileDialog {
+        id: iniFileDialog
+        title: i18n("Choose .ini file")
+        fileMode: FileDialog.OpenFile
+        nameFilters: [i18n("INI files (*.ini)")]
+        onAccepted: {
+            distroBoxManager.assembleContainer(selectedFile)
+        }
+    }
+
     customFooterActions: [
         Kirigami.Action {
             icon.name: createDialog.isCreating ? "view-refresh" : "dialog-ok"
@@ -36,6 +48,13 @@ Kirigami.Dialog {
             visible: !createDialog.selectingImage
             enabled: !createDialog.isCreating
             onTriggered: createDialog.startCreation()
+        },
+        Kirigami.Action {
+            icon.name: "document-open"
+            text: i18n("Assemble from .ini file…")
+            visible: !createDialog.selectingImage
+            enabled: !createDialog.isCreating
+            onTriggered: iniFileDialog.open()
         },
         Kirigami.Action {
             icon.name: "dialog-cancel"

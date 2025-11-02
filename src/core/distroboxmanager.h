@@ -113,6 +113,8 @@ public Q_SLOTS:
      */
     bool cloneContainer(const QString &sourceName, const QString &cloneName);
 
+    bool assembleContainer(const QString &iniFile);
+
     /**
      * @brief Upgrades packages in all containers
      * @return true if upgrades were successful, false otherwise
@@ -192,6 +194,8 @@ Q_SIGNALS:
      * @param success Whether the command completed successfully.
      */
     void containerCloneFinished(const QString &clonedName, bool success);
+
+    void containerAssembleFinished(bool success);
 
 private:
     QStringList m_availableImages; ///< List of available container base images
