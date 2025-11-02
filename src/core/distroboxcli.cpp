@@ -28,8 +28,9 @@ QString runCommand(const QString &command, bool &success)
 {
     QString actualCommand = u"/usr/bin/env "_s + command;
     if (isFlatpakRuntime()) {
-        actualCommand = u"flatpak-spawn --host "_s + command;
+        actualCommand = u"flatpak-spawn --host /usr/bin/env "_s + command;
     }
+    qDebug() << "Actual command:" << actualCommand;
 
     QString output;
     QProcess process;
