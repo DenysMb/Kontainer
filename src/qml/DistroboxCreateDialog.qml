@@ -54,7 +54,13 @@ Kirigami.Dialog {
             text: i18n("Assemble from .ini file…")
             visible: !createDialog.selectingImage
             enabled: !createDialog.isCreating
-            onTriggered: iniFileDialog.open()
+            onTriggered: {
+                if (creationMonitorTimer.running) {
+                    creationMonitorTimer.stop();
+                }
+                iniFileDialog.open();
+                createDialog.close();
+            }
         },
         Kirigami.Action {
             icon.name: "dialog-cancel"

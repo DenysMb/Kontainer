@@ -293,6 +293,7 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
     return launchCommandInTerminal(command, QDir::homePath(), callback);
 }
 
+// Assemble a container from an .ini File
 bool DistroboxManager::assembleContainer(const QString &iniFile)
 {
     QString trimmedFile = iniFile.trimmed();
