@@ -1,7 +1,7 @@
 /*
-    SPDX-License-Identifier: GPL-3.0-or-later
-    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
-*/
+ *    SPDX-License-Identifier: GPL-3.0-or-later
+ *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ */
 
 #include "terminallauncher.h"
 
@@ -105,7 +105,7 @@ TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QSt
             if (!isKonsole && isXterm) {
                 exec += QLatin1String(" -hold");
             }
-            exec += QLatin1String(" -e ") + command;
+            exec += QLatin1String(" -e /usr/bin/env ") + command;
         }
 
         config.commandLine = QStringLiteral("flatpak-spawn --host -- %1").arg(exec);
@@ -155,7 +155,7 @@ TerminalLaunchConfig buildTerminalLaunchConfig(const QString &command, const QSt
         if (!isKonsole && exec == QLatin1String("xterm")) {
             exec += QLatin1String(" -hold");
         }
-        exec += QLatin1String(" -e ") + command;
+        exec += QLatin1String(" -e /usr/bin/env ") + command;
     }
 
     config.commandLine = exec;
