@@ -335,19 +335,24 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     const auto installCmd = PackageInstallCommand::forImage(image, actualPackagePath);
     if (!installCmd) {
-        // Show error message if distribution is not recognized
-        QString message = i18n(
-            "Cannot automatically install packages for this distribution. Please enter the distrobox manually and install it using the appropriate package "
-            "manager.");
-        QString script = u"echo "_s + KShell::quoteArg(message) + u"; read -n 1"_s;
-        QString command = u"/usr/bin/env bash -c "_s + KShell::quoteArg(script);
-        return launchCommandInTerminal(command, homeDir);
+        const QString message = i18n(
+            "Cannot automatically install packages for this distribution. "
+            "Please enter the distrobox manually and install it using the appropriate package manager.");
+        const QString script = QStringLiteral("echo %1; read -n 1").arg(KShell::quoteArg(message));
+
+        // One clean bash invocation, properly quoted
+        const QString command = QStringLiteral("/usr/bin/env bash -c %1").arg(KShell::quoteArg(script));
+
+        return launchCommandInTerminal(command, QDir::homePath());
     }
 
     // Run installation command in container and wait for user input before closing
     QString message = i18n("Press any key to close this terminal…");
     QString fullCmd = u"distrobox enter %1 -- /usr/bin/env bash -c \"%2 && echo '' && echo '%3' && read -s -n 1\""_s.arg(name, *installCmd, message);
-    QString command = u"/usr/bin/env bash -c "_s + KShell::quoteArg(fullCmd);
+
+    QString command = QStringLiteral("distrobox enter %1 -- bash -c %2")
+                          .arg(name, KShell::quoteArg(QStringLiteral("%1 && echo && echo '%2' && read -s -n 1").arg(*installCmd, message)));
+
     return launchCommandInTerminal(command, homeDir);
 }
 
