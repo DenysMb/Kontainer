@@ -25,6 +25,8 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
+#include <sys/xattr.h>
+#include <QByteArray>
 #include <distroicons.h>
 
 using namespace Qt::Literals::StringLiterals;
@@ -48,6 +50,27 @@ QString runContainerCommand(const QString &container, const QString &script, boo
 {
     const QString command = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(script));
     return DistroboxCli::runCommand(command, success);
+}
+
+static QString resolveDocumentPortalPath(const QString &path)
+{
+    // Only check paths under /run/user/$UID/doc/
+    if (!path.startsWith(QStringLiteral("/run/user/")))
+        return path;
+
+    if (!path.contains(QStringLiteral("/doc/")))
+        return path;
+
+    QByteArray value(4096, '\0');
+    ssize_t len = getxattr(path.toLocal8Bit().constData(),
+                           "user.document-portal.host-path",
+                           value.data(), value.size());
+    if (len > 0) {
+        return QString::fromUtf8(value.constData(), len);
+    }
+
+    // No xattr or error — fallback to original path
+    return path;
 }
 
 QString resolveIconPathInContainer(const QString &container, const QString &iconValue)
@@ -332,9 +355,11 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     // Remove "file://" prefix if present
     QString actualPackagePath = packagePath;
-    if (actualPackagePath.startsWith(u"file://"_s)) {
+    if (actualPackagePath.startsWith(u"file://"_s))
         actualPackagePath = actualPackagePath.mid(7);
-    }
+
+    // Resolve document portal FUSE path to host path if needed
+    actualPackagePath = resolveDocumentPortalPath(actualPackagePath);
 
     const auto installCmd = PackageInstallCommand::forImage(image, actualPackagePath);
     if (!installCmd) {
@@ -348,15 +373,14 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     QString message = i18n("Press any key to close this terminal…");
 
-    // Escape any single quotes for embedding in a single-quoted string
     QString safeMessage = message;
     safeMessage.replace(u"'"_s, u"'\\''"_s);
 
-    // Use single quotes for echo argument to prevent word splitting
-    QString innerScript = QStringLiteral("%1 && echo && echo '%2' && read -s -n 1").arg(*installCmd, safeMessage);
+    QString innerScript = QStringLiteral("%1 && echo && echo '%2' && read -s -n 1")
+    .arg(*installCmd, safeMessage);
 
-    // Wrap everything in double quotes for the outer bash -c
-    QString fullCmd = QStringLiteral("distrobox enter %1 -- /usr/bin/env bash -c \"%2\"").arg(name, innerScript);
+    QString fullCmd = QStringLiteral("distrobox enter %1 -- /usr/bin/env bash -c \"%2\"")
+    .arg(name, innerScript);
 
     return launchCommandInTerminal(fullCmd, homeDir);
 }
