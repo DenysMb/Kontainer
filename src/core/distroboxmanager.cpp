@@ -305,11 +305,15 @@ bool DistroboxManager::assembleContainer(const QString &iniFile)
         trimmedFile = trimmedFile.mid(7);
     }
 
+    // Resolve potential portal FUSE path to actual host path
+    trimmedFile = resolveDocumentPortalPath(trimmedFile);
+
     QString message = i18n("Press any key to close this terminal…");
 
-    QString assembleCmd = u"distrobox assemble create --file %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(trimmedFile, message);
+    QString assembleCmd = u"distrobox assemble create --file %1 && echo '' && echo '%2' && read -s -n 1"_s
+    .arg(trimmedFile, message);
 
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(assembleCmd);
+    QString command = u"sh -c \"%1\""_s.arg(assembleCmd);
 
     QPointer<DistroboxManager> self(this);
     auto callback = [self](bool success) {
