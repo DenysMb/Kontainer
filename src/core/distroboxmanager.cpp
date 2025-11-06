@@ -258,7 +258,7 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
     QString message = i18n("Press any key to close this terminal…");
     QString cloneCmd =
         u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %2 && echo '' && echo '%3' && read -s -n 1"_s.arg(trimmedSource, trimmedClone, message);
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
+    QString command = u"bash -c \"%1\""_s.arg(cloneCmd);
     QPointer<DistroboxManager> self(this);
     auto callback = [self, trimmedClone](bool success) {
         if (!self) {
@@ -275,7 +275,7 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -284,7 +284,7 @@ bool DistroboxManager::upgradeAllContainer()
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade --all && echo '' && echo '%1' && read -s -n 1"_s.arg(message);
-    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -345,15 +345,15 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     QString message = i18n("Press any key to close this terminal…");
 
-    // Escape double quotes for safe embedding in bash -c "..."
+    // Escape any single quotes for embedding in a single-quoted string
     QString safeMessage = message;
-    safeMessage.replace(u"\""_s, u"\\\""_s);
+    safeMessage.replace(u"'"_s, u"'\\''"_s);
 
-    // Build the inner script — use double quotes, not single
-    QString innerScript = QStringLiteral("%1 && echo && echo \"%2\" && read -s -n 1").arg(*installCmd, safeMessage);
+    // Use single quotes for echo argument to prevent word splitting
+    QString innerScript = QStringLiteral("%1 && echo && echo '%2' && read -s -n 1").arg(*installCmd, safeMessage);
 
-    // Wrap with bash -c using double quotes safely
-    QString fullCmd = QStringLiteral("distrobox enter %1 -- bash -c \"%2\"").arg(name, innerScript);
+    // Wrap everything in double quotes for the outer bash -c
+    QString fullCmd = QStringLiteral("distrobox enter %1 -- /usr/bin/env bash -c \"%2\"").arg(name, innerScript);
 
     return launchCommandInTerminal(fullCmd, homeDir);
 }
