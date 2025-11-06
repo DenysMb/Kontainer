@@ -46,7 +46,7 @@ QString ensureIconCacheDirectory(const QString &container)
 
 QString runContainerCommand(const QString &container, const QString &script, bool &success)
 {
-    const QString command = u"distrobox enter %1 -- /usr/bin/env sh -c %2"_s.arg(container, KShell::quoteArg(script));
+    const QString command = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(script));
     return DistroboxCli::runCommand(command, success);
 }
 
@@ -56,55 +56,56 @@ QString resolveIconPathInContainer(const QString &container, const QString &icon
         return {};
     }
 
-    // Create a Python script file to avoid complex shell quoting
     const QString pythonScript = QStringLiteral(
-        "import os, sys\n"
-        "icon = sys.argv[1]\n"
-        "if not icon:\n"
-        "    sys.exit(1)\n"
-        "if os.path.isabs(icon) and os.path.exists(icon):\n"
-        "    print(icon, end='')\n"
-        "    sys.exit(0)\n"
-        "search_dirs = ['/usr/share/icons', '/usr/local/share/icons', '/usr/share/pixmaps', '/usr/share/applications', '/usr/share/icons/hicolor']\n"
-        "extensions = ['.png', '.svg', '.xpm', '.jpg', '.jpeg', '.ico']\n"
-        "icon_path, icon_base = os.path.split(icon)\n"
-        "if not icon_base:\n"
-        "    icon_base = icon\n"
-        "    icon_path = ''\n"
-        "base, suffix = os.path.splitext(icon_base)\n"
-        "if suffix:\n"
-        "    candidates = [icon_base]\n"
-        "else:\n"
-        "    candidates = [icon_base + ext for ext in extensions]\n"
-        "candidate_dirs = []\n"
-        "if icon_path and icon_path != '.':\n"
-        "    for root in search_dirs:\n"
-        "        candidate_dir = os.path.join(root, icon_path)\n"
-        "        if os.path.isdir(candidate_dir):\n"
-        "            candidate_dirs.append(candidate_dir)\n"
-        "else:\n"
-        "    candidate_dirs.extend([d for d in search_dirs if os.path.isdir(d)])\n"
-        "for directory in candidate_dirs:\n"
-        "    for candidate in candidates:\n"
-        "        candidate_path = os.path.join(directory, candidate)\n"
-        "        if os.path.exists(candidate_path):\n"
-        "            print(candidate_path, end='')\n"
-        "            sys.exit(0)\n"
-        "for directory in search_dirs:\n"
-        "    if not os.path.isdir(directory):\n"
-        "        continue\n"
-        "    for root, _, files in os.walk(directory):\n"
-        "        for candidate in candidates:\n"
-        "            if candidate in files:\n"
-        "                print(os.path.join(root, candidate), end='')\n"
-        "                sys.exit(0)\n"
-        "print('', end='')\n"
-        "sys.exit(1)");
+                                     "python3 - %1 <<'PY'\n"
+                                     "import os, sys\n"
+                                     "icon = sys.argv[1]\n"
+                                     "if not icon:\n"
+                                     "    raise SystemExit(1)\n"
+                                     "if os.path.isabs(icon) and os.path.exists(icon):\n"
+                                     "    print(icon, end=\"\")\n"
+                                     "    raise SystemExit(0)\n"
+                                     "search_dirs = [\"/usr/share/icons\", \"/usr/local/share/icons\", \"/usr/share/pixmaps\", \"/usr/share/applications\", "
+                                     "\"/usr/share/icons/hicolor\"]\n"
+                                     "extensions = [\".png\", \".svg\", \".xpm\", \".jpg\", \".jpeg\", \".ico\"]\n"
+                                     "icon_path, icon_base = os.path.split(icon)\n"
+                                     "if not icon_base:\n"
+                                     "    icon_base = icon\n"
+                                     "    icon_path = ''\n"
+                                     "base, suffix = os.path.splitext(icon_base)\n"
+                                     "if suffix:\n"
+                                     "    candidates = [icon_base]\n"
+                                     "else:\n"
+                                     "    candidates = [icon_base + ext for ext in extensions]\n"
+                                     "candidate_dirs = []\n"
+                                     "if icon_path and icon_path != '.':\n"
+                                     "    for root in search_dirs:\n"
+                                     "        candidate_dir = os.path.join(root, icon_path)\n"
+                                     "        if os.path.isdir(candidate_dir):\n"
+                                     "            candidate_dirs.append(candidate_dir)\n"
+                                     "else:\n"
+                                     "    candidate_dirs.extend([d for d in search_dirs if os.path.isdir(d)])\n"
+                                     "for directory in candidate_dirs:\n"
+                                     "    for candidate in candidates:\n"
+                                     "        candidate_path = os.path.join(directory, candidate)\n"
+                                     "        if os.path.exists(candidate_path):\n"
+                                     "            print(candidate_path, end=\"\")\n"
+                                     "            raise SystemExit(0)\n"
+                                     "for directory in search_dirs:\n"
+                                     "    if not os.path.isdir(directory):\n"
+                                     "        continue\n"
+                                     "    for root, _, files in os.walk(directory):\n"
+                                     "        for candidate in candidates:\n"
+                                     "            if candidate in files:\n"
+                                     "                print(os.path.join(root, candidate), end=\"\")\n"
+                                     "                raise SystemExit(0)\n"
+                                     "print('', end=\"\")\n"
+                                     "raise SystemExit(1)\n"
+                                     "PY")
+                                     .arg(KShell::quoteArg(iconValue));
 
     bool success = false;
-    const QString output = runContainerCommand(container,
-                                               QStringLiteral("/usr/bin/env python3 -c %1 %2").arg(KShell::quoteArg(pythonScript), KShell::quoteArg(iconValue)),
-                                               success);
+    const QString output = runContainerCommand(container, pythonScript, success);
     if (!success) {
         return {};
     }
@@ -148,17 +149,17 @@ QString cacheIconFromContainer(const QString &container, const QString &basename
 
     if (!QFile::exists(localPath)) {
         const QString pythonScript = QStringLiteral(
-            "import base64, sys\n"
-            "path = sys.argv[1]\n"
-            "with open(path, 'rb') as handler:\n"
-            "    data = handler.read()\n"
-            "    print(base64.b64encode(data).decode('ascii'), end='')\n");
+                                         "python3 - %1 <<'PY'\n"
+                                         "import base64, sys\n"
+                                         "path = sys.argv[1]\n"
+                                         "with open(path, 'rb') as handler:\n"
+                                         "    data = handler.read()\n"
+                                         "    print(base64.b64encode(data).decode('ascii'), end=\"\")\n"
+                                         "PY")
+                                         .arg(KShell::quoteArg(iconPath));
 
         bool success = false;
-        const QString base64Data =
-            runContainerCommand(container,
-                                QStringLiteral("/usr/bin/env python3 -c %1 %2").arg(KShell::quoteArg(pythonScript), KShell::quoteArg(iconPath)),
-                                success);
+        const QString base64Data = runContainerCommand(container, pythonScript, success);
         if (!success || base64Data.isEmpty()) {
             iconCache.insert(cacheKey, QString());
             return {};
@@ -255,10 +256,9 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
     }
 
     QString message = i18n("Press any key to close this terminal…");
-    // Use a simple shell script without nested bash -c
-    QString command = QStringLiteral("distrobox-stop %1 -Y && distrobox create --clone %1 --name %2 && echo && echo '%3' && read -s -n 1")
-                          .arg(trimmedSource, trimmedClone, message);
-
+    QString cloneCmd =
+        u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %2 && echo '' && echo '%3' && read -s -n 1"_s.arg(trimmedSource, trimmedClone, message);
+    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(cloneCmd);
     QPointer<DistroboxManager> self(this);
     auto callback = [self, trimmedClone](bool success) {
         if (!self) {
@@ -274,7 +274,8 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
 bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
-    QString command = QStringLiteral("distrobox upgrade %1 && echo && echo '%2' && read -s -n 1").arg(name, message);
+    QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
+    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -282,7 +283,8 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 bool DistroboxManager::upgradeAllContainer()
 {
     QString message = i18n("Press any key to close this terminal…");
-    QString command = QStringLiteral("distrobox upgrade --all && echo && echo '%1' && read -s -n 1").arg(message);
+    QString upgradeCmd = u"distrobox upgrade --all && echo '' && echo '%1' && read -s -n 1"_s.arg(message);
+    QString command = u"/usr/bin/env bash -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -321,10 +323,10 @@ bool DistroboxManager::generateEntry(const QString &name)
     return success;
 }
 
-// Installs a package file in a container using the appropriate package manager
 bool DistroboxManager::installPackageInContainer(const QString &name, const QString &packagePath, const QString &image)
 {
     QString homeDir = QDir::homePath();
+
     // Remove "file://" prefix if present
     QString actualPackagePath = packagePath;
     if (actualPackagePath.startsWith(u"file://"_s)) {
@@ -333,20 +335,27 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     const auto installCmd = PackageInstallCommand::forImage(image, actualPackagePath);
     if (!installCmd) {
-        const QString message = i18n(
+        QString message = i18n(
             "Cannot automatically install packages for this distribution. "
             "Please enter the distrobox manually and install it using the appropriate package manager.");
-
-        // Simple command without nested shell
-        const QString command = QStringLiteral("echo %1; read -n 1").arg(KShell::quoteArg(message));
-        return launchCommandInTerminal(command, QDir::homePath());
+        QString script = u"echo "_s + KShell::quoteArg(message) + u"; read -n 1"_s;
+        QString command = u"bash -c "_s + KShell::quoteArg(script);
+        return launchCommandInTerminal(command, homeDir);
     }
 
-    // Clean installation command without nested bash -c
     QString message = i18n("Press any key to close this terminal…");
-    QString command = QStringLiteral("distrobox enter %1 -- %2 && echo && echo '%3' && read -s -n 1").arg(name, *installCmd, message);
 
-    return launchCommandInTerminal(command, homeDir);
+    // Escape double quotes for safe embedding in bash -c "..."
+    QString safeMessage = message;
+    safeMessage.replace(u"\""_s, u"\\\""_s);
+
+    // Build the inner script — use double quotes, not single
+    QString innerScript = QStringLiteral("%1 && echo && echo \"%2\" && read -s -n 1").arg(*installCmd, safeMessage);
+
+    // Wrap with bash -c using double quotes safely
+    QString fullCmd = QStringLiteral("distrobox enter %1 -- bash -c \"%2\"").arg(name, innerScript);
+
+    return launchCommandInTerminal(fullCmd, homeDir);
 }
 
 bool DistroboxManager::isFlatpak() const
@@ -359,8 +368,9 @@ QVariantList DistroboxManager::allApps(const QString &container)
     qDebug() << "=== allApps for container:" << container << "===";
 
     QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
+    QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
     bool success = false;
-    QString raw = runContainerCommand(container, findCmd, success);
+    QString raw = DistroboxCli::runCommand(output, success);
     QVariantList list;
     if (!success) {
         qDebug() << "Find command failed for container:" << container;
@@ -383,8 +393,9 @@ QVariantList DistroboxManager::allApps(const QString &container)
 
         // Read desktop file from container
         QString readCmd = QStringLiteral("cat %1").arg(KShell::quoteArg(line));
+        QString desktopOutput = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(readCmd));
         bool readSuccess = false;
-        QString desktopContent = runContainerCommand(container, readCmd, readSuccess);
+        QString desktopContent = DistroboxCli::runCommand(desktopOutput, readSuccess);
 
         if (!readSuccess) {
             continue;
@@ -515,7 +526,7 @@ bool DistroboxManager::exportApp(const QString &basename, const QString &contain
 {
     // Construct the full path to the desktop file in the container
     QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
-    QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(container, KShell::quoteArg(desktopPath));
+    QString command = u"distrobox enter %1 -- distrobox-export --app %2"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
 
     bool success;
     QString output = DistroboxCli::runCommand(command, success);
@@ -635,7 +646,7 @@ bool DistroboxManager::unexportApp(const QString &basename, const QString &conta
         qDebug() << "STRATEGY: Safe to use distrobox-export --delete (will remove icons/metadata)";
 
         // First try with just the basename (how distrobox-export expects it)
-        QString command = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(container, KShell::quoteArg(basename));
+        QString command = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(basename));
         qDebug() << "Executing command:" << command;
 
         bool success;
@@ -652,7 +663,7 @@ bool DistroboxManager::unexportApp(const QString &basename, const QString &conta
 
         // If that fails, try with the full path
         QString desktopPath = QStringLiteral("/usr/share/applications/") + basename + QStringLiteral(".desktop");
-        QString altCommand = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(container, KShell::quoteArg(desktopPath));
+        QString altCommand = u"distrobox enter %1 -- distrobox-export --app %2 --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(desktopPath));
         qDebug() << "Executing alternative command:" << altCommand;
 
         output = DistroboxCli::runCommand(altCommand, success);
