@@ -258,7 +258,7 @@ bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &
     QString message = i18n("Press any key to close this terminal…");
     QString cloneCmd =
         u"distrobox-stop %1 -Y && distrobox create --clone %1 --name %2 && echo '' && echo '%3' && read -s -n 1"_s.arg(trimmedSource, trimmedClone, message);
-    QString command = u"bash -c \"%1\""_s.arg(cloneCmd);
+    QString command = u"sh -c \"%1\""_s.arg(cloneCmd);
     QPointer<DistroboxManager> self(this);
     auto callback = [self, trimmedClone](bool success) {
         if (!self) {
@@ -275,7 +275,7 @@ bool DistroboxManager::upgradeContainer(const QString &name)
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(name, message);
-    QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"sh -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -284,7 +284,7 @@ bool DistroboxManager::upgradeAllContainer()
 {
     QString message = i18n("Press any key to close this terminal…");
     QString upgradeCmd = u"distrobox upgrade --all && echo '' && echo '%1' && read -s -n 1"_s.arg(message);
-    QString command = u"bash -c \"%1\""_s.arg(upgradeCmd);
+    QString command = u"sh -c \"%1\""_s.arg(upgradeCmd);
 
     return launchCommandInTerminal(command);
 }
@@ -323,6 +323,9 @@ bool DistroboxManager::generateEntry(const QString &name)
     return success;
 }
 
+// Installs a Package File with the Containers Package Manager
+// Doesnt like POSIX sh and wants GNU bash for launching in the Terminal
+// TODO: Make the function use POSIX sh to increase portability
 bool DistroboxManager::installPackageInContainer(const QString &name, const QString &packagePath, const QString &image)
 {
     QString homeDir = QDir::homePath();
