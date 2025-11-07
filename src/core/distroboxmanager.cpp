@@ -363,11 +363,20 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 
     const auto installCmd = PackageInstallCommand::forImage(image, actualPackagePath);
     if (!installCmd) {
-        QString message = i18n(
-            "Cannot automatically install packages for this distribution. "
+        const QString message = i18n(
+            "Cannot automatically install packages for this distribution.\n"
             "Please enter the distrobox manually and install it using the appropriate package manager.");
-        QString script = u"echo "_s + KShell::quoteArg(message) + u"; read -n 1"_s;
-        QString command = u"bash -c "_s + KShell::quoteArg(script);
+
+        // Escape single quotes for embedding inside double quotes
+        QString safeMessage = message;
+        safeMessage.replace(u"'"_s, u"'\\''"_s);
+
+        // Use consistent quoting style as the install path
+        const QString script = QStringLiteral("echo '%1'; read -n 1 -s -r -p \'Press any key to continue...\'").arg(safeMessage);
+
+        // Bash -c in double quotes to avoid nested single-quote issues
+        const QString command = QStringLiteral("bash -c \"%1\"").arg(script);
+
         return launchCommandInTerminal(command, homeDir);
     }
 
