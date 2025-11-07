@@ -306,7 +306,7 @@ Kirigami.Dialog {
                 Controls.TextField {
                     id: argsField
                     Kirigami.FormData.label: i18n("Arguments")
-                    placeholderText: i18n("--home=/path/to/home (optional)")
+                    placeholderText: i18n("--home /path/to/home (optional)")
                     Layout.fillWidth: true
                 }
             }

@@ -286,8 +286,8 @@ msgstr "Opdrachtregelopties"
 
 #: src/qml/DistroboxCreateDialog.qml:304
 #, kde-format
-msgid "--home=/path/to/home (optional)"
-msgstr "--home=/locatie/van/persoonlijkemap (optioneel)"
+msgid "--home /path/to/home (optional)"
+msgstr "--home /locatie/van/persoonlijkemap (optioneel)"
 
 #: src/qml/DistroboxCreateDialog.qml:320
 #, kde-format

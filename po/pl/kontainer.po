@@ -288,8 +288,8 @@ msgstr "Argumenty"
 
 #: src/qml/DistroboxCreateDialog.qml:304
 #, kde-format
-msgid "--home=/path/to/home (optional)"
-msgstr "--home=/ścieżka/do/katalogu/domowego (opcjonalne)"
+msgid "--home /path/to/home (optional)"
+msgstr "--home /ścieżka/do/katalogu/domowego (opcjonalne)"
 
 #: src/qml/DistroboxCreateDialog.qml:320
 #, kde-format
