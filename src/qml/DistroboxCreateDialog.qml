@@ -9,7 +9,6 @@ import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import QtQuick.Dialogs
 
-
 import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
@@ -37,7 +36,7 @@ Kirigami.Dialog {
         fileMode: FileDialog.OpenFile
         nameFilters: [i18n("INI files (*.ini)")]
         onAccepted: {
-            distroBoxManager.assembleContainer(selectedFile)
+            distroBoxManager.assembleContainer(selectedFile);
         }
     }
 
@@ -51,7 +50,7 @@ Kirigami.Dialog {
         },
         Kirigami.Action {
             icon.name: "document-open"
-            text: i18n("Assemble from .ini file…")
+            text: i18n("Assemble")
             visible: !createDialog.selectingImage
             enabled: !createDialog.isCreating
             onTriggered: {
@@ -334,6 +333,13 @@ Kirigami.Dialog {
                     placeholderText: i18n("--home=/path/to/home (optional)")
                     Layout.fillWidth: true
                 }
+            }
+
+            Kirigami.InlineMessage {
+                Layout.fillWidth: true
+                visible: true
+                type: Kirigami.MessageType.Information
+                text: i18n("Use Assemble to pick a distrobox.ini manifest. Kontainer will run \"distrobox assemble create --file <manifest>\" to build every container listed there.")
             }
 
             Kirigami.Separator {

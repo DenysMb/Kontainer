@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kontainer 1.0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-26 13:25+0100\n"
+"POT-Creation-Date: 2025-11-09 21:50+0000\n"
 "PO-Revision-Date: 2025-09-21 15:03+0100\n"
 "Last-Translator: Denys Madureira <denysmb@zoho.com>\n"
 "Language-Team: English <kde-i18n-doc@kde.org>\n"
@@ -44,17 +44,19 @@ msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr ""
 
-#: src/core/distroboxmanager.cpp:258 src/core/distroboxmanager.cpp:276
-#: src/core/distroboxmanager.cpp:285 src/core/distroboxmanager.cpp:348
+#: src/core/distroboxmanager.cpp:281 src/core/distroboxmanager.cpp:311
+#: src/core/distroboxmanager.cpp:331 src/core/distroboxmanager.cpp:340
+#: src/core/distroboxmanager.cpp:415
 #, kde-format
 msgid "Press any key to close this terminal…"
 msgstr "Pressione qualquer tecla para fechar esse terminal..."
 
-#: src/core/distroboxmanager.cpp:340
-#, kde-format
+#: src/core/distroboxmanager.cpp:399
+#, fuzzy, kde-format
 msgid ""
-"Cannot automatically install packages for this distribution. Please enter "
-"the distrobox manually and install it using the appropriate package manager."
+"Cannot automatically install packages for this distribution.\n"
+"Please enter the distrobox manually and install it using the appropriate "
+"package manager."
 msgstr ""
 "Não foi possível instalar o arquivo automaticamente para esta distro. Por "
 "favor, entre manualmente na distrobox e instale o arquivo usando o "
@@ -219,7 +221,7 @@ msgstr ""
 msgid "Container"
 msgstr "Remover container"
 
-#: src/qml/DistroboxCloneDialog.qml:107 src/qml/DistroboxCreateDialog.qml:266
+#: src/qml/DistroboxCloneDialog.qml:107 src/qml/DistroboxCreateDialog.qml:295
 #, kde-format
 msgid "Name"
 msgstr "Nome"
@@ -229,83 +231,106 @@ msgstr "Nome"
 msgid "fedora-clone"
 msgstr ""
 
-#: src/qml/DistroboxCreateDialog.qml:15
+#: src/qml/DistroboxCreateDialog.qml:16
 #, kde-format
 msgid "Select image"
 msgstr ""
 
-#: src/qml/DistroboxCreateDialog.qml:15
+#: src/qml/DistroboxCreateDialog.qml:16
 #, kde-format
 msgid "Create new container"
 msgstr "Criar um novo container"
 
-#: src/qml/DistroboxCreateDialog.qml:34
+#: src/qml/DistroboxCreateDialog.qml:35
+#, kde-format
+msgid "Choose .ini file"
+msgstr ""
+
+#: src/qml/DistroboxCreateDialog.qml:37
+#, kde-format
+msgid "INI files (*.ini)"
+msgstr ""
+
+#: src/qml/DistroboxCreateDialog.qml:46
 #, fuzzy, kde-format
 msgid "Creating…"
 msgstr "Criar..."
 
-#: src/qml/DistroboxCreateDialog.qml:34
+#: src/qml/DistroboxCreateDialog.qml:46
 #, fuzzy, kde-format
 msgid "Create"
 msgstr "Criar..."
 
-#: src/qml/DistroboxCreateDialog.qml:41
+#: src/qml/DistroboxCreateDialog.qml:53
+#, kde-format
+msgid "Assemble"
+msgstr ""
+
+#: src/qml/DistroboxCreateDialog.qml:66
 #, kde-format
 msgid "Cancel"
 msgstr ""
 
-#: src/qml/DistroboxCreateDialog.qml:142
+#: src/qml/DistroboxCreateDialog.qml:167
 #, kde-format
 msgid "Name and Image fields are required"
 msgstr "Campos Nome e Imagem são obrigatórios"
 
-#: src/qml/DistroboxCreateDialog.qml:194
+#: src/qml/DistroboxCreateDialog.qml:221
 #, kde-format
 msgid "Failed to create container. Please check your input and try again."
 msgstr ""
 "Erro ao criar o container. Por favor cheque os dados e tente novamente."
 
-#: src/qml/DistroboxCreateDialog.qml:267
+#: src/qml/DistroboxCreateDialog.qml:296
 #, kde-format
 msgid "Fedora"
 msgstr ""
 
-#: src/qml/DistroboxCreateDialog.qml:272
+#: src/qml/DistroboxCreateDialog.qml:301
 #, kde-format
 msgid "Image"
 msgstr "Imagem"
 
-#: src/qml/DistroboxCreateDialog.qml:280
+#: src/qml/DistroboxCreateDialog.qml:309
 #, fuzzy, kde-format
 msgid "Select container image…"
 msgstr "Criando um novo container..."
 
-#: src/qml/DistroboxCreateDialog.qml:303
+#: src/qml/DistroboxCreateDialog.qml:332
 #, kde-format
 msgid "Arguments"
 msgstr "Argumentos"
 
-#: src/qml/DistroboxCreateDialog.qml:304
+#: src/qml/DistroboxCreateDialog.qml:333
 #, kde-format
 msgid "--home=/path/to/home (optional)"
 msgstr "--home=/caminho/para/home (opcional)"
 
-#: src/qml/DistroboxCreateDialog.qml:320
+#: src/qml/DistroboxCreateDialog.qml:342
+#, kde-format
+msgid ""
+"Use Assemble to pick a distrobox.ini manifest. Kontainer will run "
+"\"distrobox assemble create --file <manifest>\" to build every container "
+"listed there."
+msgstr ""
+
+#: src/qml/DistroboxCreateDialog.qml:357
 #, kde-format
 msgid "Command preview"
 msgstr "Prévia do comando"
 
-#: src/qml/DistroboxCreateDialog.qml:350
+#: src/qml/DistroboxCreateDialog.qml:387
 #, kde-format
 msgid "Creating container…"
 msgstr "Criando um novo container..."
 
-#: src/qml/DistroboxCreateDialog.qml:366
+#: src/qml/DistroboxCreateDialog.qml:403
 #, kde-format
 msgid "Search images…"
 msgstr ""
 
-#: src/qml/DistroboxCreateDialog.qml:428
+#: src/qml/DistroboxCreateDialog.qml:465
 #, kde-format
 msgid "No images match your search"
 msgstr ""
@@ -315,17 +340,17 @@ msgstr ""
 msgid "Remove container"
 msgstr "Remover container"
 
-#: src/qml/DistroboxRemoveDialog.qml:29
+#: src/qml/DistroboxRemoveDialog.qml:36
 #, kde-format
 msgid "Failed to remove container"
 msgstr "Falha ao remover container"
 
-#: src/qml/DistroboxRemoveDialog.qml:40
+#: src/qml/DistroboxRemoveDialog.qml:47
 #, kde-format
 msgid "Are you sure you want to remove %1?"
 msgstr "Você tem certeza que deseja remover %1?"
 
-#: src/qml/DistroboxRemoveDialog.qml:46
+#: src/qml/DistroboxRemoveDialog.qml:53
 #, kde-format
 msgid "This action cannot be undone."
 msgstr "Essa ação não pode ser desfeita."
