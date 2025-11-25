@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: Kontainer 1.0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-09 21:50+0000\n"
-"PO-Revision-Date: 2025-07-09 10:13+0200\n"
-"Last-Translator: Microwave <micro.mail88@gmail.com>\n"
-"Language-Team: Polish <kde-i18n-doc@kde.org>\n"
+"PO-Revision-Date: 2025-11-25 15:56+0100\n"
+"Last-Translator: Marcel Mrówka <micro.mail88@gmail.com>\n"
+"Language-Team: Polish\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 25.04.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 |"
+"| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 25.08.2\n"
 
 #: io.github.DenysMb.Kontainer.desktop:5 src/qml/Main.qml:19
 #, kde-format
@@ -26,7 +26,7 @@ msgstr "Kontainer"
 
 #: io.github.DenysMb.Kontainer.desktop:11
 msgid "container;podman;distrobox;"
-msgstr "container;podman;distrobox;"
+msgstr "container;podman;distrobox;kontenery;"
 
 #: io.github.DenysMb.Kontainer.desktop:12 src/main.cpp:46
 #, kde-format
@@ -53,15 +53,15 @@ msgid "Press any key to close this terminal…"
 msgstr "Naciśnij dowolny klawisz, aby zamknąć ten terminal..."
 
 #: src/core/distroboxmanager.cpp:399
-#, fuzzy, kde-format
+#, kde-format
 msgid ""
 "Cannot automatically install packages for this distribution.\n"
 "Please enter the distrobox manually and install it using the appropriate "
 "package manager."
 msgstr ""
-"Nie można automatycznie zainstalować pakietów dla tej dystrybucji. Proszę "
-"wejść do distrobox'a i ręcznie zainstalować je używając poprawnego menedżera "
-"pakietów."
+"Nie można automatycznie zainstalować pakietów dla tej dystrybucji.\n"
+"Proszę ręcznie wejść do distrobox'a i zainstalować je używając "
+"odpowiedniego menedżera pakietów."
 
 #: src/main.cpp:42
 #, kde-format
@@ -89,7 +89,7 @@ msgstr "Autor"
 #: src/qml/ApplicationsWindow.qml:19
 #, kde-format
 msgid "Applications Management - %1"
-msgstr ""
+msgstr "Zarządzanie aplikacjami - %1"
 
 #: src/qml/ApplicationsWindow.qml:126
 #: src/qml/components/MainContainersPage.qml:48
@@ -100,42 +100,42 @@ msgstr "Odśwież"
 #: src/qml/ApplicationsWindow.qml:143
 #, kde-format
 msgid "Exported Applications (%1)"
-msgstr ""
+msgstr "Wyeksportowane aplikacje (%1)"
 
 #: src/qml/ApplicationsWindow.qml:151
 #, kde-format
 msgid "All Applications (%1)"
-msgstr ""
+msgstr "Wszystkie aplikacje (%1)"
 
 #: src/qml/ApplicationsWindow.qml:180
 #, kde-format
 msgid "Search exported applications..."
-msgstr ""
+msgstr "Szukaj wyeksportowanych aplikacji..."
 
 #: src/qml/ApplicationsWindow.qml:214
 #, kde-format
 msgid "Search available applications..."
-msgstr ""
+msgstr "Szukaj dostępnych aplikacji..."
 
 #: src/qml/ApplicationsWindow.qml:241
 #, kde-format
 msgid "No exported applications found matching '%1'"
-msgstr ""
+msgstr "Brak wyeksportowanych aplikacji pasujących do '%1'"
 
 #: src/qml/ApplicationsWindow.qml:241
 #, kde-format
 msgid "No exported applications found"
-msgstr ""
+msgstr "Nie znaleziono wyeksportowanych aplikacji"
 
 #: src/qml/ApplicationsWindow.qml:248
 #, kde-format
 msgid "No applications found matching '%1'"
-msgstr ""
+msgstr "Brak aplikacji pasujących do '%1'"
 
 #: src/qml/ApplicationsWindow.qml:248
-#, fuzzy, kde-format
+#, kde-format
 msgid "No applications found in container"
-msgstr "Nie znaleziono kontenerów. Czy chcesz teraz jakiś stworzyć?"
+msgstr "Nie znaleziono żadnych aplikacji w kontenerze"
 
 #: src/qml/ApplicationsWindow.qml:249
 #, kde-format
@@ -143,83 +143,85 @@ msgid ""
 "This container might not have desktop applications installed or they might "
 "not be detectable."
 msgstr ""
+"Ten kontener może nie mieć zainstalowanych aplikacji z graficznym interfejsem "
+"lub nie są one wykrywalne."
 
 #: src/qml/ApplicationsWindow.qml:290 src/qml/ApplicationsWindow.qml:350
 #, kde-format
 msgid "Unexport"
-msgstr ""
+msgstr "Cofnij eksportowanie"
 
 #: src/qml/ApplicationsWindow.qml:301 src/qml/ApplicationsWindow.qml:362
-#, fuzzy, kde-format
+#, kde-format
 msgid "Failed to unexport application"
-msgstr "Nie udało się usunąć kontenera."
+msgstr "Nie udało się cofnąć eksportowania aplikacji."
 
 #: src/qml/ApplicationsWindow.qml:350
 #, kde-format
 msgid "Export"
-msgstr ""
+msgstr "Wyeksportuj"
 
 #: src/qml/ApplicationsWindow.qml:362
-#, fuzzy, kde-format
+#, kde-format
 msgid "Failed to export application"
-msgstr "Nie udało się usunąć kontenera."
+msgstr "Nie udało się wyeksportować aplikacji."
 
 #: src/qml/ApplicationsWindow.qml:379
 #, kde-format
 msgid "%1 selected"
-msgstr ""
+msgstr "%1 zaznaczone"
 
 #: src/qml/ApplicationsWindow.qml:385
 #, kde-format
 msgid "Unexport Selected"
-msgstr ""
+msgstr "Cofnij eksportowanie zaznaczonych"
 
 #: src/qml/ApplicationsWindow.qml:385
 #, kde-format
 msgid "Export Selected"
-msgstr ""
+msgstr "Wyeksportuj zaznaczone"
 
 #: src/qml/ApplicationsWindow.qml:400
 #, kde-format
 msgid "%1 applications"
-msgstr ""
+msgstr "%1 aplikacji"
 
 #: src/qml/ApplicationsWindow.qml:407
 #, kde-format
 msgid "Clear Selection"
-msgstr ""
+msgstr "Wyczyść zaznaczenie"
 
 #: src/qml/DistroboxCloneDialog.qml:14
-#, fuzzy, kde-format
+#, kde-format
 msgid "Clone container"
-msgstr "Usuń kontener"
+msgstr "Duplikuj kontener"
 
 #: src/qml/DistroboxCloneDialog.qml:32
 #, kde-format
 msgid "No containers available to clone."
-msgstr ""
+msgstr "Brak kontenerów do duplikowania."
 
 #: src/qml/DistroboxCloneDialog.qml:62
 #, kde-format
 msgid "Select a container to clone."
-msgstr ""
+msgstr "Wybierz kontener do zduplikowania."
 
 #: src/qml/DistroboxCloneDialog.qml:68
-#, fuzzy, kde-format
+#, kde-format
 msgid "Choose a name for the cloned container."
-msgstr "Stwórz nowy kontener"
+msgstr "Wybierz nazwę dla zduplikowanego kontenera."
 
 #: src/qml/DistroboxCloneDialog.qml:74
-#, fuzzy, kde-format
+#, kde-format
 msgid "Failed to launch clone command. Check your setup and try again."
 msgstr ""
-"Nie udało się utworzyć kontenera. Proszę sprawdzić wprowadzone dane i "
-"spróbować ponownie."
+"Nie udało się uruchomić komendy duplikowania. Sprawdź swoją konfiguracje i spr"
+"óbuj ponownie."
 
 #: src/qml/DistroboxCloneDialog.qml:89
-#, fuzzy, kde-format
+#, kde-format
 msgid "Container"
-msgstr "Kontainer"
+msgstr "Kontener"
 
 #: src/qml/DistroboxCloneDialog.qml:107 src/qml/DistroboxCreateDialog.qml:295
 #, kde-format
@@ -229,12 +231,12 @@ msgstr "Nazwa"
 #: src/qml/DistroboxCloneDialog.qml:108
 #, kde-format
 msgid "fedora-clone"
-msgstr ""
+msgstr "fedora-duplikat"
 
 #: src/qml/DistroboxCreateDialog.qml:16
 #, kde-format
 msgid "Select image"
-msgstr ""
+msgstr "Wybierz obraz"
 
 #: src/qml/DistroboxCreateDialog.qml:16
 #, kde-format
@@ -244,32 +246,32 @@ msgstr "Stwórz nowy kontener"
 #: src/qml/DistroboxCreateDialog.qml:35
 #, kde-format
 msgid "Choose .ini file"
-msgstr ""
+msgstr "Wybierz plik .ini"
 
 #: src/qml/DistroboxCreateDialog.qml:37
 #, kde-format
 msgid "INI files (*.ini)"
-msgstr ""
+msgstr "Pliki INI (*.ini)"
 
 #: src/qml/DistroboxCreateDialog.qml:46
-#, fuzzy, kde-format
+#, kde-format
 msgid "Creating…"
-msgstr "Stwórz..."
+msgstr "Tworzenie..."
 
 #: src/qml/DistroboxCreateDialog.qml:46
-#, fuzzy, kde-format
+#, kde-format
 msgid "Create"
-msgstr "Stwórz..."
+msgstr "Stwórz"
 
 #: src/qml/DistroboxCreateDialog.qml:53
 #, kde-format
 msgid "Assemble"
-msgstr ""
+msgstr "Zbuduj"
 
 #: src/qml/DistroboxCreateDialog.qml:66
 #, kde-format
 msgid "Cancel"
-msgstr ""
+msgstr "Anuluj"
 
 #: src/qml/DistroboxCreateDialog.qml:167
 #, kde-format
@@ -294,9 +296,9 @@ msgid "Image"
 msgstr "Obraz"
 
 #: src/qml/DistroboxCreateDialog.qml:309
-#, fuzzy, kde-format
+#, kde-format
 msgid "Select container image…"
-msgstr "Tworzenie kontenera..."
+msgstr "Wybierz obraz kontenera..."
 
 #: src/qml/DistroboxCreateDialog.qml:332
 #, kde-format
@@ -306,7 +308,7 @@ msgstr "Argumenty"
 #: src/qml/DistroboxCreateDialog.qml:333
 #, kde-format
 msgid "--home /path/to/home (optional)"
-msgstr "--home /ścieżka/do/katalogu/domowego (opcjonalne)"
+msgstr "--home /ścieżka/do/katalogu-domowego (opcjonalne)"
 
 #: src/qml/DistroboxCreateDialog.qml:342
 #, kde-format
@@ -315,6 +317,9 @@ msgid ""
 "\"distrobox assemble create --file <manifest>\" to build every container "
 "listed there."
 msgstr ""
+"Użyj opcji Zbuduj, aby wygrać plik konfiguracji distrobox.ini. Kontainer "
+"\"distrobox assemble create --file <plik>\", aby zbudować każdy kontener "
+"tam umieszczony."
 
 #: src/qml/DistroboxCreateDialog.qml:357
 #, kde-format
@@ -329,12 +334,12 @@ msgstr "Tworzenie kontenera..."
 #: src/qml/DistroboxCreateDialog.qml:403
 #, kde-format
 msgid "Search images…"
-msgstr ""
+msgstr "Szukaj obrazów..."
 
 #: src/qml/DistroboxCreateDialog.qml:465
 #, kde-format
 msgid "No images match your search"
-msgstr ""
+msgstr "Brak obrazów pasujących do twojego wyszukiwania"
 
 #: src/qml/DistroboxRemoveDialog.qml:15
 #, kde-format
@@ -359,7 +364,7 @@ msgstr "Nie będzie można tego odwrócić."
 #: src/qml/DistroboxShortcutDialog.qml:19
 #, kde-format
 msgid "Create Distrobox Shortcuts"
-msgstr "Stwórz Skróty Distrobox"
+msgstr "Stwórz skróty Distrobox"
 
 #: src/qml/DistroboxShortcutDialog.qml:38
 #, kde-format
@@ -382,13 +387,13 @@ msgid ""
 "Failed to create container.\n"
 "Please check your input and try again."
 msgstr ""
-"Nie udało się stworzyć kontener.\n"
+"Nie udało się stworzyć kontenera.\n"
 "Proszę sprawdzić wprowadzone dane i spróbować ponownie."
 
 #: src/qml/FilePickerDialog.qml:12
 #, kde-format
 msgid "Choose Package"
-msgstr "Wybierz Pakiet"
+msgstr "Wybierz pakiet"
 
 #: src/qml/FilePickerDialog.qml:13
 #, kde-format
@@ -398,37 +403,37 @@ msgstr "Pliki pakietów"
 #: src/qml/components/ContainerActionsToolbar.qml:33
 #, kde-format
 msgid "Install Package"
-msgstr "Zainstaluj Pakiet"
+msgstr "Zainstaluj pakiet"
 
 #: src/qml/components/ContainerActionsToolbar.qml:38
 #, kde-format
 msgid "Manage Applications"
-msgstr ""
+msgstr "Zarządzaj aplikacjami"
 
 #: src/qml/components/ContainerActionsToolbar.qml:43
 #, kde-format
 msgid "Open Terminal"
-msgstr "Otwórz Terminal"
+msgstr "Otwórz terminal"
 
 #: src/qml/components/ContainerActionsToolbar.qml:47
 #, kde-format
 msgid "More options"
-msgstr ""
+msgstr "Więcej opcji"
 
 #: src/qml/components/ContainerActionsToolbar.qml:51
 #, kde-format
 msgid "Upgrade Container"
-msgstr "Zaktualizuj Kontener"
+msgstr "Zaktualizuj kontener"
 
 #: src/qml/components/ContainerActionsToolbar.qml:56
-#, fuzzy, kde-format
+#, kde-format
 msgid "Clone Container"
-msgstr "Usuń Kontener"
+msgstr "Duplikuj kontener"
 
 #: src/qml/components/ContainerActionsToolbar.qml:61
 #, kde-format
 msgid "Remove Container"
-msgstr "Usuń Kontener"
+msgstr "Usuń kontener"
 
 #: src/qml/components/ContainerListStatus.qml:22
 #, kde-format
@@ -438,7 +443,7 @@ msgstr "Nie znaleziono kontenerów. Czy chcesz teraz jakiś stworzyć?"
 #: src/qml/components/ContainerListStatus.qml:24
 #, kde-format
 msgid "Create Container"
-msgstr "Stwórz Kontener"
+msgstr "Stwórz kontener"
 
 #: src/qml/components/MainContainersPage.qml:30
 #, kde-format
@@ -453,39 +458,39 @@ msgstr "Stwórz..."
 #: src/qml/components/MainContainersPage.qml:43
 #, kde-format
 msgid "Upgrade all…"
-msgstr ""
+msgstr "Zaktualizuj wszystkie..."
 
 #: src/qml/components/MainGlobalDrawer.qml:24
 #, kde-format
 msgid "Create Container…"
-msgstr "Stwórz Kontener..."
+msgstr "Stwórz kontener..."
 
 #: src/qml/components/MainGlobalDrawer.qml:29
 #, kde-format
 msgid "Create Distrobox Shortcut…"
-msgstr "Stwórz Skrót Dixtrobox..."
+msgstr "Stwórz skrót Dixtrobox..."
 
 #: src/qml/components/MainGlobalDrawer.qml:38
-#, fuzzy, kde-format
+#, kde-format
 msgid "Show Container Icons"
-msgstr "Usuń Kontener"
+msgstr "Pokaż ikony kontenerów"
 
 #: src/qml/components/MainGlobalDrawer.qml:45
-#, fuzzy, kde-format
+#, kde-format
 msgid "Clone Container…"
-msgstr "Stwórz Kontener..."
+msgstr "Duplikuj kontener..."
 
 #: src/qml/components/MainGlobalDrawer.qml:54
 #, kde-format
 msgid "Open Distrobox Documentation"
-msgstr "Otwórz Dokumentacje Distrobox"
+msgstr "Otwórz dokumentacje Distroboxa"
 
 #: src/qml/components/MainGlobalDrawer.qml:59
 #, kde-format
 msgid "Open Distrobox Useful Tips"
-msgstr "Otwórz Pomocne Porady Distrobox"
+msgstr "Otwórz pomocne rady dot. Distroboxa"
 
 #: src/qml/components/MainGlobalDrawer.qml:67
 #, kde-format
 msgid "About Kontainer"
-msgstr "Kontainer - informacje"
+msgstr "O aplikacji Kontainer"
