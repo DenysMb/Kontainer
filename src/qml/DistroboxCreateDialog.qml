@@ -30,6 +30,10 @@ Kirigami.Dialog {
     property string pendingContainerName: ""
     property string customHomePath: ""
 
+    ListModel {
+        id: volumesModel
+    }
+
     FileDialog {
         id: iniFileDialog
         title: i18n("Choose .ini file")
@@ -45,6 +49,23 @@ Kirigami.Dialog {
         title: i18n("Select custom home directory")
         onAccepted: {
             createDialog.customHomePath = selectedFolder.toString().replace("file://", "");
+        }
+    }
+
+    FolderDialog {
+        id: volumeDirectoryDialog
+        title: i18n("Select volume directory")
+        onAccepted: {
+            var volumePath = selectedFolder.toString().replace("file://", "");
+            // Check for duplicates
+            for (var i = 0; i < volumesModel.count; i++) {
+                if (volumesModel.get(i).path === volumePath) {
+                    return; // Already exists, don't add
+                }
+            }
+            volumesModel.append({
+                "path": volumePath
+            });
         }
     }
 
@@ -101,6 +122,7 @@ Kirigami.Dialog {
         initCheckbox.checked = false;
         nvidiaCheckbox.checked = false;
         createDialog.customHomePath = "";
+        volumesModel.clear();
 
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
@@ -164,6 +186,11 @@ Kirigami.Dialog {
         var fullArgs = argsField.text.trim();
         if (createDialog.customHomePath.length > 0) {
             fullArgs += (fullArgs.length > 0 ? " " : "") + "--home \"" + createDialog.customHomePath + "\"";
+        }
+        // Add all volumes from the model
+        for (var i = 0; i < volumesModel.count; i++) {
+            var volumePath = volumesModel.get(i).path;
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--volume \"" + volumePath + "\"";
         }
         if (initCheckbox.checked) {
             fullArgs += (fullArgs.length > 0 ? " " : "") + "--init --additional-packages \"systemd\"";
@@ -368,6 +395,27 @@ Kirigami.Dialog {
                     Layout.fillWidth: true
                 }
 
+                Controls.CheckBox {
+                    id: initCheckbox
+                    Kirigami.FormData.label: i18n("Additional Options")
+                    text: i18n("Enable systemd init support")
+                    checked: false
+                    enabled: !createDialog.isCreating
+                }
+
+                Controls.CheckBox {
+                    id: nvidiaCheckbox
+                    text: i18n("Enable NVIDIA GPU support")
+                    checked: false
+                    enabled: !createDialog.isCreating
+                }
+
+                Kirigami.Separator {
+                    Layout.fillWidth: true
+                    Layout.topMargin: Kirigami.Units.smallSpacing
+                    Layout.bottomMargin: Kirigami.Units.smallSpacing
+                }
+
                 ColumnLayout {
                     Kirigami.FormData.label: i18n("Custom Home")
                     Layout.fillWidth: true
@@ -406,19 +454,74 @@ Kirigami.Dialog {
                     }
                 }
 
-                Controls.CheckBox {
-                    id: initCheckbox
-                    Kirigami.FormData.label: i18n("Additional Options")
-                    text: i18n("Enable systemd init support")
-                    checked: false
-                    enabled: !createDialog.isCreating
+                Kirigami.Separator {
+                    Layout.fillWidth: true
+                    Layout.topMargin: Kirigami.Units.smallSpacing
+                    Layout.bottomMargin: Kirigami.Units.smallSpacing
                 }
 
-                Controls.CheckBox {
-                    id: nvidiaCheckbox
-                    text: i18n("Enable NVIDIA GPU support")
-                    checked: false
-                    enabled: !createDialog.isCreating
+                ColumnLayout {
+                    Kirigami.FormData.label: i18n("Additional Volumes")
+                    Layout.fillWidth: true
+                    spacing: Kirigami.Units.smallSpacing
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing / 2
+
+                        Repeater {
+                            model: volumesModel
+
+                            delegate: Controls.ItemDelegate {
+                                required property string path
+                                required property int index
+
+                                Layout.fillWidth: true
+                                contentItem: RowLayout {
+                                    spacing: Kirigami.Units.smallSpacing
+
+                                    Kirigami.Icon {
+                                        source: "folder"
+                                        Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                                        Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                                    }
+
+                                    Controls.Label {
+                                        Layout.fillWidth: true
+                                        text: path
+                                        elide: Text.ElideMiddle
+                                    }
+
+                                    Controls.Button {
+                                        icon.name: "edit-delete-remove"
+                                        flat: true
+                                        enabled: !createDialog.isCreating
+                                        onClicked: volumesModel.remove(index)
+                                        Controls.ToolTip.visible: hovered
+                                        Controls.ToolTip.text: i18n("Remove volume")
+                                        Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                                    }
+                                }
+                            }
+                        }
+
+                        Controls.Button {
+                            Layout.fillWidth: true
+                            icon.name: "list-add"
+                            text: i18n("Add Volume")
+                            enabled: !createDialog.isCreating
+                            onClicked: volumeDirectoryDialog.open()
+                        }
+
+                        Controls.Label {
+                            Layout.fillWidth: true
+                            visible: volumesModel.count === 0
+                            text: i18n("Mount additional directories inside the container")
+                            wrapMode: Text.Wrap
+                            color: Kirigami.Theme.disabledTextColor
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        }
+                    }
                 }
             }
 
@@ -446,11 +549,7 @@ Kirigami.Dialog {
 
                 Controls.Label {
                     Layout.fillWidth: true
-                    text: "distrobox create --name " +
-                    ((nameField.text && nameField.text.trim().length > 0) ? nameField.text.trim().replace(/\s+/g, "-") : "…") +
-                    " --image " +
-                    (selectedImageFull || selectedImageDisplay || "…") +
-                    (getFullArgs().length > 0 ? " " + getFullArgs() : "") + " --yes"
+                    text: "distrobox create --name " + ((nameField.text && nameField.text.trim().length > 0) ? nameField.text.trim().replace(/\s+/g, "-") : "…") + " --image " + (selectedImageFull || selectedImageDisplay || "…") + (getFullArgs().length > 0 ? " " + getFullArgs() : "") + " --yes"
                     wrapMode: Text.Wrap
                     font.family: "monospace"
                     font.italic: true
