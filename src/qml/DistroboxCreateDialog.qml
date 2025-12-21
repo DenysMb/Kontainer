@@ -22,7 +22,32 @@ Kirigami.Dialog {
     property var errorDialog
     required property var mainPage
     property bool selectingImage: false
+    property bool advancedOpen: false
+
+    // Indicates whether any advanced option is currently set,
+    // so the user doesn't forget hidden changes.
+    readonly property bool advancedModified: argsField.text.trim().length > 0 || createDialog.customHomePath.length > 0 || volumesModel.count > 0
+
+    readonly property string advancedOptionsSummary: {
+        const parts = [];
+
+        if (argsField.text.trim().length > 0) {
+            parts.push(i18nc("Short name of advanced option", "arguments"));
+        }
+
+        if (createDialog.customHomePath.length > 0) {
+            parts.push(i18nc("Short name of advanced option", "custom home"));
+        }
+
+        if (volumesModel.count > 0) {
+            parts.push(i18np("%1 volume", "%1 volumes", volumesModel.count));
+        }
+
+        return parts.join(i18nc("Separator between enabled advanced options", ", "));
+    }
+
     property var availableImages: []
+
     property var filteredImages: []
     property string selectedImageFull: ""
     property string selectedImageDisplay: ""
@@ -102,6 +127,7 @@ Kirigami.Dialog {
                 createDialog.pendingContainerName = "";
                 createDialog.isCreating = false;
                 createDialog.selectingImage = false;
+                createDialog.advancedOpen = false;
                 createDialog.close();
             }
         }
@@ -121,7 +147,9 @@ Kirigami.Dialog {
         imageSearchQuery = "";
         initCheckbox.checked = false;
         nvidiaCheckbox.checked = false;
+        createDialog.advancedOpen = false;
         createDialog.customHomePath = "";
+
         volumesModel.clear();
 
         if (availableImages && availableImages.length > 0) {
@@ -321,6 +349,7 @@ Kirigami.Dialog {
         isCreating = false;
         createDialog.close();
         createDialog.selectingImage = false;
+        createDialog.advancedOpen = false;
     }
 
     Component.onCompleted: {
@@ -388,13 +417,6 @@ Kirigami.Dialog {
                     }
                 }
 
-                Controls.TextField {
-                    id: argsField
-                    Kirigami.FormData.label: i18n("Arguments")
-                    placeholderText: i18n("Additional arguments (optional)")
-                    Layout.fillWidth: true
-                }
-
                 Controls.CheckBox {
                     id: initCheckbox
                     Kirigami.FormData.label: i18n("Additional Options")
@@ -416,110 +438,140 @@ Kirigami.Dialog {
                     Layout.bottomMargin: Kirigami.Units.smallSpacing
                 }
 
-                ColumnLayout {
-                    Kirigami.FormData.label: i18n("Custom Home")
+                Controls.Button {
                     Layout.fillWidth: true
-                    spacing: Kirigami.Units.smallSpacing / 2
+                    icon.name: createDialog.advancedOpen ? "arrow-down" : "arrow-right"
+                    text: createDialog.advancedOpen ? i18n("Hide advanced options") : i18n("Show advanced options")
+                    enabled: !createDialog.isCreating
+                    onClicked: createDialog.advancedOpen = !createDialog.advancedOpen
 
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Kirigami.Units.smallSpacing
-
-                        Controls.Button {
-                            Layout.fillWidth: true
-                            icon.name: "folder-open"
-                            text: createDialog.customHomePath.length > 0 ? createDialog.customHomePath : i18n("Use custom home directory")
-                            enabled: !createDialog.isCreating
-                            onClicked: homeDirectoryDialog.open()
-                        }
-
-                        Controls.Button {
-                            visible: createDialog.customHomePath.length > 0
-                            enabled: !createDialog.isCreating
-                            icon.name: "edit-clear"
-                            onClicked: createDialog.customHomePath = ""
-                            Controls.ToolTip.visible: hovered
-                            Controls.ToolTip.text: i18n("Clear custom home directory")
-                            Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
-                        }
-                    }
-
-                    Controls.Label {
-                        Layout.fillWidth: true
-                        visible: createDialog.customHomePath.length === 0
-                        text: i18n("By default, the container will use your home directory")
-                        wrapMode: Text.Wrap
-                        color: Kirigami.Theme.disabledTextColor
-                        font.pointSize: Kirigami.Theme.smallFont.pointSize
-                    }
+                    Controls.ToolTip.visible: hovered && createDialog.advancedModified
+                    Controls.ToolTip.text: i18n("Some advanced options are set")
+                    Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
                 }
 
-                Kirigami.Separator {
+                Controls.Label {
+                    Kirigami.FormData.label: ""
                     Layout.fillWidth: true
-                    Layout.topMargin: Kirigami.Units.smallSpacing
-                    Layout.bottomMargin: Kirigami.Units.smallSpacing
+                    visible: createDialog.advancedModified || createDialog.advancedOpen
+                    wrapMode: Text.Wrap
+                    color: createDialog.advancedModified ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.disabledTextColor
+                    font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    text: createDialog.advancedModified ? i18n("Using advanced options: %1", createDialog.advancedOptionsSummary) : i18n("No advanced options set")
                 }
 
+                // Advanced section content
                 ColumnLayout {
-                    Kirigami.FormData.label: i18n("Additional Volumes")
                     Layout.fillWidth: true
-                    spacing: Kirigami.Units.smallSpacing
+                    visible: createDialog.advancedOpen
+                    spacing: Kirigami.Units.largeSpacing
+
+                    Controls.TextField {
+                        id: argsField
+                        Kirigami.FormData.label: i18n("Arguments")
+                        placeholderText: i18n("Additional arguments (optional)")
+                        Layout.fillWidth: true
+                    }
 
                     ColumnLayout {
+                        Kirigami.FormData.label: i18n("Custom Home")
                         Layout.fillWidth: true
                         spacing: Kirigami.Units.smallSpacing / 2
 
-                        Repeater {
-                            model: volumesModel
-
-                            delegate: Controls.ItemDelegate {
-                                required property string path
-                                required property int index
-
-                                Layout.fillWidth: true
-                                contentItem: RowLayout {
-                                    spacing: Kirigami.Units.smallSpacing
-
-                                    Kirigami.Icon {
-                                        source: "folder"
-                                        Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                                        Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                                    }
-
-                                    Controls.Label {
-                                        Layout.fillWidth: true
-                                        text: path
-                                        elide: Text.ElideMiddle
-                                    }
-
-                                    Controls.Button {
-                                        icon.name: "edit-delete-remove"
-                                        flat: true
-                                        enabled: !createDialog.isCreating
-                                        onClicked: volumesModel.remove(index)
-                                        Controls.ToolTip.visible: hovered
-                                        Controls.ToolTip.text: i18n("Remove volume")
-                                        Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
-                                    }
-                                }
-                            }
-                        }
-
-                        Controls.Button {
+                        RowLayout {
                             Layout.fillWidth: true
-                            icon.name: "list-add"
-                            text: i18n("Add Volume")
-                            enabled: !createDialog.isCreating
-                            onClicked: volumeDirectoryDialog.open()
+                            spacing: Kirigami.Units.smallSpacing
+
+                            Controls.Button {
+                                Layout.fillWidth: true
+                                icon.name: "folder-open"
+                                text: createDialog.customHomePath.length > 0 ? createDialog.customHomePath : i18n("Use custom home directory")
+                                enabled: !createDialog.isCreating
+                                onClicked: homeDirectoryDialog.open()
+                            }
+
+                            Controls.Button {
+                                visible: createDialog.customHomePath.length > 0
+                                enabled: !createDialog.isCreating
+                                icon.name: "edit-clear"
+                                onClicked: createDialog.customHomePath = ""
+                                Controls.ToolTip.visible: hovered
+                                Controls.ToolTip.text: i18n("Clear custom home directory")
+                                Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                            }
                         }
 
                         Controls.Label {
                             Layout.fillWidth: true
-                            visible: volumesModel.count === 0
-                            text: i18n("Mount additional directories inside the container")
+                            visible: createDialog.customHomePath.length === 0
+                            text: i18n("By default, the container will use your home directory")
                             wrapMode: Text.Wrap
                             color: Kirigami.Theme.disabledTextColor
                             font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        }
+                    }
+
+                    ColumnLayout {
+                        Kirigami.FormData.label: i18n("Additional Volumes")
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing / 2
+
+                            Repeater {
+                                model: volumesModel
+
+                                delegate: Controls.ItemDelegate {
+                                    required property string path
+                                    required property int index
+
+                                    Layout.fillWidth: true
+                                    contentItem: RowLayout {
+                                        spacing: Kirigami.Units.smallSpacing
+
+                                        Kirigami.Icon {
+                                            source: "folder"
+                                            Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                                            Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                                        }
+
+                                        Controls.Label {
+                                            Layout.fillWidth: true
+                                            text: path
+                                            elide: Text.ElideMiddle
+                                        }
+
+                                        Controls.Button {
+                                            icon.name: "edit-delete-remove"
+                                            flat: true
+                                            enabled: !createDialog.isCreating
+                                            onClicked: volumesModel.remove(index)
+                                            Controls.ToolTip.visible: hovered
+                                            Controls.ToolTip.text: i18n("Remove volume")
+                                            Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                                        }
+                                    }
+                                }
+                            }
+
+                            Controls.Button {
+                                Layout.fillWidth: true
+                                icon.name: "list-add"
+                                text: i18n("Add Volume")
+                                enabled: !createDialog.isCreating
+                                onClicked: volumeDirectoryDialog.open()
+                            }
+
+                            Controls.Label {
+                                Layout.fillWidth: true
+                                visible: volumesModel.count === 0
+                                text: i18n("Mount additional directories inside the container")
+                                wrapMode: Text.Wrap
+                                color: Kirigami.Theme.disabledTextColor
+                                font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            }
                         }
                     }
                 }
