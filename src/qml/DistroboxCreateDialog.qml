@@ -90,6 +90,7 @@ Kirigami.Dialog {
         argsField.text = "";
         imageSearchQuery = "";
         initCheckbox.checked = false;
+        nvidiaCheckbox.checked = false;
 
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
@@ -153,6 +154,9 @@ Kirigami.Dialog {
         var fullArgs = argsField.text.trim();
         if (initCheckbox.checked) {
             fullArgs += (fullArgs.length > 0 ? " " : "") + "--init --additional-packages \"systemd\"";
+        }
+        if (nvidiaCheckbox.checked) {
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--nvidia";
         }
         return fullArgs;
     }
@@ -355,6 +359,13 @@ Kirigami.Dialog {
                     id: initCheckbox
                     Kirigami.FormData.label: i18n("Additional Options")
                     text: i18n("Enable systemd init support")
+                    checked: false
+                    enabled: !createDialog.isCreating
+                }
+
+                Controls.CheckBox {
+                    id: nvidiaCheckbox
+                    text: i18n("Enable NVIDIA GPU support")
                     checked: false
                     enabled: !createDialog.isCreating
                 }
