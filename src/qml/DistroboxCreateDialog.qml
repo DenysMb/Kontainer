@@ -1,14 +1,13 @@
 /*
- *    SPDX-License-Identifier: GPL-3.0-or-later
- *    SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
- *    SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
+ *   SPDX-License-Identifier: GPL-3.0-or-later
+ *   SPDX-FileCopyrightText: 2025 Denys Madureira <denysmb@zoho.com>
+ *   SPDX-FileCopyrightText: 2025 Thomas Duckworth <tduck@filotimoproject.org>
  */
 
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import QtQuick.Dialogs
-
 import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
@@ -23,12 +22,42 @@ Kirigami.Dialog {
     property var errorDialog
     required property var mainPage
     property bool selectingImage: false
+    property bool advancedOpen: false
+
+    // Indicates whether any advanced option is currently set,
+    // so the user doesn't forget hidden changes.
+    readonly property bool advancedModified: argsField.text.trim().length > 0 || createDialog.customHomePath.length > 0 || volumesModel.count > 0
+
+    readonly property string advancedOptionsSummary: {
+        const parts = [];
+
+        if (argsField.text.trim().length > 0) {
+            parts.push(i18nc("Short name of advanced option", "arguments"));
+        }
+
+        if (createDialog.customHomePath.length > 0) {
+            parts.push(i18nc("Short name of advanced option", "custom home"));
+        }
+
+        if (volumesModel.count > 0) {
+            parts.push(i18np("%1 volume", "%1 volumes", volumesModel.count));
+        }
+
+        return parts.join(i18nc("Separator between enabled advanced options", ", "));
+    }
+
     property var availableImages: []
+
     property var filteredImages: []
     property string selectedImageFull: ""
     property string selectedImageDisplay: ""
     property string imageSearchQuery: ""
     property string pendingContainerName: ""
+    property string customHomePath: ""
+
+    ListModel {
+        id: volumesModel
+    }
 
     FileDialog {
         id: iniFileDialog
@@ -37,6 +66,31 @@ Kirigami.Dialog {
         nameFilters: [i18n("INI files (*.ini)")]
         onAccepted: {
             distroBoxManager.assembleContainer(selectedFile);
+        }
+    }
+
+    FolderDialog {
+        id: homeDirectoryDialog
+        title: i18n("Select custom home directory")
+        onAccepted: {
+            createDialog.customHomePath = selectedFolder.toString().replace("file://", "");
+        }
+    }
+
+    FolderDialog {
+        id: volumeDirectoryDialog
+        title: i18n("Select volume directory")
+        onAccepted: {
+            var volumePath = selectedFolder.toString().replace("file://", "");
+            // Check for duplicates
+            for (var i = 0; i < volumesModel.count; i++) {
+                if (volumesModel.get(i).path === volumePath) {
+                    return; // Already exists, don't add
+                }
+            }
+            volumesModel.append({
+                "path": volumePath
+            });
         }
     }
 
@@ -73,6 +127,7 @@ Kirigami.Dialog {
                 createDialog.pendingContainerName = "";
                 createDialog.isCreating = false;
                 createDialog.selectingImage = false;
+                createDialog.advancedOpen = false;
                 createDialog.close();
             }
         }
@@ -90,6 +145,12 @@ Kirigami.Dialog {
         nameField.text = "";
         argsField.text = "";
         imageSearchQuery = "";
+        initCheckbox.checked = false;
+        nvidiaCheckbox.checked = false;
+        createDialog.advancedOpen = false;
+        createDialog.customHomePath = "";
+
+        volumesModel.clear();
 
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
@@ -149,19 +210,39 @@ Kirigami.Dialog {
         }
     }
 
+    function getFullArgs() {
+        var fullArgs = argsField.text.trim();
+        if (createDialog.customHomePath.length > 0) {
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--home \"" + createDialog.customHomePath + "\"";
+        }
+        // Add all volumes from the model
+        for (var i = 0; i < volumesModel.count; i++) {
+            var volumePath = volumesModel.get(i).path;
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--volume \"" + volumePath + "\"";
+        }
+        if (initCheckbox.checked) {
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--init --additional-packages \"systemd\"";
+        }
+        if (nvidiaCheckbox.checked) {
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--nvidia";
+        }
+        return fullArgs;
+    }
+
     function startCreation() {
         if (isCreating) {
             return;
         }
 
         var imageName = selectedImageFull || selectedImageDisplay;
+        var safeName = nameField.text.trim().replace(/\s+/g, "-"); // sanitize whitespace
 
-        if (nameField.text && imageName) {
-            console.log("Creating container:", nameField.text, imageName, argsField.text);
+        if (safeName && imageName) {
+            console.log("Creating container:", safeName, imageName, getFullArgs());
             selectingImage = false;
             isCreating = true;
 
-            // Use a timer to allow the UI to update before starting the creation process
+            nameField.text = safeName; // reflect sanitized name in UI
             createTimer.start();
         } else {
             errorDialog.text = i18n("Name and Image fields are required");
@@ -169,18 +250,17 @@ Kirigami.Dialog {
         }
     }
 
-    // Timer for container creation
     Timer {
         id: createTimer
         interval: 0
         onTriggered: {
             var imageName = selectedImageFull || selectedImageDisplay;
+            var safeName = nameField.text.trim().replace(/\s+/g, "-");
 
-            var success = distroBoxManager.createContainer(nameField.text, imageName, argsField.text);
+            var success = distroBoxManager.createContainer(safeName, imageName, getFullArgs());
 
             if (success) {
-                // Refresh the container list after creation
-                createDialog.pendingContainerName = nameField.text ? nameField.text.trim() : "";
+                createDialog.pendingContainerName = safeName;
                 var result = distroBoxManager.listContainers();
                 var containers = [];
                 try {
@@ -269,6 +349,7 @@ Kirigami.Dialog {
         isCreating = false;
         createDialog.close();
         createDialog.selectingImage = false;
+        createDialog.advancedOpen = false;
     }
 
     Component.onCompleted: {
@@ -295,6 +376,15 @@ Kirigami.Dialog {
                     Kirigami.FormData.label: i18n("Name")
                     placeholderText: i18n("Fedora")
                     Layout.fillWidth: true
+
+                    // Real-time whitespace sanitization
+                    onTextChanged: {
+                        var sanitized = text.replace(/\s+/g, "-");
+                        if (sanitized !== text) {
+                            text = sanitized;
+                            cursorPosition = text.length;
+                        }
+                    }
                 }
 
                 ColumnLayout {
@@ -327,11 +417,163 @@ Kirigami.Dialog {
                     }
                 }
 
-                Controls.TextField {
-                    id: argsField
-                    Kirigami.FormData.label: i18n("Arguments")
-                    placeholderText: i18n("--home /path/to/home (optional)")
+                Controls.CheckBox {
+                    id: initCheckbox
+                    Kirigami.FormData.label: i18n("Additional Options")
+                    text: i18n("Enable systemd init support")
+                    checked: false
+                    enabled: !createDialog.isCreating
+                }
+
+                Controls.CheckBox {
+                    id: nvidiaCheckbox
+                    text: i18n("Enable NVIDIA GPU support")
+                    checked: false
+                    enabled: !createDialog.isCreating
+                }
+
+                Kirigami.Separator {
                     Layout.fillWidth: true
+                    Layout.topMargin: Kirigami.Units.smallSpacing
+                    Layout.bottomMargin: Kirigami.Units.smallSpacing
+                }
+
+                Controls.Button {
+                    Layout.fillWidth: true
+                    icon.name: createDialog.advancedOpen ? "arrow-down" : "arrow-right"
+                    text: createDialog.advancedOpen ? i18n("Hide advanced options") : i18n("Show advanced options")
+                    enabled: !createDialog.isCreating
+                    onClicked: createDialog.advancedOpen = !createDialog.advancedOpen
+
+                    Controls.ToolTip.visible: hovered && createDialog.advancedModified
+                    Controls.ToolTip.text: i18n("Some advanced options are set")
+                    Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                }
+
+                Controls.Label {
+                    Kirigami.FormData.label: ""
+                    Layout.fillWidth: true
+                    visible: createDialog.advancedModified || createDialog.advancedOpen
+                    wrapMode: Text.Wrap
+                    color: createDialog.advancedModified ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.disabledTextColor
+                    font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    text: createDialog.advancedModified ? i18n("Using advanced options: %1", createDialog.advancedOptionsSummary) : i18n("No advanced options set")
+                }
+
+                // Advanced section content
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    visible: createDialog.advancedOpen
+                    spacing: Kirigami.Units.largeSpacing
+
+                    Controls.TextField {
+                        id: argsField
+                        Kirigami.FormData.label: i18n("Arguments")
+                        placeholderText: i18n("Additional arguments (optional)")
+                        Layout.fillWidth: true
+                    }
+
+                    ColumnLayout {
+                        Kirigami.FormData.label: i18n("Custom Home")
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing / 2
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing
+
+                            Controls.Button {
+                                Layout.fillWidth: true
+                                icon.name: "folder-open"
+                                text: createDialog.customHomePath.length > 0 ? createDialog.customHomePath : i18n("Use custom home directory")
+                                enabled: !createDialog.isCreating
+                                onClicked: homeDirectoryDialog.open()
+                            }
+
+                            Controls.Button {
+                                visible: createDialog.customHomePath.length > 0
+                                enabled: !createDialog.isCreating
+                                icon.name: "edit-clear"
+                                onClicked: createDialog.customHomePath = ""
+                                Controls.ToolTip.visible: hovered
+                                Controls.ToolTip.text: i18n("Clear custom home directory")
+                                Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                            }
+                        }
+
+                        Controls.Label {
+                            Layout.fillWidth: true
+                            visible: createDialog.customHomePath.length === 0
+                            text: i18n("By default, the container will use your home directory")
+                            wrapMode: Text.Wrap
+                            color: Kirigami.Theme.disabledTextColor
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        }
+                    }
+
+                    ColumnLayout {
+                        Kirigami.FormData.label: i18n("Additional Volumes")
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing / 2
+
+                            Repeater {
+                                model: volumesModel
+
+                                delegate: Controls.ItemDelegate {
+                                    required property string path
+                                    required property int index
+
+                                    Layout.fillWidth: true
+                                    contentItem: RowLayout {
+                                        spacing: Kirigami.Units.smallSpacing
+
+                                        Kirigami.Icon {
+                                            source: "folder"
+                                            Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                                            Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                                        }
+
+                                        Controls.Label {
+                                            Layout.fillWidth: true
+                                            text: path
+                                            elide: Text.ElideMiddle
+                                        }
+
+                                        Controls.Button {
+                                            icon.name: "edit-delete-remove"
+                                            flat: true
+                                            enabled: !createDialog.isCreating
+                                            onClicked: volumesModel.remove(index)
+                                            Controls.ToolTip.visible: hovered
+                                            Controls.ToolTip.text: i18n("Remove volume")
+                                            Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                                        }
+                                    }
+                                }
+                            }
+
+                            Controls.Button {
+                                Layout.fillWidth: true
+                                icon.name: "list-add"
+                                text: i18n("Add Volume")
+                                enabled: !createDialog.isCreating
+                                onClicked: volumeDirectoryDialog.open()
+                            }
+
+                            Controls.Label {
+                                Layout.fillWidth: true
+                                visible: volumesModel.count === 0
+                                text: i18n("Mount additional directories inside the container")
+                                wrapMode: Text.Wrap
+                                color: Kirigami.Theme.disabledTextColor
+                                font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            }
+                        }
+                    }
                 }
             }
 
@@ -359,7 +601,7 @@ Kirigami.Dialog {
 
                 Controls.Label {
                     Layout.fillWidth: true
-                    text: "distrobox create --name " + (nameField.text || "…") + " --image " + (selectedImageFull || selectedImageDisplay || "…") + (argsField.text ? " " + argsField.text : "") + " --yes"
+                    text: "distrobox create --name " + ((nameField.text && nameField.text.trim().length > 0) ? nameField.text.trim().replace(/\s+/g, "-") : "…") + " --image " + (selectedImageFull || selectedImageDisplay || "…") + (getFullArgs().length > 0 ? " " + getFullArgs() : "") + " --yes"
                     wrapMode: Text.Wrap
                     font.family: "monospace"
                     font.italic: true
