@@ -28,6 +28,7 @@ Kirigami.Dialog {
     property string selectedImageDisplay: ""
     property string imageSearchQuery: ""
     property string pendingContainerName: ""
+    property string customHomePath: ""
 
     FileDialog {
         id: iniFileDialog
@@ -36,6 +37,14 @@ Kirigami.Dialog {
         nameFilters: [i18n("INI files (*.ini)")]
         onAccepted: {
             distroBoxManager.assembleContainer(selectedFile);
+        }
+    }
+
+    FolderDialog {
+        id: homeDirectoryDialog
+        title: i18n("Select custom home directory")
+        onAccepted: {
+            createDialog.customHomePath = selectedFolder.toString().replace("file://", "");
         }
     }
 
@@ -91,6 +100,7 @@ Kirigami.Dialog {
         imageSearchQuery = "";
         initCheckbox.checked = false;
         nvidiaCheckbox.checked = false;
+        createDialog.customHomePath = "";
 
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
@@ -152,6 +162,9 @@ Kirigami.Dialog {
 
     function getFullArgs() {
         var fullArgs = argsField.text.trim();
+        if (createDialog.customHomePath.length > 0) {
+            fullArgs += (fullArgs.length > 0 ? " " : "") + "--home \"" + createDialog.customHomePath + "\"";
+        }
         if (initCheckbox.checked) {
             fullArgs += (fullArgs.length > 0 ? " " : "") + "--init --additional-packages \"systemd\"";
         }
@@ -351,8 +364,46 @@ Kirigami.Dialog {
                 Controls.TextField {
                     id: argsField
                     Kirigami.FormData.label: i18n("Arguments")
-                    placeholderText: i18n("--home /path/to/home (optional)")
+                    placeholderText: i18n("Additional arguments (optional)")
                     Layout.fillWidth: true
+                }
+
+                ColumnLayout {
+                    Kirigami.FormData.label: i18n("Custom Home")
+                    Layout.fillWidth: true
+                    spacing: Kirigami.Units.smallSpacing / 2
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing
+
+                        Controls.Button {
+                            Layout.fillWidth: true
+                            icon.name: "folder-open"
+                            text: createDialog.customHomePath.length > 0 ? createDialog.customHomePath : i18n("Use custom home directory")
+                            enabled: !createDialog.isCreating
+                            onClicked: homeDirectoryDialog.open()
+                        }
+
+                        Controls.Button {
+                            visible: createDialog.customHomePath.length > 0
+                            enabled: !createDialog.isCreating
+                            icon.name: "edit-clear"
+                            onClicked: createDialog.customHomePath = ""
+                            Controls.ToolTip.visible: hovered
+                            Controls.ToolTip.text: i18n("Clear custom home directory")
+                            Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
+                        }
+                    }
+
+                    Controls.Label {
+                        Layout.fillWidth: true
+                        visible: createDialog.customHomePath.length === 0
+                        text: i18n("By default, the container will use your home directory")
+                        wrapMode: Text.Wrap
+                        color: Kirigami.Theme.disabledTextColor
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    }
                 }
 
                 Controls.CheckBox {
