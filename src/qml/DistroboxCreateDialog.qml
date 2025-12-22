@@ -51,6 +51,7 @@ Kirigami.Dialog {
     property var filteredImages: []
     property string selectedImageFull: ""
     property string selectedImageDisplay: ""
+    property bool selectedImageIsCustom: false
     property string imageSearchQuery: ""
     property string pendingContainerName: ""
     property string customHomePath: ""
@@ -155,9 +156,11 @@ Kirigami.Dialog {
         if (availableImages && availableImages.length > 0) {
             selectedImageFull = availableImages[0].full;
             selectedImageDisplay = availableImages[0].display;
+            selectedImageIsCustom = false;
         } else {
             selectedImageFull = "";
             selectedImageDisplay = "";
+            selectedImageIsCustom = false;
         }
 
         if (imageSearchField) {
@@ -173,8 +176,10 @@ Kirigami.Dialog {
 
         if (!availableImages || availableImages.length === 0) {
             filteredImages = [];
-            selectedImageFull = "";
-            selectedImageDisplay = "";
+            if (!selectedImageIsCustom) {
+                selectedImageFull = "";
+                selectedImageDisplay = "";
+            }
         } else {
             var trimmed = imageSearchQuery.trim().toLowerCase();
             if (trimmed.length === 0) {
@@ -183,22 +188,36 @@ Kirigami.Dialog {
                 filteredImages = availableImages.filter(function (image) {
                     return image.display.toLowerCase().includes(trimmed) || image.full.toLowerCase().includes(trimmed);
                 });
+                
+                // If no matches found and user typed something, add custom image option
+                if (filteredImages.length === 0 && imageSearchQuery.trim().length > 0) {
+                    filteredImages = [{
+                        display: i18n("Use custom image: %1", imageSearchQuery.trim()),
+                        full: imageSearchQuery.trim(),
+                        isCustom: true
+                    }];
+                }
             }
 
             if (filteredImages.length > 0) {
+                // Check if current selection exists in filtered results
                 var match = filteredImages.find(function (image) {
                     return image.full === selectedImageFull;
                 });
 
                 if (match) {
                     selectedImageDisplay = match.display;
-                } else {
+                } else if (!selectedImageIsCustom) {
+                    // Only change selection if it's not a custom image
                     selectedImageFull = filteredImages[0].full;
                     selectedImageDisplay = filteredImages[0].display;
                 }
+                // If it's a custom image, keep the current selection even if not in list
             } else {
-                selectedImageFull = "";
-                selectedImageDisplay = "";
+                if (!selectedImageIsCustom) {
+                    selectedImageFull = "";
+                    selectedImageDisplay = "";
+                }
             }
         }
 
@@ -410,10 +429,11 @@ Kirigami.Dialog {
 
                     Controls.Label {
                         Layout.fillWidth: true
-                        visible: createDialog.selectedImageFull.length > 0 && createDialog.selectedImageFull !== createDialog.selectedImageDisplay
-                        text: createDialog.selectedImageFull
+                        visible: createDialog.selectedImageFull.length > 0 && (createDialog.selectedImageFull !== createDialog.selectedImageDisplay || createDialog.selectedImageIsCustom)
+                        text: createDialog.selectedImageIsCustom ? i18n("Custom image: %1", createDialog.selectedImageFull) : createDialog.selectedImageFull
                         wrapMode: Text.Wrap
-                        color: Kirigami.Theme.disabledTextColor
+                        color: createDialog.selectedImageIsCustom ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.disabledTextColor
+                        font.italic: createDialog.selectedImageIsCustom
                     }
                 }
 
@@ -666,6 +686,7 @@ Kirigami.Dialog {
                     onClicked: {
                         createDialog.selectedImageFull = modelData.full;
                         createDialog.selectedImageDisplay = modelData.display;
+                        createDialog.selectedImageIsCustom = modelData.isCustom || false;
                         imageListView.currentIndex = index;
                         createDialog.selectingImage = false;
                         if (imageSearchField && imageSearchField.text.length > 0) {
@@ -679,22 +700,35 @@ Kirigami.Dialog {
                         }
                     }
 
-                    contentItem: ColumnLayout {
-                        spacing: Kirigami.Units.smallSpacing / 2
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.smallSpacing
 
-                        Controls.Label {
-                            Layout.fillWidth: true
-                            text: modelData.display
-                            wrapMode: Text.Wrap
-                            font.bold: true
+                        Kirigami.Icon {
+                            source: modelData.isCustom ? "document-new" : "application-x-container"
+                            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                            color: modelData.isCustom ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.textColor
                         }
 
-                        Controls.Label {
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            text: modelData.full
-                            wrapMode: Text.Wrap
-                            color: Kirigami.Theme.disabledTextColor
-                            visible: modelData.full !== modelData.display
+                            spacing: Kirigami.Units.smallSpacing / 2
+
+                            Controls.Label {
+                                Layout.fillWidth: true
+                                text: modelData.display
+                                wrapMode: Text.Wrap
+                                font.bold: true
+                                color: modelData.isCustom ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.textColor
+                            }
+
+                            Controls.Label {
+                                Layout.fillWidth: true
+                                text: modelData.full
+                                wrapMode: Text.Wrap
+                                color: Kirigami.Theme.disabledTextColor
+                                visible: modelData.full !== modelData.display && !modelData.isCustom
+                            }
                         }
                     }
                 }
@@ -702,8 +736,8 @@ Kirigami.Dialog {
 
             Kirigami.PlaceholderMessage {
                 Layout.fillWidth: true
-                visible: createDialog.filteredImages.length === 0
-                text: i18n("No images match your search")
+                visible: createDialog.filteredImages.length === 0 && imageSearchField.text.trim().length === 0
+                text: i18n("Type to search for images")
             }
         }
     }
