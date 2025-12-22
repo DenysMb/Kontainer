@@ -12,6 +12,7 @@ Kirigami.ScrollablePage {
     property var containersList: []
     property bool appRefreshing: false
     property bool fallbackToDistroColors: false
+    property var pendingContainers: ({}) // Map of containerName -> bool
 
     signal createRequested
     signal upgradeAllRequested
@@ -23,9 +24,9 @@ Kirigami.ScrollablePage {
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
     signal removeContainerRequested(string containerName)
-    signal startContainerRequested(string containerName)
-    signal stopContainerRequested(string containerName)
-    signal rebootContainerRequested(string containerName)
+    signal startContainerRequested(string containerName, bool setPending)
+    signal stopContainerRequested(string containerName, bool setPending)
+    signal rebootContainerRequested(string containerName, bool setPending)
 
     spacing: Kirigami.Units.smallSpacing
     padding: Kirigami.Units.smallSpacing
@@ -67,6 +68,7 @@ Kirigami.ScrollablePage {
             delegate: ContainerCard {
                 container: modelData
                 fallbackToDistroColors: page.fallbackToDistroColors
+                isPending: page.pendingContainers[modelData.name] || false
                 onInstallPackageRequested: function (containerName, containerImage) {
                     page.installPackageRequested(containerName, containerImage);
                 }
@@ -86,13 +88,13 @@ Kirigami.ScrollablePage {
                     page.removeContainerRequested(containerName);
                 }
                 onStartContainerRequested: function (containerName) {
-                    page.startContainerRequested(containerName);
+                    page.startContainerRequested(containerName, true);
                 }
                 onStopContainerRequested: function (containerName) {
-                    page.stopContainerRequested(containerName);
+                    page.stopContainerRequested(containerName, true);
                 }
                 onRebootContainerRequested: function (containerName) {
-                    page.rebootContainerRequested(containerName);
+                    page.rebootContainerRequested(containerName, true);
                 }
             }
 

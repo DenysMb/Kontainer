@@ -41,6 +41,34 @@ Kirigami.ApplicationWindow {
         containersPage.containersList = JSON.parse(result);
         refreshing = false;
     }
+    
+    function setPending(containerName, isPending) {
+        var pending = containersPage.pendingContainers;
+        if (isPending) {
+            pending[containerName] = true;
+        } else {
+            delete pending[containerName];
+        }
+        containersPage.pendingContainers = pending;
+        // Force update
+        containersPage.pendingContainersChanged();
+    }
+    
+    function executeContainerOperation(containerName, operation) {
+        setPending(containerName, true);
+        
+        // Execute operation asynchronously using Timer
+        var timer = Qt.createQmlObject('import QtQuick; Timer {}', root);
+        timer.interval = 100;
+        timer.repeat = false;
+        timer.triggered.connect(function() {
+            operation();
+            refresh();
+            setPending(containerName, false);
+            timer.destroy();
+        });
+        timer.start();
+    }
 
     Connections {
         target: distroBoxManager
@@ -135,17 +163,35 @@ Kirigami.ApplicationWindow {
             removeDialog.containerName = containerName;
             removeDialog.open();
         }
-        onStartContainerRequested: function(containerName) {
-            distroBoxManager.startContainer(containerName);
-            refresh();
+        onStartContainerRequested: function(containerName, setPending) {
+            if (setPending) {
+                executeContainerOperation(containerName, function() {
+                    distroBoxManager.startContainer(containerName);
+                });
+            } else {
+                distroBoxManager.startContainer(containerName);
+                refresh();
+            }
         }
-        onStopContainerRequested: function(containerName) {
-            distroBoxManager.stopContainer(containerName);
-            refresh();
+        onStopContainerRequested: function(containerName, setPending) {
+            if (setPending) {
+                executeContainerOperation(containerName, function() {
+                    distroBoxManager.stopContainer(containerName);
+                });
+            } else {
+                distroBoxManager.stopContainer(containerName);
+                refresh();
+            }
         }
-        onRebootContainerRequested: function(containerName) {
-            distroBoxManager.rebootContainer(containerName);
-            refresh();
+        onRebootContainerRequested: function(containerName, setPending) {
+            if (setPending) {
+                executeContainerOperation(containerName, function() {
+                    distroBoxManager.rebootContainer(containerName);
+                });
+            } else {
+                distroBoxManager.rebootContainer(containerName);
+                refresh();
+            }
         }
     }
 }
