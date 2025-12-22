@@ -152,6 +152,15 @@ Kirigami.ApplicationWindow {
         }
         onOpenTerminalRequested: function(containerName) {
             distroBoxManager.enterContainer(containerName);
+            // Refresh after 1 second to update container status (in case it was stopped and auto-started)
+            var timer = Qt.createQmlObject('import QtQuick; Timer {}', root);
+            timer.interval = 1000;
+            timer.repeat = false;
+            timer.triggered.connect(function() {
+                refresh();
+                timer.destroy();
+            });
+            timer.start();
         }
         onUpgradeContainerRequested: function(containerName) {
             distroBoxManager.upgradeContainer(containerName);
