@@ -703,11 +703,13 @@ Kirigami.Dialog {
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.smallSpacing
 
-                        Kirigami.Icon {
-                            source: modelData.isCustom ? "document-new" : "application-x-container"
-                            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
-                            color: modelData.isCustom ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.textColor
+                        // Distro color strip (like ContainerBadge with fallbackToDistroColors)
+                        Rectangle {
+                            Layout.preferredWidth: Kirigami.Units.smallSpacing
+                            Layout.fillHeight: true
+                            Layout.minimumHeight: Kirigami.Units.gridUnit * 2
+                            radius: 4
+                            color: modelData.isCustom ? Kirigami.Theme.neutralTextColor : distroBoxManager.getDistroColor(modelData.full)
                         }
 
                         ColumnLayout {
