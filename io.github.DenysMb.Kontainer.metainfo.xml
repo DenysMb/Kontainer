@@ -62,7 +62,17 @@
   <content_rating type="oars-1.1" />
 
   <releases>
-  <release version="1.2.3" date="2025-11-02">
+    <release version="1.3.0" date="2025-12-22">
+      <description>
+        <p>Add container lifecycle management with start, stop, and reboot capabilities.</p>
+        <p>Add advanced container creation options including custom images, additional arguments, custom home directories, and volume mounting.</p>
+        <p>Add Assemble support to import container configurations from distrobox.ini manifest files.</p>
+        <p>Detect and warn users when Podman or Docker is not installed.</p>
+        <p>Disable container actions appropriately when the container engine is unavailable.</p>
+        <p>Fix terminal launcher environment handling and document portal path resolution.</p>
+      </description>
+    </release>
+    <release version="1.2.3" date="2025-11-02">
       <description>
         <p>Fix an error that prevented Kontainer to start natively installed distrobox inside flatpak'ed konsole.</p>
       </description>
