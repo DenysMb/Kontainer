@@ -380,9 +380,50 @@ Kirigami.Dialog {
     ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
 
+        // Busy overlay that covers the entire dialog content
+        Item {
+            id: busyOverlay
+            visible: createDialog.isCreating
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: Kirigami.Units.gridUnit * 8
+
+            // Semi-transparent background
+            Rectangle {
+                anchors.fill: parent
+                color: Kirigami.Theme.backgroundColor
+                opacity: 0.85
+            }
+
+            // Centered busy content
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: Kirigami.Units.largeSpacing
+
+                Controls.BusyIndicator {
+                    Layout.alignment: Qt.AlignHCenter
+                    running: createDialog.isCreating
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                }
+
+                Controls.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: i18n("Creating container…")
+                    font.bold: true
+                }
+
+                Controls.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: i18n("This may take a few minutes")
+                    color: Kirigami.Theme.disabledTextColor
+                }
+            }
+        }
+
         ColumnLayout {
             id: formPage
-            visible: !createDialog.selectingImage
+            visible: !createDialog.selectingImage && !createDialog.isCreating
             Layout.fillWidth: true
             spacing: Kirigami.Units.largeSpacing
 
@@ -629,31 +670,11 @@ Kirigami.Dialog {
                     opacity: 0.7
                 }
             }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.preferredHeight: busyRow.height
-                visible: createDialog.isCreating
-
-                RowLayout {
-                    id: busyRow
-                    anchors.centerIn: parent
-                    spacing: Kirigami.Units.largeSpacing
-
-                    Controls.BusyIndicator {
-                        running: createDialog.isCreating
-                    }
-
-                    Controls.Label {
-                        text: i18n("Creating container…")
-                    }
-                }
-            }
         }
 
         ColumnLayout {
             id: imageSelectionLayout
-            visible: createDialog.selectingImage
+            visible: createDialog.selectingImage && !createDialog.isCreating
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
 
