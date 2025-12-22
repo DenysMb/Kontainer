@@ -11,6 +11,7 @@ Item {
 
     property bool isEmpty: true
     property bool isRefreshing: false
+    property bool containerEngineAvailable: true
 
     signal createRequested()
 
@@ -18,7 +19,15 @@ Item {
 
     Kirigami.PlaceholderMessage {
         anchors.centerIn: parent
-        visible: status.isEmpty && !status.isRefreshing
+        visible: !status.containerEngineAvailable && !status.isRefreshing
+        icon.name: "emblem-warning"
+        text: i18n("Container engine not found")
+        explanation: i18n("Podman or Docker is required to use Kontainer. Please install one of them to continue.")
+    }
+
+    Kirigami.PlaceholderMessage {
+        anchors.centerIn: parent
+        visible: status.containerEngineAvailable && status.isEmpty && !status.isRefreshing
         text: i18n("No containers found. Create a new container now?")
         helpfulAction: Kirigami.Action {
             text: i18n("Create Container")

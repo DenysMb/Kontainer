@@ -12,6 +12,7 @@ Kirigami.ScrollablePage {
     property var containersList: []
     property bool appRefreshing: false
     property bool fallbackToDistroColors: false
+    property bool containerEngineAvailable: true
     property var pendingContainers: ({}) // Map of containerName -> bool
 
     signal createRequested
@@ -101,6 +102,7 @@ Kirigami.ScrollablePage {
             ContainerListStatus {
                 isEmpty: containersListView.count === 0
                 isRefreshing: page.appRefreshing
+                containerEngineAvailable: page.containerEngineAvailable
                 onCreateRequested: page.createRequested()
             }
         }

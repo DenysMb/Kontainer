@@ -458,6 +458,24 @@ bool DistroboxManager::isFlatpak() const
     return DistroboxCli::isFlatpak();
 }
 
+bool DistroboxManager::isContainerEngineAvailable() const
+{
+    // Check if podman is available
+    bool success = false;
+    QString podmanCheck = DistroboxCli::runCommand(QStringLiteral("which podman"), success);
+    if (success && !podmanCheck.trimmed().isEmpty()) {
+        return true;
+    }
+    
+    // Check if docker is available
+    QString dockerCheck = DistroboxCli::runCommand(QStringLiteral("which docker"), success);
+    if (success && !dockerCheck.trimmed().isEmpty()) {
+        return true;
+    }
+    
+    return false;
+}
+
 QVariantList DistroboxManager::allApps(const QString &container)
 {
     qDebug() << "=== allApps for container:" << container << "===";

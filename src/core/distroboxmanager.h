@@ -184,6 +184,12 @@ public Q_SLOTS:
     bool isFlatpak() const;
 
     /**
+     * @brief Checks if Podman or Docker is installed on the system
+     * @return true if either Podman or Docker is available, false otherwise
+     */
+    bool isContainerEngineAvailable() const;
+
+    /**
      * @brief Lists available applications inside the given container
      * @param container Name of the container
      * @return QVariantList of AvailableApp structs representing available applications

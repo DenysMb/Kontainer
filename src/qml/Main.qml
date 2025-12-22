@@ -24,6 +24,7 @@ Kirigami.ApplicationWindow {
     }
 
     property bool refreshing: false
+    property bool containerEngineAvailable: true
 
     // persistent settings storage using QtCore.Settings
     Settings {
@@ -37,8 +38,17 @@ Kirigami.ApplicationWindow {
 
     function refresh() {
         refreshing = true;
-        var result = distroBoxManager.listContainers();
-        containersPage.containersList = JSON.parse(result);
+        
+        // Check if container engine is available
+        containerEngineAvailable = distroBoxManager.isContainerEngineAvailable();
+        
+        if (containerEngineAvailable) {
+            var result = distroBoxManager.listContainers();
+            containersPage.containersList = JSON.parse(result);
+        } else {
+            containersPage.containersList = [];
+        }
+        
         refreshing = false;
     }
     
@@ -130,6 +140,7 @@ Kirigami.ApplicationWindow {
         id: containersPage
         fallbackToDistroColors: root.fallbackToDistroColors
         appRefreshing: root.refreshing
+        containerEngineAvailable: root.containerEngineAvailable
         onCreateRequested: createDialog.open()
         onUpgradeAllRequested: distroBoxManager.upgradeAllContainer()
         onRefreshRequested: refresh()
