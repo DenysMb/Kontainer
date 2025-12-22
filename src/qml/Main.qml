@@ -135,5 +135,17 @@ Kirigami.ApplicationWindow {
             removeDialog.containerName = containerName;
             removeDialog.open();
         }
+        onStartContainerRequested: function(containerName) {
+            distroBoxManager.startContainer(containerName);
+            refresh();
+        }
+        onStopContainerRequested: function(containerName) {
+            distroBoxManager.stopContainer(containerName);
+            refresh();
+        }
+        onRebootContainerRequested: function(containerName) {
+            distroBoxManager.rebootContainer(containerName);
+            refresh();
+        }
     }
 }

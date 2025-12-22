@@ -80,14 +80,21 @@ QString containersJson()
         return u"[]"_s;
     }
 
+    const QString statusOutput = runCommand(u"distrobox list | tail -n +2 | cut -d'|' -f3 | awk '{$1=$1;print}'"_s, success);
+    if (!success) {
+        return u"[]"_s;
+    }
+
     const QStringList names = namesOutput.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts);
     const QStringList images = imagesOutput.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts);
+    const QStringList statuses = statusOutput.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts);
 
     QJsonArray containerArray;
-    for (int i = 0; i < qMin(names.size(), images.size()); ++i) {
+    for (int i = 0; i < qMin(names.size(), qMin(images.size(), statuses.size())); ++i) {
         QJsonObject container;
         container[u"name"_s] = names[i];
         container[u"image"_s] = images[i];
+        container[u"status"_s] = statuses[i];
         containerArray.append(container);
     }
 

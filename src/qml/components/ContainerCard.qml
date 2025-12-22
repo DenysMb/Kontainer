@@ -19,6 +19,9 @@ Kirigami.AbstractCard {
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
     signal removeContainerRequested(string containerName)
+    signal startContainerRequested(string containerName)
+    signal stopContainerRequested(string containerName)
+    signal rebootContainerRequested(string containerName)
 
     contentItem: RowLayout {
         spacing: Kirigami.Units.smallSpacing
@@ -58,6 +61,7 @@ Kirigami.AbstractCard {
             ContainerActionsToolbar {
                 containerName: card.container.name || ""
                 containerImage: card.container.image || ""
+                containerStatus: card.container.status || ""
                 onInstallPackageRequested: function(containerName, containerImage) {
                     card.installPackageRequested(containerName, containerImage)
                 }
@@ -75,6 +79,15 @@ Kirigami.AbstractCard {
                 }
                 onRemoveContainerRequested: function(containerName) {
                     card.removeContainerRequested(containerName)
+                }
+                onStartContainerRequested: function(containerName) {
+                    card.startContainerRequested(containerName)
+                }
+                onStopContainerRequested: function(containerName) {
+                    card.stopContainerRequested(containerName)
+                }
+                onRebootContainerRequested: function(containerName) {
+                    card.rebootContainerRequested(containerName)
                 }
             }
         }

@@ -268,6 +268,33 @@ bool DistroboxManager::removeContainer(const QString &name)
     return success;
 }
 
+// Starts a stopped container
+bool DistroboxManager::startContainer(const QString &name)
+{
+    QString command = u"podman start %1"_s.arg(name);
+    bool success;
+    DistroboxCli::runCommand(command, success);
+    return success;
+}
+
+// Stops a running container
+bool DistroboxManager::stopContainer(const QString &name)
+{
+    QString command = u"distrobox-stop %1 -Y"_s.arg(name);
+    bool success;
+    DistroboxCli::runCommand(command, success);
+    return success;
+}
+
+// Reboots a container (stop then start)
+bool DistroboxManager::rebootContainer(const QString &name)
+{
+    QString command = u"distrobox-stop %1 -Y && podman start %1"_s.arg(name);
+    bool success;
+    DistroboxCli::runCommand(command, success);
+    return success;
+}
+
 // Clone a container to a user-provided name
 bool DistroboxManager::cloneContainer(const QString &sourceName, const QString &cloneName)
 {

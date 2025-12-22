@@ -99,6 +99,27 @@ public Q_SLOTS:
     bool removeContainer(const QString &name);
 
     /**
+     * @brief Starts a stopped Distrobox container
+     * @param name Name of the container to start
+     * @return true if container start was successful, false otherwise
+     */
+    bool startContainer(const QString &name);
+
+    /**
+     * @brief Stops a running Distrobox container
+     * @param name Name of the container to stop
+     * @return true if container stop was successful, false otherwise
+     */
+    bool stopContainer(const QString &name);
+
+    /**
+     * @brief Reboots a Distrobox container
+     * @param name Name of the container to reboot
+     * @return true if container reboot was successful, false otherwise
+     */
+    bool rebootContainer(const QString &name);
+
+    /**
      * @brief Upgrades packages in the specified container
      * @param name Name of the container to upgrade
      * @return true if upgrade was successful, false otherwise

@@ -23,6 +23,9 @@ Kirigami.ScrollablePage {
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
     signal removeContainerRequested(string containerName)
+    signal startContainerRequested(string containerName)
+    signal stopContainerRequested(string containerName)
+    signal rebootContainerRequested(string containerName)
 
     spacing: Kirigami.Units.smallSpacing
     padding: Kirigami.Units.smallSpacing
@@ -81,6 +84,15 @@ Kirigami.ScrollablePage {
                 }
                 onRemoveContainerRequested: function (containerName) {
                     page.removeContainerRequested(containerName);
+                }
+                onStartContainerRequested: function (containerName) {
+                    page.startContainerRequested(containerName);
+                }
+                onStopContainerRequested: function (containerName) {
+                    page.stopContainerRequested(containerName);
+                }
+                onRebootContainerRequested: function (containerName) {
+                    page.rebootContainerRequested(containerName);
                 }
             }
 
