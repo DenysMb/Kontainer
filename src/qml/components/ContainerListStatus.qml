@@ -13,7 +13,7 @@ Item {
     property bool isRefreshing: false
     property bool containerEngineAvailable: true
 
-    signal createRequested()
+    signal createRequested
 
     anchors.fill: parent
 
@@ -22,7 +22,7 @@ Item {
         visible: !status.containerEngineAvailable && !status.isRefreshing
         icon.name: "emblem-warning"
         text: i18n("Container engine not found")
-        explanation: i18n("Podman or Docker is required to use Kontainer. Please install one of them to continue.")
+        explanation: i18n("Podman or Docker is required to use Kontainer.\nPlease install one of them and click 'Refresh' (or restart the application).")
     }
 
     Kirigami.PlaceholderMessage {

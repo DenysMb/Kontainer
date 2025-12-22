@@ -42,11 +42,13 @@ Kirigami.ScrollablePage {
         Kirigami.Action {
             text: i18n("Create…")
             icon.name: "list-add"
+            enabled: page.containerEngineAvailable
             onTriggered: page.createRequested()
         },
         Kirigami.Action {
             text: i18n("Upgrade all…")
             icon.name: "system-software-update"
+            enabled: page.containerEngineAvailable
             onTriggered: page.upgradeAllRequested()
         },
         Kirigami.Action {
