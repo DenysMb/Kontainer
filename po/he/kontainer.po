@@ -232,7 +232,7 @@ msgstr "שדרוג מכולה"
 #: src/qml/components/ContainerActionsToolbar.qml:85
 #, kde-format
 msgid "Clone Container"
-msgstr "שכפול מכונה"
+msgstr "שכפול מכולה"
 
 #: src/qml/components/ContainerActionsToolbar.qml:91
 #, kde-format
