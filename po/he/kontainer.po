@@ -251,7 +251,7 @@ msgid ""
 "Please install one of them and click 'Refresh' (or restart the application)."
 msgstr ""
 "כדי להשתמש ב־Kontainer צריך את Podman או את Docker.\n"
-"נא להתקין אחד מהם וללחוץ על ‚ריענון’ או להפעיל את היישום מחדש)."
+"נא להתקין אחד מהם וללחוץ על ‚ריענון’ (או להפעיל את היישום מחדש)."
 
 #: src/qml/components/ContainerListStatus.qml:31
 #, kde-format
