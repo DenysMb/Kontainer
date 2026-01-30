@@ -404,7 +404,7 @@ msgstr "קובצי INI‏ (‎*.ini)"
 #: src/qml/DistroboxCreateDialog.qml:75
 #, kde-format
 msgid "Select custom home directory"
-msgstr "בחירת תיקיית בית כברירת מחדל"
+msgstr "בחירת תיקיית בית מותאמת אישית"
 
 #: src/qml/DistroboxCreateDialog.qml:83
 #, kde-format
