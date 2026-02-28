@@ -48,10 +48,7 @@ int main(int argc, char *argv[])
         KAboutLicense::GPL_V3,
         // Copyright Statement.
         i18n("Denys Madureira (c) 2025"));
-    aboutData.addAuthor(i18nc("@info:credit", "Denys Madureira"),
-                        i18nc("@info:credit", "Author"),
-                        u"denysmb@zoho.com"_s,
-                        u"https://github.com/DenysMb/Kontainer"_s);
+    aboutData.addAuthor(i18nc("@info:credit", "Denys Madureira"), i18nc("@info:credit", "Author"), u"denysmb@zoho.com"_s, u"https://invent.kde.org/denysmb"_s);
     aboutData.setTranslator(i18nc("NAME OF TRANSLATORS", "Your names"), i18nc("EMAIL OF TRANSLATORS", "Your emails"));
     KAboutData::setApplicationData(aboutData);
 
