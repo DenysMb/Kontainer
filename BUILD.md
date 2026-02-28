@@ -12,7 +12,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/DenysMb/Kontainer.git
+   git clone https://invent.kde.org/denysmb/Kontainer.git
    cd Kontainer
    ```
 

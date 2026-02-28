@@ -4,7 +4,7 @@
 BASEDIR=`pwd`	# root of translatable sources
 PROJECT=$(grep -Po '(?<=project\()\w+' CMakeLists.txt) # project name
 PROJECT_UPPER="$(tr '[:lower:]' '[:upper:]' <<< ${PROJECT:0:1})${PROJECT:1}" # uppercased project name
-BUGADDR="https://github.com/DenysMb/Kontainer"	# MSGID-Bugs
+BUGADDR="https://invent.kde.org/denysmb/Kontainer"	# MSGID-Bugs
 WDIR="`pwd`/po"		# working dir
 
 
