@@ -25,9 +25,8 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
-#include <sys/xattr.h>
-#include <QByteArray>
 #include <distroicons.h>
+#include <sys/xattr.h>
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -46,10 +45,35 @@ QString ensureIconCacheDirectory(const QString &container)
     return iconsRoot;
 }
 
+// Distrobox 2.0+ prints the container name to stdout when auto-starting
+// a stopped container (podman start <name> via Interactive mode). This
+// contaminates the output of "distrobox enter <container> -- sh -c ..."
+// commands. Strip the container name from the first line when present.
+// See: https://github.com/DenysMb/Kontainer/issues/73
+QString stripContainerStartupNoise(const QString &output, const QString &container)
+{
+    if (container.isEmpty() || output.isEmpty()) {
+        return output;
+    }
+
+    const int newlinePos = output.indexOf(QLatin1Char('\n'));
+    if (newlinePos < 0) {
+        return output;
+    }
+
+    const QString firstLine = output.left(newlinePos);
+    if (firstLine.trimmed() == container.trimmed()) {
+        return output.mid(newlinePos + 1);
+    }
+
+    return output;
+}
+
 QString runContainerCommand(const QString &container, const QString &script, bool &success)
 {
     const QString command = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(script));
-    return DistroboxCli::runCommand(command, success);
+    QString output = DistroboxCli::runCommand(command, success);
+    return stripContainerStartupNoise(output, container);
 }
 
 static QString resolveDocumentPortalPath(const QString &path)
@@ -62,9 +86,7 @@ static QString resolveDocumentPortalPath(const QString &path)
         return path;
 
     QByteArray value(4096, '\0');
-    ssize_t len = getxattr(path.toLocal8Bit().constData(),
-                           "user.document-portal.host-path",
-                           value.data(), value.size());
+    ssize_t len = getxattr(path.toLocal8Bit().constData(), "user.document-portal.host-path", value.data(), value.size());
     if (len > 0) {
         return QString::fromUtf8(value.constData(), len);
     }
@@ -337,8 +359,7 @@ bool DistroboxManager::assembleContainer(const QString &iniFile)
 
     QString message = i18n("Press any key to close this terminal…");
 
-    QString assembleCmd = u"distrobox assemble create --file %1 && echo '' && echo '%2' && read -s -n 1"_s
-    .arg(trimmedFile, message);
+    QString assembleCmd = u"distrobox assemble create --file %1 && echo '' && echo '%2' && read -s -n 1"_s.arg(trimmedFile, message);
 
     QString command = u"sh -c \"%1\""_s.arg(assembleCmd);
 
@@ -444,11 +465,9 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
     QString safeMessage = message;
     safeMessage.replace(u"'"_s, u"'\\''"_s);
 
-    QString innerScript = QStringLiteral("%1 && echo && echo '%2' && read -s -n 1")
-    .arg(*installCmd, safeMessage);
+    QString innerScript = QStringLiteral("%1 && echo && echo '%2' && read -s -n 1").arg(*installCmd, safeMessage);
 
-    QString fullCmd = QStringLiteral("distrobox enter %1 -- /usr/bin/env bash -c \"%2\"")
-    .arg(name, innerScript);
+    QString fullCmd = QStringLiteral("distrobox enter %1 -- /usr/bin/env bash -c \"%2\"").arg(name, innerScript);
 
     return launchCommandInTerminal(fullCmd, homeDir);
 }
@@ -466,13 +485,13 @@ bool DistroboxManager::isContainerEngineAvailable() const
     if (success && !podmanCheck.trimmed().isEmpty()) {
         return true;
     }
-    
+
     // Check if docker is available
     QString dockerCheck = DistroboxCli::runCommand(QStringLiteral("which docker"), success);
     if (success && !dockerCheck.trimmed().isEmpty()) {
         return true;
     }
-    
+
     return false;
 }
 
@@ -484,6 +503,7 @@ QVariantList DistroboxManager::allApps(const QString &container)
     QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
     bool success = false;
     QString raw = DistroboxCli::runCommand(output, success);
+    raw = stripContainerStartupNoise(raw, container);
     QVariantList list;
     if (!success) {
         qDebug() << "Find command failed for container:" << container;
@@ -509,6 +529,7 @@ QVariantList DistroboxManager::allApps(const QString &container)
         QString desktopOutput = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(readCmd));
         bool readSuccess = false;
         QString desktopContent = DistroboxCli::runCommand(desktopOutput, readSuccess);
+        desktopContent = stripContainerStartupNoise(desktopContent, container);
 
         if (!readSuccess) {
             continue;
