@@ -579,8 +579,8 @@ msgstr "Prévia do comando"
 
 #: src/qml/DistroboxCreateDialog.qml:685
 #, kde-format
-msgid "Search images…"
-msgstr ""
+msgid "Search or type a custom image…"
+msgstr "Pesquise ou digite uma imagem personalizada…"
 
 #: src/qml/DistroboxCreateDialog.qml:763
 #, kde-format

@@ -682,7 +682,7 @@ Kirigami.Dialog {
                 id: imageSearchField
                 Layout.fillWidth: true
                 enabled: !createDialog.isCreating
-                placeholderText: i18n("Search images…")
+                placeholderText: i18n("Search or type a custom image…")
                 onTextChanged: updateFilteredImages(text)
             }
 

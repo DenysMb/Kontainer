@@ -62,6 +62,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+  <release version="1.5.1" date="2026-07-19">
+    <description>
+      <p>Change placeholder message on distrobox image selection input to make it clearer that users can write images name that are not in the list.</p>
+    </description>
+  </release>
   <release version="1.5.0" date="2026-07-12">
     <description>
       <p>Add support for Distrobox 2.0: strip container startup noise from stdout when auto-starting stopped containers, fixing missing app.</p>
