@@ -219,6 +219,13 @@ public Q_SLOTS:
      */
     Q_INVOKABLE bool unexportApp(const QString &basename, const QString &container);
 
+    /**
+     * @brief Resolves a document portal path to the real path on the host
+     * @param path Path returned by a portal file dialog (e.g. /run/user/1000/doc/...)
+     * @return Real path on the host, or the original path if it is not a portal path or cannot be resolved
+     */
+    Q_INVOKABLE QString resolveHostPath(const QString &path) const;
+
 Q_SIGNALS:
     /**
      * @brief Emitted when a container clone operation finishes.
