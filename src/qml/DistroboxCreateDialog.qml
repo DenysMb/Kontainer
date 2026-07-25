@@ -74,7 +74,7 @@ Kirigami.Dialog {
         id: homeDirectoryDialog
         title: i18n("Select custom home directory")
         onAccepted: {
-            createDialog.customHomePath = selectedFolder.toString().replace("file://", "");
+            createDialog.customHomePath = distroBoxManager.resolveHostPath(selectedFolder.toString().replace("file://", ""));
         }
     }
 
@@ -82,7 +82,7 @@ Kirigami.Dialog {
         id: volumeDirectoryDialog
         title: i18n("Select volume directory")
         onAccepted: {
-            var volumePath = selectedFolder.toString().replace("file://", "");
+            var volumePath = distroBoxManager.resolveHostPath(selectedFolder.toString().replace("file://", ""));
             // Check for duplicates
             for (var i = 0; i < volumesModel.count; i++) {
                 if (volumesModel.get(i).path === volumePath) {

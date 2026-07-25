@@ -25,6 +25,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
+#include <cstring>
 #include <distroicons.h>
 #include <sys/xattr.h>
 
@@ -85,14 +86,18 @@ static QString resolveDocumentPortalPath(const QString &path)
     if (!path.contains(QStringLiteral("/doc/")))
         return path;
 
-    QByteArray value(4096, '\0');
-    ssize_t len = getxattr(path.toLocal8Bit().constData(), "user.document-portal.host-path", value.data(), value.size());
-    if (len > 0) {
-        return QString::fromUtf8(value.constData(), len);
-    }
+    const QByteArray pathUtf8 = path.toLocal8Bit();
+    const ssize_t size = getxattr(pathUtf8.constData(), "user.document-portal.host-path", nullptr, 0);
+    if (size <= 0)
+        return path;
 
-    // No xattr or error — fallback to original path
-    return path;
+    QByteArray value(size, '\0');
+    const ssize_t len = getxattr(pathUtf8.constData(), "user.document-portal.host-path", value.data(), value.size());
+    if (len <= 0)
+        return path;
+
+    // Older xdg-desktop-portal versions include a trailing NUL in the xattr value
+    return QString::fromUtf8(value.constData(), strnlen(value.constData(), len));
 }
 
 QString resolveIconPathInContainer(const QString &container, const QString &iconValue)
@@ -475,6 +480,11 @@ bool DistroboxManager::installPackageInContainer(const QString &name, const QStr
 bool DistroboxManager::isFlatpak() const
 {
     return DistroboxCli::isFlatpak();
+}
+
+QString DistroboxManager::resolveHostPath(const QString &path) const
+{
+    return resolveDocumentPortalPath(path);
 }
 
 bool DistroboxManager::isContainerEngineAvailable() const
