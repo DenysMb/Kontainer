@@ -43,6 +43,7 @@ ecm_target_qml_sources(kontainer
     qml/components/MainGlobalDrawer.qml
     qml/About.qml
     qml/ApplicationsWindow.qml
+    qml/BinariesWindow.qml
     qml/DistroboxCreateDialog.qml
     qml/DistroboxCloneDialog.qml
     qml/DistroboxRemoveDialog.qml

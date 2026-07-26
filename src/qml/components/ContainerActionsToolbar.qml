@@ -17,6 +17,7 @@ Kirigami.ActionToolBar {
 
     signal installPackageRequested(string containerName, string containerImage)
     signal manageApplicationsRequested(string containerName)
+    signal manageBinariesRequested(string containerName)
     signal openTerminalRequested(string containerName)
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
@@ -67,6 +68,12 @@ Kirigami.ActionToolBar {
                 text: i18n("Install Package")
                 enabled: !toolbar.isPending
                 onTriggered: toolbar.installPackageRequested(toolbar.containerName, toolbar.containerImage)
+            }
+            Kirigami.Action {
+                icon.name: "application-x-executable"
+                text: i18n("Manage Binaries")
+                enabled: !toolbar.isPending
+                onTriggered: toolbar.manageBinariesRequested(toolbar.containerName)
             }
             Kirigami.Action {
                 icon.name: "system-reboot"

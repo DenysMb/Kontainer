@@ -25,6 +25,7 @@ Kirigami.ApplicationWindow {
 
     property bool refreshing: false
     property bool containerEngineAvailable: true
+    property var containerStats: ({})
 
     // persistent settings storage using QtCore.Settings
     Settings {
@@ -97,6 +98,25 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    Connections {
+        target: distroBoxManager
+        function onContainerStatsReady(stats) {
+            var map = ({});
+            for (var i = 0; i < stats.length; i++) {
+                map[stats[i].name] = stats[i];
+            }
+            containerStats = map;
+        }
+    }
+
+    Timer {
+        id: statsTimer
+        interval: 5000
+        repeat: true
+        running: root.containerEngineAvailable
+        onTriggered: distroBoxManager.requestContainerStats()
+    }
+
 
     globalDrawer: MainGlobalDrawer {
         hasContainers: containersPage.containersList.length > 0
@@ -141,6 +161,7 @@ Kirigami.ApplicationWindow {
         fallbackToDistroColors: root.fallbackToDistroColors
         appRefreshing: root.refreshing
         containerEngineAvailable: root.containerEngineAvailable
+        containerStats: root.containerStats
         onCreateRequested: createDialog.open()
         onUpgradeAllRequested: distroBoxManager.upgradeAllContainer()
         onRefreshRequested: refresh()
@@ -159,6 +180,17 @@ Kirigami.ApplicationWindow {
                 window.show();
             } else {
                 console.error("Error loading ApplicationsWindow:", component.errorString());
+            }
+        }
+        onManageBinariesRequested: function(containerName) {
+            var component = Qt.createComponent("BinariesWindow.qml");
+            if (component.status === Component.Ready) {
+                var window = component.createObject(root, {
+                    containerName: containerName
+                });
+                window.show();
+            } else {
+                console.error("Error loading BinariesWindow:", component.errorString());
             }
         }
         onOpenTerminalRequested: function(containerName) {

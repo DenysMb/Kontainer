@@ -19,12 +19,17 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QPointer>
+#include <QProcess>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
+#include <algorithm>
 #include <cstring>
 #include <distroicons.h>
 #include <sys/xattr.h>
@@ -505,6 +510,59 @@ bool DistroboxManager::isContainerEngineAvailable() const
     return false;
 }
 
+void DistroboxManager::requestContainerStats()
+{
+    if (m_statsProcess) {
+        return;
+    }
+
+    auto *process = new QProcess(this);
+    m_statsProcess = process;
+
+    QObject::connect(process, &QProcess::finished, this, [this, process](int exitCode, QProcess::ExitStatus) {
+        process->deleteLater();
+        m_statsProcess.clear();
+
+        QVariantList stats;
+        if (exitCode != 0) {
+            Q_EMIT containerStatsReady(stats);
+            return;
+        }
+
+        const QByteArray raw = process->readAllStandardOutput();
+        if (raw.trimmed().isEmpty()) {
+            Q_EMIT containerStatsReady(stats);
+            return;
+        }
+
+        QJsonParseError parseError;
+        const QJsonDocument doc = QJsonDocument::fromJson(raw, &parseError);
+        if (parseError.error != QJsonParseError::NoError || !doc.isArray()) {
+            Q_EMIT containerStatsReady(stats);
+            return;
+        }
+
+        for (const QJsonValue &val : doc.array()) {
+            const QJsonObject obj = val.toObject();
+            QVariantMap entry;
+            entry[QStringLiteral("name")] = obj[QStringLiteral("name")].toString();
+            entry[QStringLiteral("cpuPercent")] = obj[QStringLiteral("cpu_percent")].toString();
+            entry[QStringLiteral("memUsage")] = obj[QStringLiteral("mem_usage")].toString();
+            entry[QStringLiteral("memPercent")] = obj[QStringLiteral("mem_percent")].toString();
+            stats.append(entry);
+        }
+
+        Q_EMIT containerStatsReady(stats);
+    });
+
+    QString command = u"podman stats --no-stream --format json"_s;
+    if (DistroboxCli::isFlatpak()) {
+        command = u"flatpak-spawn --host /usr/bin/env "_s + command;
+    }
+
+    process->start(u"sh"_s, QStringList() << QLatin1String("-c") << command);
+}
+
 QVariantList DistroboxManager::allApps(const QString &container)
 {
     qDebug() << "=== allApps for container:" << container << "===";
@@ -852,4 +910,106 @@ bool DistroboxManager::unexportApp(const QString &basename, const QString &conta
         qDebug() << "=== UNEXPORT OPERATION END (FAILED) ===";
         return false;
     }
+}
+
+QVariantList DistroboxManager::exportedBinaries(const QString &container)
+{
+    QVariantList list;
+    const QString binDir = QDir::homePath() + QStringLiteral("/.local/bin");
+    const QDir dir(binDir);
+    if (!dir.exists()) {
+        return list;
+    }
+
+    const QFileInfoList entries = dir.entryInfoList(QDir::Files);
+    for (const QFileInfo &fileInfo : entries) {
+        QFile file(fileInfo.absoluteFilePath());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            continue;
+        }
+
+        const QString content = QString::fromUtf8(file.readAll());
+        file.close();
+
+        if (!content.contains(QLatin1String("# distrobox_binary"))) {
+            continue;
+        }
+
+        const QString marker = u"# name: %1"_s.arg(container);
+        if (!content.contains(marker)) {
+            continue;
+        }
+
+        const QString basename = fileInfo.fileName();
+
+        QString path = basename;
+        static const QRegularExpression pathRx(QStringLiteral("--\\s+(.+?)\\s+\"\\$@\""));
+        const QRegularExpressionMatch match = pathRx.match(content);
+        if (match.hasMatch()) {
+            path = match.captured(1).trimmed();
+            if ((path.startsWith(QLatin1Char('\'')) && path.endsWith(QLatin1Char('\'')))
+                || (path.startsWith(QLatin1Char('"')) && path.endsWith(QLatin1Char('"')))) {
+                path = path.mid(1, path.length() - 2);
+            }
+        }
+
+        QVariantMap entry;
+        entry[QStringLiteral("basename")] = basename;
+        entry[QStringLiteral("path")] = path;
+        list.append(entry);
+    }
+
+    return list;
+}
+
+QVariantList DistroboxManager::availableBinaries(const QString &container)
+{
+    QVariantList list;
+    const QString script =
+        u"for f in /usr/bin/* /usr/local/bin/*; do [ -f \"$f\" ] && [ -x \"$f\" ] && printf '%s\\t%s\\n' \"$(basename \"$f\")\" \"$f\"; done"_s;
+
+    bool success = false;
+    const QString output = runContainerCommand(container, script, success);
+    if (!success || output.trimmed().isEmpty()) {
+        return list;
+    }
+
+    const QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    for (const QString &line : lines) {
+        const int tabPos = line.indexOf(QLatin1Char('\t'));
+        if (tabPos < 0) {
+            continue;
+        }
+
+        QVariantMap entry;
+        entry[QStringLiteral("basename")] = line.left(tabPos);
+        entry[QStringLiteral("path")] = line.mid(tabPos + 1);
+        list.append(entry);
+    }
+
+    std::sort(list.begin(), list.end(), [](const QVariant &a, const QVariant &b) {
+        return a.toMap()[QStringLiteral("basename")].toString().compare(b.toMap()[QStringLiteral("basename")].toString(), Qt::CaseInsensitive) < 0;
+    });
+
+    return list;
+}
+
+bool DistroboxManager::exportBinary(const QString &path, const QString &container)
+{
+    const QString command =
+        u"distrobox enter %1 -- distrobox-export --bin %2 --export-path ~/.local/bin"_s.arg(KShell::quoteArg(container), KShell::quoteArg(path));
+
+    bool success = false;
+    DistroboxCli::runCommand(command, success);
+    return success;
+}
+
+bool DistroboxManager::unexportBinary(const QString &path, const QString &container)
+{
+    const QString command =
+        u"distrobox enter %1 -- distrobox-export --bin %2 --export-path ~/.local/bin --delete"_s.arg(KShell::quoteArg(container), KShell::quoteArg(path));
+
+    bool success = false;
+    DistroboxCli::runCommand(command, success);
+    return success;
 }

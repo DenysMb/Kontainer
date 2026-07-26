@@ -13,7 +13,7 @@ Item {
     property string containerName: ""
     property string containerImage: ""
 
-    readonly property int iconBackgroundSize: Kirigami.Units.iconSizes.medium + Kirigami.Units.smallSpacing * 2
+    readonly property int iconBackgroundSize: Kirigami.Units.iconSizes.large + Kirigami.Units.smallSpacing * 2
 
     Layout.fillHeight: true
     width: fallbackToDistroColors ? Kirigami.Units.smallSpacing : iconBackgroundSize
@@ -55,8 +55,8 @@ Item {
         Kirigami.Icon {
             anchors.centerIn: parent
             source: distroBoxManager.getDistroIcon(badge.containerName)
-            width: Kirigami.Units.iconSizes.medium
-            height: Kirigami.Units.iconSizes.medium
+            width: Kirigami.Units.iconSizes.large
+            height: Kirigami.Units.iconSizes.large
         }
     }
 }

@@ -13,9 +13,11 @@ Kirigami.AbstractCard {
     property var container: ({})
     property bool fallbackToDistroColors: false
     property bool isPending: false
+    property var stats: null
 
     signal installPackageRequested(string containerName, string containerImage)
     signal manageApplicationsRequested(string containerName)
+    signal manageBinariesRequested(string containerName)
     signal openTerminalRequested(string containerName)
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
@@ -62,6 +64,40 @@ Kirigami.AbstractCard {
                         font.pointSize: Kirigami.Theme.smallFont.pointSize
                         opacity: 0.7
                     }
+
+                    Row {
+                        Layout.fillWidth: true
+                        spacing: 0
+
+                        Controls.Label {
+                            text: i18n("CPU: ")
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            font.bold: true
+                            opacity: 0.7
+                        }
+                        Controls.Label {
+                            text: card.stats ? card.stats.cpuPercent : "---"
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            opacity: 0.7
+                        }
+
+                        Item {
+                            width: Kirigami.Units.smallSpacing * 2
+                            height: 1
+                        }
+
+                        Controls.Label {
+                            text: i18n("RAM: ")
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            font.bold: true
+                            opacity: 0.7
+                        }
+                        Controls.Label {
+                            text: card.stats ? card.stats.memUsage : "---"
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            opacity: 0.7
+                        }
+                    }
                 }
 
                 ContainerActionsToolbar {
@@ -74,6 +110,9 @@ Kirigami.AbstractCard {
                     }
                     onManageApplicationsRequested: function(containerName) {
                         card.manageApplicationsRequested(containerName)
+                    }
+                    onManageBinariesRequested: function(containerName) {
+                        card.manageBinariesRequested(containerName)
                     }
                     onOpenTerminalRequested: function(containerName) {
                         card.openTerminalRequested(containerName)

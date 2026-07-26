@@ -8,8 +8,11 @@
 
 #include <QDir>
 #include <QObject>
+#include <QPointer>
+#include <QProcess>
 #include <QString>
 #include <QStringList>
+#include <QVariantList>
 #include <functional>
 
 /**
@@ -220,11 +223,50 @@ public Q_SLOTS:
     Q_INVOKABLE bool unexportApp(const QString &basename, const QString &container);
 
     /**
+     * @brief Lists binaries exported from the given container
+     * @param container Name of the container
+     * @return QVariantList of {basename, path} maps representing exported binaries
+     */
+    Q_INVOKABLE QVariantList exportedBinaries(const QString &container);
+
+    /**
+     * @brief Lists available binaries inside the given container
+     * @param container Name of the container
+     * @return QVariantList of {basename, path} maps representing available binaries
+     */
+    Q_INVOKABLE QVariantList availableBinaries(const QString &container);
+
+    /**
+     * @brief Exports a binary from a container to the host system
+     * @param path Full path to the binary inside the container
+     * @param container Name of the container
+     * @return true if export was successful, false otherwise
+     */
+    Q_INVOKABLE bool exportBinary(const QString &path, const QString &container);
+
+    /**
+     * @brief Removes an exported binary from the host system
+     * @param path Full path to the binary that was exported
+     * @param container Name of the container the binary was exported from
+     * @return true if unexport was successful, false otherwise
+     */
+    Q_INVOKABLE bool unexportBinary(const QString &path, const QString &container);
+
+    /**
      * @brief Resolves a document portal path to the real path on the host
      * @param path Path returned by a portal file dialog (e.g. /run/user/1000/doc/...)
      * @return Real path on the host, or the original path if it is not a portal path or cannot be resolved
      */
     Q_INVOKABLE QString resolveHostPath(const QString &path) const;
+
+    /**
+     * @brief Requests container resource stats asynchronously
+     *
+     * Runs podman stats --no-stream --format json in the background.
+     * Emits containerStatsReady with the parsed results when done.
+     * No-op if a request is already in flight.
+     */
+    Q_INVOKABLE void requestContainerStats();
 
 Q_SIGNALS:
     /**
@@ -240,9 +282,16 @@ Q_SIGNALS:
      */
     void containerAssembleFinished(bool success);
 
+    /**
+     * @brief Emitted with container resource utilization stats.
+     * @param stats QVariantList of QVariantMap with keys: name, cpuPercent, memUsage, memPercent
+     */
+    void containerStatsReady(const QVariantList &stats);
+
 private:
     QStringList m_availableImages; ///< List of available container base images
     QStringList m_fullImageNames; ///< List of full image names/URLs
+    QPointer<QProcess> m_statsProcess; ///< Active stats fetch process, null when idle
 
     /**
      * @brief Checks if an application with the given basename is exported by other containers

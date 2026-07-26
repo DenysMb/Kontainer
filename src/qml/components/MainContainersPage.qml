@@ -14,6 +14,7 @@ Kirigami.ScrollablePage {
     property bool fallbackToDistroColors: false
     property bool containerEngineAvailable: true
     property var pendingContainers: ({}) // Map of containerName -> bool
+    property var containerStats: ({})
 
     signal createRequested
     signal upgradeAllRequested
@@ -21,6 +22,7 @@ Kirigami.ScrollablePage {
     signal initialLoadRequested
     signal installPackageRequested(string containerName, string containerImage)
     signal manageApplicationsRequested(string containerName)
+    signal manageBinariesRequested(string containerName)
     signal openTerminalRequested(string containerName)
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
@@ -72,11 +74,15 @@ Kirigami.ScrollablePage {
                 container: modelData
                 fallbackToDistroColors: page.fallbackToDistroColors
                 isPending: page.pendingContainers[modelData.name] || false
+                stats: page.containerStats[modelData.name] || null
                 onInstallPackageRequested: function (containerName, containerImage) {
                     page.installPackageRequested(containerName, containerImage);
                 }
                 onManageApplicationsRequested: function (containerName) {
                     page.manageApplicationsRequested(containerName);
+                }
+                onManageBinariesRequested: function (containerName) {
+                    page.manageBinariesRequested(containerName);
                 }
                 onOpenTerminalRequested: function (containerName) {
                     page.openTerminalRequested(containerName);
