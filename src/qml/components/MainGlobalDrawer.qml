@@ -10,11 +10,13 @@ Kirigami.GlobalDrawer {
 
     property bool hasContainers: false
     property bool fallbackToDistroColors: false
+    property bool showContainerStatus: false
 
     signal createRequested()
     signal shortcutRequested()
     signal cloneRequested(string containerName)
     signal showContainerIconsToggled(bool fallbackToDistroColors)
+    signal showContainerStatusToggled(bool status)
     signal aboutRequested()
 
     isMenu: true
@@ -40,6 +42,13 @@ Kirigami.GlobalDrawer {
             checkable: true
             checked: !drawer.fallbackToDistroColors
             onToggled: drawer.showContainerIconsToggled(!checked)
+        },
+        Kirigami.Action {
+            text: i18n("Show Container Status")
+            icon.name: "office-chart-bar"
+            checkable: true
+            checked: drawer.showContainerStatus
+            onToggled: drawer.showContainerStatusToggled(checked)
         },
         Kirigami.Action {
             text: i18n("Clone Container…")

@@ -12,6 +12,7 @@ Kirigami.AbstractCard {
 
     property var container: ({})
     property bool fallbackToDistroColors: false
+    property bool showContainerStatus: false
     property bool isPending: false
     property var stats: null
 
@@ -66,6 +67,7 @@ Kirigami.AbstractCard {
                     }
 
                     Row {
+                        visible: card.showContainerStatus
                         Layout.fillWidth: true
                         spacing: 0
 

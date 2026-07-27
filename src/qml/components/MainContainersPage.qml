@@ -15,6 +15,7 @@ Kirigami.ScrollablePage {
     property bool containerEngineAvailable: true
     property var pendingContainers: ({}) // Map of containerName -> bool
     property var containerStats: ({})
+    property bool showContainerStatus: false
 
     signal createRequested
     signal upgradeAllRequested
@@ -73,6 +74,7 @@ Kirigami.ScrollablePage {
             delegate: ContainerCard {
                 container: modelData
                 fallbackToDistroColors: page.fallbackToDistroColors
+                showContainerStatus: page.showContainerStatus
                 isPending: page.pendingContainers[modelData.name] || false
                 stats: page.containerStats[modelData.name] || null
                 onInstallPackageRequested: function (containerName, containerImage) {

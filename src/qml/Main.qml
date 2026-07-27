@@ -32,10 +32,11 @@ Kirigami.ApplicationWindow {
         id: kontainerSettings
         category: "Appearance"
         property bool showColors: false
+        property bool showStatus: false
     }
 
-    // alias for clarity
     property alias fallbackToDistroColors: kontainerSettings.showColors
+    property alias showContainerStatus: kontainerSettings.showStatus
 
     function refresh() {
         refreshing = true;
@@ -121,10 +122,12 @@ Kirigami.ApplicationWindow {
     globalDrawer: MainGlobalDrawer {
         hasContainers: containersPage.containersList.length > 0
         fallbackToDistroColors: root.fallbackToDistroColors
+        showContainerStatus: root.showContainerStatus
         onCreateRequested: createDialog.open()
         onShortcutRequested: shortcutDialog.open()
         onCloneRequested: cloneDialog.openWithContainer(containerName)
         onShowContainerIconsToggled: root.fallbackToDistroColors = fallbackToDistroColors
+        onShowContainerStatusToggled: root.showContainerStatus = status
         onAboutRequested: {
             if (root.pageStack.layers.currentItem !== aboutPage) {
                 root.pageStack.layers.push(aboutPage);
@@ -159,6 +162,7 @@ Kirigami.ApplicationWindow {
     pageStack.initialPage: MainContainersPage {
         id: containersPage
         fallbackToDistroColors: root.fallbackToDistroColors
+        showContainerStatus: root.showContainerStatus
         appRefreshing: root.refreshing
         containerEngineAvailable: root.containerEngineAvailable
         containerStats: root.containerStats
