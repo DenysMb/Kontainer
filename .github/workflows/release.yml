@@ -1,0 +1,137 @@
+name: Release
+
+# Creates a git tag and a GitHub release whenever the version declared in
+# CMakeLists.txt (project(<name> VERSION X.Y.Z)) does not have a matching tag
+# on the remote yet. Release notes are extracted from the <release> entry of
+# the *.metainfo.xml file at the repository root.
+#
+# Reusable in any project following the same convention:
+#   - version in the root CMakeLists.txt: project(foo VERSION X.Y.Z)
+#   - changelog in a root *.metainfo.xml: <release version="X.Y.Z">...
+# Just copy this file. Adjust TAG_PREFIX below if the project tags releases
+# with a prefix (e.g. "v1.2.3").
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - CMakeLists.txt
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  TAG_PREFIX: ""
+
+jobs:
+  release:
+    name: Tag and release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from CMakeLists.txt
+        id: project
+        run: |
+          VERSION=$(grep -m1 -oP 'project\s*\(\s*[A-Za-z0-9_]+\s+VERSION\s+\K[0-9]+(\.[0-9]+)*' CMakeLists.txt)
+          CMAKE_NAME=$(grep -m1 -oP 'project\s*\(\s*\K[A-Za-z0-9_]+' CMakeLists.txt)
+          if [[ -z "${VERSION}" ]]; then
+            echo "::error::Could not find 'project(<name> VERSION X.Y.Z)' in CMakeLists.txt"
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "name=${CMAKE_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "Project version: ${VERSION} (${CMAKE_NAME})"
+
+      - name: Check if tag already exists
+        id: check
+        env:
+          VERSION: ${{ steps.project.outputs.version }}
+        run: |
+          TAG="${TAG_PREFIX}${VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" > /dev/null; then
+            echo "exists=true" >> "${GITHUB_OUTPUT}"
+            echo "::notice::Tag ${TAG} already exists, nothing to do."
+          else
+            echo "exists=false" >> "${GITHUB_OUTPUT}"
+            echo "Tag ${TAG} does not exist yet, a release will be created."
+          fi
+
+      - name: Extract release notes from metainfo.xml
+        id: notes
+        if: steps.check.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.project.outputs.version }}
+        run: |
+          python3 << 'PYEOF'
+          import glob
+          import os
+          import sys
+          import xml.etree.ElementTree as ET
+
+          version = os.environ["VERSION"]
+
+          files = glob.glob("*.metainfo.xml")
+          if not files:
+              print("::error::No *.metainfo.xml file found at the repository root")
+              sys.exit(1)
+
+          root = ET.parse(files[0]).getroot()
+          name = (root.findtext("name") or "").strip()
+
+          items = []
+          found = False
+          for release in root.iter("release"):
+              if release.get("version") != version:
+                  continue
+              found = True
+              description = release.find("description")
+              if description is not None:
+                  for element in description.iter():
+                      if element.tag not in ("p", "li"):
+                          continue
+                      text = " ".join("".join(element.itertext()).split())
+                      if text:
+                          items.append(f"- {text}")
+              break
+
+          if not found:
+              print(f"::error::No <release version=\"{version}\"> entry found in {files[0]}.")
+              print("::error::Add the release changelog to the metainfo file before bumping the version.")
+              sys.exit(1)
+
+          if not items:
+              print(f"::error::<release version=\"{version}\"> in {files[0]} has no <description> paragraphs.")
+              sys.exit(1)
+
+          with open("release_notes.md", "w") as notes_file:
+              notes_file.write("\n".join(items) + "\n")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
+              output_file.write(f"name={name}\n")
+
+          print(f"Extracted {len(items)} changelog item(s) for {version} from {files[0]}")
+          PYEOF
+
+      - name: Create tag and GitHub release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.project.outputs.version }}
+          NAME: ${{ steps.notes.outputs.name || steps.project.outputs.name }}
+        run: |
+          TAG="${TAG_PREFIX}${VERSION}"
+          gh release create "${TAG}" \
+            --title "${NAME} - Release ${VERSION}" \
+            --notes-file release_notes.md \
+            --target "${GITHUB_SHA}"
