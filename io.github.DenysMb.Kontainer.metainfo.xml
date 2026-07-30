@@ -62,6 +62,13 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+  <release version="1.6.0" date="2026-07-30">
+    <description>
+      <p>Add optional container resource stats display with CPU and memory usage from Podman.</p>
+      <p>Add binary export and management window for exporting container binaries to the host.</p>
+      <p>Show Distrobox version and resolved binary path in the About page.</p>
+    </description>
+  </release>
   <release version="1.5.2" date="2026-07-25">
     <description>
       <p>Fix document portal path resolution for custom home directories and volumes in Flatpak. Folder selections now return real host paths so distrobox create receives the correct directory even without filesystem permissions.</p>
