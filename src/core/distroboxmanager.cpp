@@ -492,6 +492,16 @@ QString DistroboxManager::resolveHostPath(const QString &path) const
     return resolveDocumentPortalPath(path);
 }
 
+QString DistroboxManager::distroboxVersion() const
+{
+    return DistroboxCli::distroboxVersion();
+}
+
+QString DistroboxManager::distroboxPath() const
+{
+    return DistroboxCli::distroboxPath();
+}
+
 bool DistroboxManager::isContainerEngineAvailable() const
 {
     // Check if podman is available

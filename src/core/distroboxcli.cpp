@@ -118,6 +118,30 @@ QString availableImagesJson(const AvailableImages &images)
     return QString::fromUtf8(QJsonDocument(imageArray).toJson());
 }
 
+QString distroboxVersion()
+{
+    bool success = false;
+    const QString output = runCommand(u"distrobox --version"_s, success);
+    if (!success || output.trimmed().isEmpty()) {
+        return {};
+    }
+
+    // Output is like "distrobox version 2.0.0-rc.4" or "distrobox: 1.7.2.1"
+    const QString firstLine = output.trimmed().split(QLatin1Char('\n')).first();
+    return firstLine.section(QLatin1Char(' '), -1).trimmed();
+}
+
+QString distroboxPath()
+{
+    bool success = false;
+    const QString output = runCommand(u"which distrobox"_s, success);
+    if (!success) {
+        return {};
+    }
+
+    return output.trimmed();
+}
+
 bool isFlatpak()
 {
     return isFlatpakRuntime();

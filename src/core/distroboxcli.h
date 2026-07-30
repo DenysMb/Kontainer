@@ -19,5 +19,7 @@ QString runCommand(const QString &command, bool &success);
 AvailableImages availableImages();
 QString containersJson();
 QString availableImagesJson(const AvailableImages &images);
+QString distroboxVersion();
+QString distroboxPath();
 bool isFlatpak();
 }

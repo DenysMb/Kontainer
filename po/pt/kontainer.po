@@ -646,6 +646,26 @@ msgstr "Escolher arquivo"
 msgid "Package files"
 msgstr "Arquivos"
 
+#: src/qml/About.qml:14
+#, kde-format
+msgid "Backend"
+msgstr "Backend"
+
+#: src/qml/About.qml:19
+#, kde-format
+msgid "Distrobox version"
+msgstr "Versão do Distrobox"
+
+#: src/qml/About.qml:20 src/qml/About.qml:25
+#, kde-format
+msgid "Not available"
+msgstr "Não disponível"
+
+#: src/qml/About.qml:24
+#, kde-format
+msgid "Distrobox path"
+msgstr "Caminho do Distrobox"
+
 #, kde-format
 #~ msgid "--home /path/to/home (optional)"
 #~ msgstr "--home /caminho/para/home (opcional)"

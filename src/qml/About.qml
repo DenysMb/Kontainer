@@ -9,4 +9,20 @@ import org.kde.coreaddons
 
 FormCard.AboutPage {
     aboutData: AboutData
+
+    FormCard.FormHeader {
+        title: i18n("Backend")
+    }
+
+    FormCard.FormCard {
+        FormCard.FormTextDelegate {
+            text: i18n("Distrobox version")
+            description: distroBoxManager.distroboxVersion() || i18n("Not available")
+        }
+
+        FormCard.FormTextDelegate {
+            text: i18n("Distrobox path")
+            description: distroBoxManager.distroboxPath() || i18n("Not available")
+        }
+    }
 }

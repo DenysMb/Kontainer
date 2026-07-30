@@ -193,6 +193,18 @@ public Q_SLOTS:
     bool isContainerEngineAvailable() const;
 
     /**
+     * @brief Gets the version of the distrobox binary in use
+     * @return Version string (e.g., "2.0.0-rc.4"), or empty if distrobox is not available
+     */
+    Q_INVOKABLE QString distroboxVersion() const;
+
+    /**
+     * @brief Gets the path of the distrobox binary resolved via PATH
+     * @return Absolute path to the distrobox binary, or empty if not found
+     */
+    Q_INVOKABLE QString distroboxPath() const;
+
+    /**
      * @brief Lists available applications inside the given container
      * @param container Name of the container
      * @return QVariantList of AvailableApp structs representing available applications
