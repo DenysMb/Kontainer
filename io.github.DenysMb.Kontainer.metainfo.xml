@@ -62,6 +62,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+  <release version="1.6.1" date="2026-08-04">
+    <description>
+      <p>Fix Distrobox and container engine detection in Flatpak by using the POSIX shell builtin "command -v" instead of "which", which is not installed on all host systems. This resolves the "Container engine not found" error and the empty "Distrobox path" in the About page.</p>
+    </description>
+  </release>
   <release version="1.6.0" date="2026-07-30">
     <description>
       <p>Add optional container resource stats display with CPU and memory usage from Podman.</p>
