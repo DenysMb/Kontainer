@@ -134,7 +134,7 @@ QString distroboxVersion()
 QString distroboxPath()
 {
     bool success = false;
-    const QString output = runCommand(u"which distrobox"_s, success);
+    const QString output = runCommand(u"sh -c 'command -v distrobox'"_s, success);
     if (!success) {
         return {};
     }

@@ -506,13 +506,13 @@ bool DistroboxManager::isContainerEngineAvailable() const
 {
     // Check if podman is available
     bool success = false;
-    QString podmanCheck = DistroboxCli::runCommand(QStringLiteral("which podman"), success);
+    QString podmanCheck = DistroboxCli::runCommand(QStringLiteral("sh -c 'command -v podman'"), success);
     if (success && !podmanCheck.trimmed().isEmpty()) {
         return true;
     }
 
     // Check if docker is available
-    QString dockerCheck = DistroboxCli::runCommand(QStringLiteral("which docker"), success);
+    QString dockerCheck = DistroboxCli::runCommand(QStringLiteral("sh -c 'command -v docker'"), success);
     if (success && !dockerCheck.trimmed().isEmpty()) {
         return true;
     }
