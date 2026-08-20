@@ -1,0 +1,652 @@
+# Georgian translation for Kontainer.
+# Copyright (C) 2026 Kontainer's authors
+# This file is distributed under the same license as the Kontainer package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kontainer 1.3.0\n"
+"Report-Msgid-Bugs-To: https://github.com/DenysMb/Kontainer\n"
+"POT-Creation-Date: 2025-12-22 20:24+0000\n"
+"PO-Revision-Date: 2026-08-19 11:03+0200\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+
+#: io.github.DenysMb.Kontainer.desktop:5 src/qml/Main.qml:19
+#, kde-format
+msgid "Kontainer"
+msgstr "Kontainer"
+
+#: io.github.DenysMb.Kontainer.desktop:11
+msgid "container;podman;distrobox;"
+msgstr "container;podman;distrobox;"
+
+#: io.github.DenysMb.Kontainer.desktop:12 src/main.cpp:46
+#, kde-format
+msgid "Manage Distrobox containers"
+msgstr "Distrobox-ის კონტეინერების მართვა"
+
+#: po/rc.cpp:1 src/main.cpp:55 rc.cpp:1
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Ekaterine Papava"
+
+#: po/rc.cpp:2 src/main.cpp:55 rc.cpp:2
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "papava.e@gtu.ge"
+
+#: src/core/distroboxmanager.cpp:308 src/core/distroboxmanager.cpp:338
+#: src/core/distroboxmanager.cpp:358 src/core/distroboxmanager.cpp:367
+#: src/core/distroboxmanager.cpp:442
+#, kde-format
+msgid "Press any key to close this terminal…"
+msgstr "ამ ტერმინალის დასახურად დააჭირეთ ნებისმიერ ღილაკს…"
+
+#: src/core/distroboxmanager.cpp:426
+#, kde-format
+msgid ""
+"Cannot automatically install packages for this distribution.\n"
+"Please enter the distrobox manually and install it using the appropriate "
+"package manager."
+msgstr ""
+"ამ დისტრიბუტივისთვის პაკეტების ავტომატურად დაყენება შეუძლებელია.\n"
+"შედით distrobox-ში ხელით და დააყენეთ ის შესაბამისი პაკეტების მმართველით."
+
+#: src/main.cpp:42
+#, kde-format
+msgctxt "@title"
+msgid "Kontainer"
+msgstr "Kontainer"
+
+#: src/main.cpp:50
+#, kde-format
+msgid "Denys Madureira (c) 2025"
+msgstr "Denys Madureira (c) 2025"
+
+#: src/main.cpp:51
+#, kde-format
+msgctxt "@info:credit"
+msgid "Denys Madureira"
+msgstr "Denys Madureira"
+
+#: src/main.cpp:52
+#, kde-format
+msgctxt "@info:credit"
+msgid "Author"
+msgstr "ავტორი"
+
+#: src/qml/ApplicationsWindow.qml:19
+#, kde-format
+msgid "Applications Management - %1"
+msgstr "აპლიკაციების მართვა - %1"
+
+#: src/qml/ApplicationsWindow.qml:126
+#: src/qml/components/MainContainersPage.qml:55
+#, kde-format
+msgid "Refresh"
+msgstr "განახლება"
+
+#: src/qml/ApplicationsWindow.qml:143
+#, kde-format
+msgid "Exported Applications (%1)"
+msgstr "გატანილი აპლიკაციები (%1)"
+
+#: src/qml/ApplicationsWindow.qml:151
+#, kde-format
+msgid "All Applications (%1)"
+msgstr "ყველა აპლიკაცია (%1)"
+
+#: src/qml/ApplicationsWindow.qml:180
+#, kde-format
+msgid "Search exported applications..."
+msgstr "გატანილი აპლიკაციების ძებნა..."
+
+#: src/qml/ApplicationsWindow.qml:214
+#, kde-format
+msgid "Search available applications..."
+msgstr "ხელმისაწვდომი აპლიკაციების ძებნა..."
+
+#: src/qml/ApplicationsWindow.qml:241
+#, kde-format
+msgid "No exported applications found matching '%1'"
+msgstr "'%1'-ის შესაბამისი გატანილი აპლიკაციები აღმოჩენილი არაა"
+
+#: src/qml/ApplicationsWindow.qml:241
+#, kde-format
+msgid "No exported applications found"
+msgstr "გატანილი აპლიკაციები აღმოჩენილი არაა"
+
+#: src/qml/ApplicationsWindow.qml:248
+#, kde-format
+msgid "No applications found matching '%1'"
+msgstr "'%1'-ის შესაბამისი აპლიკაციები აღმოჩენილი არაა"
+
+#: src/qml/ApplicationsWindow.qml:248
+#, kde-format
+msgid "No applications found in container"
+msgstr "კონტეინერში აპლიკაციები აღმოჩენილი არაა"
+
+#: src/qml/ApplicationsWindow.qml:249
+#, kde-format
+msgid ""
+"This container might not have desktop applications installed or they might "
+"not be detectable."
+msgstr ""
+"ამ კონტეინერში, შეიძლება, აპლიკაციები დაყენებული არაა, ან მათი აღმოჩენა "
+"შეუძლებელია."
+
+#: src/qml/ApplicationsWindow.qml:290 src/qml/ApplicationsWindow.qml:350
+#, kde-format
+msgid "Unexport"
+msgstr "გატანის გაუქმება"
+
+#: src/qml/ApplicationsWindow.qml:301 src/qml/ApplicationsWindow.qml:362
+#, kde-format
+msgid "Failed to unexport application"
+msgstr "აპლიკაციის გატანის გაუქმება ჩავარდა"
+
+#: src/qml/ApplicationsWindow.qml:350
+#, kde-format
+msgid "Export"
+msgstr "გატანა"
+
+#: src/qml/ApplicationsWindow.qml:362
+#, kde-format
+msgid "Failed to export application"
+msgstr "აპლიკაციის გატანა ჩავარდა"
+
+#: src/qml/ApplicationsWindow.qml:379
+#, kde-format
+msgid "%1 selected"
+msgstr "მონიშნულია %1"
+
+#: src/qml/ApplicationsWindow.qml:385
+#, kde-format
+msgid "Unexport Selected"
+msgstr "მონიშნულის გატანის გაუქმება"
+
+#: src/qml/ApplicationsWindow.qml:385
+#, kde-format
+msgid "Export Selected"
+msgstr "მონიშნულის გატანა"
+
+#: src/qml/ApplicationsWindow.qml:400
+#, kde-format
+msgid "%1 applications"
+msgstr "%1 აპლიკაცია"
+
+#: src/qml/ApplicationsWindow.qml:407
+#, kde-format
+msgid "Clear Selection"
+msgstr "მონიშნულის გასუფთავება"
+
+#: src/qml/components/ContainerActionsToolbar.qml:39
+#, kde-format
+msgid "Stop Container"
+msgstr "კონტეინერის გაჩერება"
+
+#: src/qml/components/ContainerActionsToolbar.qml:39
+#, kde-format
+msgid "Start Container"
+msgstr "კონტეინერის გაშვება"
+
+#: src/qml/components/ContainerActionsToolbar.qml:51
+#, kde-format
+msgid "Manage Applications"
+msgstr "აპლიკაციების მართვა"
+
+#: src/qml/components/ContainerActionsToolbar.qml:57
+#, kde-format
+msgid "Open Terminal"
+msgstr "ტერმინალის გახსნა"
+
+#: src/qml/components/ContainerActionsToolbar.qml:62
+#, kde-format
+msgid "More options"
+msgstr "მეტი პარამეტრი"
+
+#: src/qml/components/ContainerActionsToolbar.qml:67
+#, kde-format
+msgid "Install Package"
+msgstr "პაკეტის დაყენება"
+
+#: src/qml/components/ContainerActionsToolbar.qml:73
+#, kde-format
+msgid "Reboot Container"
+msgstr "კონტეინერის გადატვირთვა"
+
+#: src/qml/components/ContainerActionsToolbar.qml:79
+#, kde-format
+msgid "Upgrade Container"
+msgstr "კონტეინერის განახლება"
+
+#: src/qml/components/ContainerActionsToolbar.qml:85
+#, kde-format
+msgid "Clone Container"
+msgstr "კონტეინერის დაკლონვა"
+
+#: src/qml/components/ContainerActionsToolbar.qml:91
+#, kde-format
+msgid "Remove Container"
+msgstr "კონტეინერის წაშლა"
+
+#: src/qml/components/ContainerListStatus.qml:24
+#, kde-format
+msgid "Container engine not found"
+msgstr "კონტეინერის ძრავა აღმოჩენილი არაა"
+
+#: src/qml/components/ContainerListStatus.qml:25
+#, kde-format
+msgid ""
+"Podman or Docker is required to use Kontainer.\n"
+"Please install one of them and click 'Refresh' (or restart the application)."
+msgstr ""
+"Kontainer-ის გამოყენებას Podman, ან Docker სჭირდება.\n"
+"დააყენეთ ერთერთი მათგანი და დააწკაპუნეთ 'განახლებაზე' (ან გადატვირთეთ "
+"აპლიკაცია)."
+
+#: src/qml/components/ContainerListStatus.qml:31
+#, kde-format
+msgid "No containers found. Create a new container now?"
+msgstr "კონტეინერები აღმოჩენილი არაა. გნებავთ ახლის შექმნა?"
+
+#: src/qml/components/ContainerListStatus.qml:33
+#, kde-format
+msgid "Create Container"
+msgstr "კონტეინერის შექმნა"
+
+#: src/qml/components/MainContainersPage.qml:35
+#, kde-format
+msgid "Distrobox Containers"
+msgstr "Distrobox-ის კონტეინერები"
+
+#: src/qml/components/MainContainersPage.qml:43
+#, kde-format
+msgid "Create…"
+msgstr "შექმნა…"
+
+#: src/qml/components/MainContainersPage.qml:49
+#, kde-format
+msgid "Upgrade all…"
+msgstr "ყველას განახლება…"
+
+#: src/qml/components/MainGlobalDrawer.qml:24
+#, kde-format
+msgid "Create Container…"
+msgstr "კონტეინერის შექმნა…"
+
+#: src/qml/components/MainGlobalDrawer.qml:29
+#, kde-format
+msgid "Create Distrobox Shortcut…"
+msgstr "Distrobox-ის მალსახმობის შექმნა…"
+
+#: src/qml/components/MainGlobalDrawer.qml:38
+#, kde-format
+msgid "Show Container Icons"
+msgstr "კონტეინერის ხატულების ჩვენება"
+
+#: src/qml/components/MainGlobalDrawer.qml:45
+#, kde-format
+msgid "Clone Container…"
+msgstr "კონტეინერის დაკლონვა…"
+
+#: src/qml/components/MainGlobalDrawer.qml:54
+#, kde-format
+msgid "Open Distrobox Documentation"
+msgstr "Distrobox-ის დოკუმენტაციის გახსნა"
+
+#: src/qml/components/MainGlobalDrawer.qml:59
+#, kde-format
+msgid "Open Distrobox Useful Tips"
+msgstr "Distrobox-ის სასარგებლო რჩევების გახსნა"
+
+#: src/qml/components/MainGlobalDrawer.qml:67
+#, kde-format
+msgid "About Kontainer"
+msgstr "Kontainer-ის შესახებ"
+
+#: src/qml/DistroboxCloneDialog.qml:14
+#, kde-format
+msgid "Clone container"
+msgstr "კონტეინერის დაკლონვა"
+
+#: src/qml/DistroboxCloneDialog.qml:32
+#, kde-format
+msgid "No containers available to clone."
+msgstr "დასაკლონი კონტეინერის გარეშე."
+
+#: src/qml/DistroboxCloneDialog.qml:62
+#, kde-format
+msgid "Select a container to clone."
+msgstr "აირჩიეთ დასაკლონი კონტეინერი."
+
+#: src/qml/DistroboxCloneDialog.qml:68
+#, kde-format
+msgid "Choose a name for the cloned container."
+msgstr "აირჩიეთ დაკლონილი კონტეინერის სახელი."
+
+#: src/qml/DistroboxCloneDialog.qml:74
+#, kde-format
+msgid "Failed to launch clone command. Check your setup and try again."
+msgstr ""
+"დაკლონვის ბრძანების გაშვება ჩავარდა. შეამოწმეთ თქვენი გარემო და კიდევ "
+"სცადეთ."
+
+#: src/qml/DistroboxCloneDialog.qml:89
+#, kde-format
+msgid "Container"
+msgstr "კონტეინერი"
+
+#: src/qml/DistroboxCloneDialog.qml:107 src/qml/DistroboxCreateDialog.qml:436
+#, kde-format
+msgid "Name"
+msgstr "სახელი"
+
+#: src/qml/DistroboxCloneDialog.qml:108
+#, kde-format
+msgid "fedora-clone"
+msgstr "fedora-clone"
+
+#: src/qml/DistroboxCreateDialog.qml:15
+#, kde-format
+msgid "Select image"
+msgstr "აირჩიეთ გამოსახულება"
+
+#: src/qml/DistroboxCreateDialog.qml:15
+#, kde-format
+msgid "Create new container"
+msgstr "ახალი კონტეინერის შექმნა"
+
+#: src/qml/DistroboxCreateDialog.qml:35
+#, kde-format
+msgctxt "Short name of advanced option"
+msgid "arguments"
+msgstr "არგუმენტები"
+
+#: src/qml/DistroboxCreateDialog.qml:39
+#, kde-format
+msgctxt "Short name of advanced option"
+msgid "custom home"
+msgstr "მორგებული საწყისი"
+
+#: src/qml/DistroboxCreateDialog.qml:43
+#, kde-format
+msgid "%1 volume"
+msgid_plural "%1 volumes"
+msgstr[0] "%1 ტომი"
+msgstr[1] "%1 ტომი"
+
+#: src/qml/DistroboxCreateDialog.qml:46
+#, kde-format
+msgctxt "Separator between enabled advanced options"
+msgid ", "
+msgstr ", "
+
+#: src/qml/DistroboxCreateDialog.qml:65
+#, kde-format
+msgid "Choose .ini file"
+msgstr ".ini ფაილის არჩევა"
+
+#: src/qml/DistroboxCreateDialog.qml:67
+#, kde-format
+msgid "INI files (*.ini)"
+msgstr "INI ფაილები (*.ini)"
+
+#: src/qml/DistroboxCreateDialog.qml:75
+#, kde-format
+msgid "Select custom home directory"
+msgstr "მორგებული საწყისი საქაღალდის არჩევა"
+
+#: src/qml/DistroboxCreateDialog.qml:83
+#, kde-format
+msgid "Select volume directory"
+msgstr "ტომების საქაღალდის არჩევა"
+
+#: src/qml/DistroboxCreateDialog.qml:101
+#, kde-format
+msgid "Creating…"
+msgstr "შექმნა…"
+
+#: src/qml/DistroboxCreateDialog.qml:101
+#, kde-format
+msgid "Create"
+msgstr "შექმნა"
+
+#: src/qml/DistroboxCreateDialog.qml:108
+#, kde-format
+msgid "Assemble"
+msgstr "აწყობა"
+
+#: src/qml/DistroboxCreateDialog.qml:121
+#, kde-format
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#: src/qml/DistroboxCreateDialog.qml:195
+#, kde-format
+msgid "Use custom image: %1"
+msgstr "მორგებული ასლის ფაილის გამოყენება: %1"
+
+#: src/qml/DistroboxCreateDialog.qml:267
+#, kde-format
+msgid "Name and Image fields are required"
+msgstr "სახელის და ასლის ფაილის ველები აუცილებელია"
+
+#: src/qml/DistroboxCreateDialog.qml:320
+#, kde-format
+msgid "Failed to create container. Please check your input and try again."
+msgstr "კონტეინერის შექმნა ჩავარდა. შეამოწმეთ, რა შეიყვანეთ და კიდევ სცადეთ."
+
+#: src/qml/DistroboxCreateDialog.qml:412
+#, kde-format
+msgid "Creating container…"
+msgstr "კონტეინერი იქმნება…"
+
+#: src/qml/DistroboxCreateDialog.qml:418
+#, kde-format
+msgid "This may take a few minutes"
+msgstr "ამას რამდენიმე წუთი შეიძლება დასჭირდეს"
+
+#: src/qml/DistroboxCreateDialog.qml:437
+#, kde-format
+msgid "Fedora"
+msgstr "Fedora"
+
+#: src/qml/DistroboxCreateDialog.qml:451
+#, kde-format
+msgid "Image"
+msgstr "გამოსახულება"
+
+#: src/qml/DistroboxCreateDialog.qml:459
+#, kde-format
+msgid "Select container image…"
+msgstr "აირჩიეთ კონტეინერის ასლის ფაილი…"
+
+#: src/qml/DistroboxCreateDialog.qml:474
+#, kde-format
+msgid "Custom image: %1"
+msgstr "მორგებული ასლის ფაილი: %1"
+
+#: src/qml/DistroboxCreateDialog.qml:483
+#, kde-format
+msgid "Additional Options"
+msgstr "დამატებითი პარამეტრები"
+
+#: src/qml/DistroboxCreateDialog.qml:484
+#, kde-format
+msgid "Enable systemd init support"
+msgstr "systemd-ით გაშვების ჩართვა"
+
+#: src/qml/DistroboxCreateDialog.qml:491
+#, kde-format
+msgid "Enable NVIDIA GPU support"
+msgstr "NVIDIA GPU-ის მხარდაჭერის ჩართვა"
+
+#: src/qml/DistroboxCreateDialog.qml:505
+#, kde-format
+msgid "Hide advanced options"
+msgstr "დამატებითი პარამეტრების დამალვა"
+
+#: src/qml/DistroboxCreateDialog.qml:505
+#, kde-format
+msgid "Show advanced options"
+msgstr "დამატებითი პარამეტრების ჩვენება"
+
+#: src/qml/DistroboxCreateDialog.qml:510
+#, kde-format
+msgid "Some advanced options are set"
+msgstr "ზოგიერთი დამატებით პარამეტრი დაყენებულია"
+
+#: src/qml/DistroboxCreateDialog.qml:521
+#, kde-format
+msgid "Using advanced options: %1"
+msgstr "გამოიყენება დამატებითი პარამეტრები: %1"
+
+#: src/qml/DistroboxCreateDialog.qml:521
+#, kde-format
+msgid "No advanced options set"
+msgstr "დამატებით პარამეტრი დაყენებული არაა"
+
+#: src/qml/DistroboxCreateDialog.qml:532
+#, kde-format
+msgid "Arguments"
+msgstr "არგუმენტები"
+
+#: src/qml/DistroboxCreateDialog.qml:533
+#, kde-format
+msgid "Additional arguments (optional)"
+msgstr "დამატებითი არგუმენტები (არასავალდებულო)"
+
+#: src/qml/DistroboxCreateDialog.qml:538
+#, kde-format
+msgid "Custom Home"
+msgstr "მორგებული საწყისი"
+
+#: src/qml/DistroboxCreateDialog.qml:549
+#, kde-format
+msgid "Use custom home directory"
+msgstr "მორგებული საწყისი საქაღალდის გამოყენება"
+
+#: src/qml/DistroboxCreateDialog.qml:560
+#, kde-format
+msgid "Clear custom home directory"
+msgstr "მორგებული საწყისი საქაღალდის გასუფთავება"
+
+#: src/qml/DistroboxCreateDialog.qml:568
+#, kde-format
+msgid "By default, the container will use your home directory"
+msgstr "ნაგულისხმევად კონტეინერი თქვენს საწყის საქაღალდეს გამოიყენებს"
+
+#: src/qml/DistroboxCreateDialog.qml:576
+#, kde-format
+msgid "Additional Volumes"
+msgstr "დამატებითი ტომები"
+
+#: src/qml/DistroboxCreateDialog.qml:613
+#, kde-format
+msgid "Remove volume"
+msgstr "ტომის წაშლა"
+
+#: src/qml/DistroboxCreateDialog.qml:623
+#, kde-format
+msgid "Add Volume"
+msgstr "ტომის დამატება"
+
+#: src/qml/DistroboxCreateDialog.qml:631
+#, kde-format
+msgid "Mount additional directories inside the container"
+msgstr "დამატებითი საქაღალდეების მიმაგრება კონტეინერის შიგნით"
+
+#: src/qml/DistroboxCreateDialog.qml:645
+#, kde-format
+msgid ""
+"Use Assemble to pick a distrobox.ini manifest. Kontainer will run "
+"\"distrobox assemble create --file <manifest>\" to build every container "
+"listed there."
+msgstr ""
+"distrobox.ini-ის მანიფესტის ასარჩევად გამოიყენეთ Assemble. აქ ჩამოთვლილი "
+"კონტეინერების ასაგებად Kontainer გაუშვებს ბრძანებას \"distrobox assemble "
+"create --file <manifest>\"."
+
+#: src/qml/DistroboxCreateDialog.qml:659
+#, kde-format
+msgid "Command preview"
+msgstr "ბრძანების გადახედვა"
+
+#: src/qml/DistroboxCreateDialog.qml:685
+#, kde-format
+msgid "Search images…"
+msgstr "ასლის ფაილების ძებნა…"
+
+#: src/qml/DistroboxCreateDialog.qml:763
+#, kde-format
+msgid "Type to search for images"
+msgstr "აკრიფეთ ასლის ფაილების მოსაძებნად"
+
+#: src/qml/DistroboxRemoveDialog.qml:15
+#, kde-format
+msgid "Remove container"
+msgstr "კონტეინერის წაშლა"
+
+#: src/qml/DistroboxRemoveDialog.qml:36
+#, kde-format
+msgid "Failed to remove container"
+msgstr "კონტეინერის წაშლის შეცდომა"
+
+#: src/qml/DistroboxRemoveDialog.qml:47
+#, kde-format
+msgid "Are you sure you want to remove %1?"
+msgstr "დარწმუნებული ბრძანდებით, რომ გნებავთ წაშალოთ %1?"
+
+#: src/qml/DistroboxRemoveDialog.qml:53
+#, kde-format
+msgid "This action cannot be undone."
+msgstr "ქმედების დაბრუნება შეუძლებელია."
+
+#: src/qml/DistroboxShortcutDialog.qml:19
+#, kde-format
+msgid "Create Distrobox Shortcuts"
+msgstr "Distrobox-ის მალსახმობების შექმნა"
+
+#: src/qml/DistroboxShortcutDialog.qml:38
+#, kde-format
+msgid "Create shortcuts for all containers"
+msgstr "მალსახმობების შექმნა ყველა კონტეინერისთვის"
+
+#: src/qml/DistroboxShortcutDialog.qml:48
+#, kde-format
+msgid "Alternatively, select a specific container:"
+msgstr "ან აირჩიეთ კონკრეტული კონტეინერი:"
+
+#: src/qml/ErrorDialog.qml:15
+#, kde-format
+msgid "Error"
+msgstr "შეცდომა"
+
+#: src/qml/ErrorDialog.qml:19
+#, kde-format
+msgid ""
+"Failed to create container.\n"
+"Please check your input and try again."
+msgstr ""
+"კონტეინერის შექმნა ჩავარდა.\n"
+"შეამოწმეთ, რა შეიყვანეთ და კიდევ სცადეთ."
+
+#: src/qml/FilePickerDialog.qml:12
+#, kde-format
+msgid "Choose Package"
+msgstr "პაკეტის არჩევა"
+
+#: src/qml/FilePickerDialog.qml:13
+#, kde-format
+msgid "Package files"
+msgstr "პაკეტის ფაილები"
