@@ -355,6 +355,16 @@ private:
     QPointer<QProcess> m_logsProcess; ///< Active logs stream process, null when idle
 
     /**
+     * @brief Lists available applications in a container without icon extraction
+     *
+     * Fallback for containers without python3: parses .desktop files with a
+     * single shell command, skipping icon resolution.
+     * @param container Name of the container
+     * @return QVariantList of AvailableApp structs (icons not cached)
+     */
+    QVariantList allAppsWithoutIcons(const QString &container);
+
+    /**
      * @brief Checks if an application with the given basename is exported by other containers
      * @param basename Basename of the application to check
      * @param excludeContainer Container to exclude from the check

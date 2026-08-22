@@ -104,142 +104,6 @@ static QString resolveDocumentPortalPath(const QString &path)
     // Older xdg-desktop-portal versions include a trailing NUL in the xattr value
     return QString::fromUtf8(value.constData(), strnlen(value.constData(), len));
 }
-
-QString resolveIconPathInContainer(const QString &container, const QString &iconValue)
-{
-    if (iconValue.trimmed().isEmpty()) {
-        return {};
-    }
-
-    const QString pythonScript = QStringLiteral(
-                                     "python3 - %1 <<'PY'\n"
-                                     "import os, sys\n"
-                                     "icon = sys.argv[1]\n"
-                                     "if not icon:\n"
-                                     "    raise SystemExit(1)\n"
-                                     "if os.path.isabs(icon) and os.path.exists(icon):\n"
-                                     "    print(icon, end=\"\")\n"
-                                     "    raise SystemExit(0)\n"
-                                     "search_dirs = [\"/usr/share/icons\", \"/usr/local/share/icons\", \"/usr/share/pixmaps\", \"/usr/share/applications\", "
-                                     "\"/usr/share/icons/hicolor\"]\n"
-                                     "extensions = [\".png\", \".svg\", \".xpm\", \".jpg\", \".jpeg\", \".ico\"]\n"
-                                     "icon_path, icon_base = os.path.split(icon)\n"
-                                     "if not icon_base:\n"
-                                     "    icon_base = icon\n"
-                                     "    icon_path = ''\n"
-                                     "base, suffix = os.path.splitext(icon_base)\n"
-                                     "if suffix:\n"
-                                     "    candidates = [icon_base]\n"
-                                     "else:\n"
-                                     "    candidates = [icon_base + ext for ext in extensions]\n"
-                                     "candidate_dirs = []\n"
-                                     "if icon_path and icon_path != '.':\n"
-                                     "    for root in search_dirs:\n"
-                                     "        candidate_dir = os.path.join(root, icon_path)\n"
-                                     "        if os.path.isdir(candidate_dir):\n"
-                                     "            candidate_dirs.append(candidate_dir)\n"
-                                     "else:\n"
-                                     "    candidate_dirs.extend([d for d in search_dirs if os.path.isdir(d)])\n"
-                                     "for directory in candidate_dirs:\n"
-                                     "    for candidate in candidates:\n"
-                                     "        candidate_path = os.path.join(directory, candidate)\n"
-                                     "        if os.path.exists(candidate_path):\n"
-                                     "            print(candidate_path, end=\"\")\n"
-                                     "            raise SystemExit(0)\n"
-                                     "for directory in search_dirs:\n"
-                                     "    if not os.path.isdir(directory):\n"
-                                     "        continue\n"
-                                     "    for root, _, files in os.walk(directory):\n"
-                                     "        for candidate in candidates:\n"
-                                     "            if candidate in files:\n"
-                                     "                print(os.path.join(root, candidate), end=\"\")\n"
-                                     "                raise SystemExit(0)\n"
-                                     "print('', end=\"\")\n"
-                                     "raise SystemExit(1)\n"
-                                     "PY")
-                                     .arg(KShell::quoteArg(iconValue));
-
-    bool success = false;
-    const QString output = runContainerCommand(container, pythonScript, success);
-    if (!success) {
-        return {};
-    }
-
-    return output.trimmed();
-}
-
-QString cacheIconFromContainer(const QString &container, const QString &basename, const QString &iconValue)
-{
-    static QHash<QString, QString> iconCache;
-
-    const QString cacheKey = container + QLatin1Char('|') + iconValue;
-    if (iconCache.contains(cacheKey)) {
-        return iconCache.value(cacheKey);
-    }
-
-    const QString iconPath = resolveIconPathInContainer(container, iconValue);
-    if (iconPath.isEmpty()) {
-        iconCache.insert(cacheKey, QString());
-        return {};
-    }
-
-    const QString cacheDirectory = ensureIconCacheDirectory(container);
-    if (cacheDirectory.isEmpty()) {
-        iconCache.insert(cacheKey, QString());
-        return {};
-    }
-
-    const QFileInfo iconInfo(iconPath);
-    QString localName = basename;
-    if (localName.isEmpty()) {
-        localName = iconInfo.completeBaseName();
-    }
-
-    QString suffix = iconInfo.suffix();
-    if (suffix.isEmpty()) {
-        suffix = QStringLiteral("png");
-    }
-
-    const QString localPath = QDir(cacheDirectory).filePath(localName + QLatin1Char('.') + suffix);
-
-    if (!QFile::exists(localPath)) {
-        const QString pythonScript = QStringLiteral(
-                                         "python3 - %1 <<'PY'\n"
-                                         "import base64, sys\n"
-                                         "path = sys.argv[1]\n"
-                                         "with open(path, 'rb') as handler:\n"
-                                         "    data = handler.read()\n"
-                                         "    print(base64.b64encode(data).decode('ascii'), end=\"\")\n"
-                                         "PY")
-                                         .arg(KShell::quoteArg(iconPath));
-
-        bool success = false;
-        const QString base64Data = runContainerCommand(container, pythonScript, success);
-        if (!success || base64Data.isEmpty()) {
-            iconCache.insert(cacheKey, QString());
-            return {};
-        }
-
-        const QByteArray binaryData = QByteArray::fromBase64(base64Data.trimmed().toUtf8());
-        if (binaryData.isEmpty()) {
-            iconCache.insert(cacheKey, QString());
-            return {};
-        }
-
-        QFile localFile(localPath);
-        if (!localFile.open(QIODevice::WriteOnly)) {
-            iconCache.insert(cacheKey, QString());
-            return {};
-        }
-
-        localFile.write(binaryData);
-        localFile.close();
-    }
-
-    const QString url = QUrl::fromLocalFile(localPath).toString();
-    iconCache.insert(cacheKey, url);
-    return url;
-}
 }
 
 // Constructor: Initializes the manager and populates available images lists
@@ -677,87 +541,220 @@ void DistroboxManager::requestContainerStats()
 
 QVariantList DistroboxManager::allApps(const QString &container)
 {
-    qDebug() << "=== allApps for container:" << container << "===";
-
-    QString findCmd = QStringLiteral("find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print");
-    QString output = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(findCmd));
-    bool success = false;
-    QString raw = DistroboxCli::runCommand(output, success);
-    raw = stripContainerStartupNoise(raw, container);
     QVariantList list;
-    if (!success) {
-        qDebug() << "Find command failed for container:" << container;
-        return list;
+
+    const QString pythonScript = QStringLiteral(
+        "python3 - <<'PY'\n"
+        "import base64\n"
+        "import json\n"
+        "import os\n"
+        "\n"
+        "search_dirs = [\"/usr/share/icons\", \"/usr/local/share/icons\", \"/usr/share/pixmaps\", \"/usr/share/applications\", \"/usr/share/icons/hicolor\"]\n"
+        "extensions = [\".png\", \".svg\", \".xpm\", \".jpg\", \".jpeg\", \".ico\"]\n"
+        "\n"
+        "def resolve_icon(icon):\n"
+        "    if not icon:\n"
+        "        return ''\n"
+        "    if os.path.isabs(icon) and os.path.exists(icon):\n"
+        "        return icon\n"
+        "    icon_path, icon_base = os.path.split(icon)\n"
+        "    if not icon_base:\n"
+        "        icon_base = icon\n"
+        "        icon_path = ''\n"
+        "    base, suffix = os.path.splitext(icon_base)\n"
+        "    candidates = [icon_base] if suffix else [icon_base + ext for ext in extensions]\n"
+        "    candidate_dirs = []\n"
+        "    if icon_path and icon_path != '.':\n"
+        "        for root in search_dirs:\n"
+        "            candidate_dir = os.path.join(root, icon_path)\n"
+        "            if os.path.isdir(candidate_dir):\n"
+        "                candidate_dirs.append(candidate_dir)\n"
+        "    else:\n"
+        "        candidate_dirs.extend([d for d in search_dirs if os.path.isdir(d)])\n"
+        "    for directory in candidate_dirs:\n"
+        "        for candidate in candidates:\n"
+        "            candidate_path = os.path.join(directory, candidate)\n"
+        "            if os.path.exists(candidate_path):\n"
+        "                return candidate_path\n"
+        "    for directory in search_dirs:\n"
+        "        if not os.path.isdir(directory):\n"
+        "            continue\n"
+        "        for root, _, files in os.walk(directory):\n"
+        "            for candidate in candidates:\n"
+        "                if candidate in files:\n"
+        "                    return os.path.join(root, candidate)\n"
+        "    return ''\n"
+        "\n"
+        "apps = []\n"
+        "for root, _, files in os.walk(\"/usr/share/applications\"):\n"
+        "    for file_name in files:\n"
+        "        if not file_name.endswith(\".desktop\"):\n"
+        "            continue\n"
+        "        path = os.path.join(root, file_name)\n"
+        "        english = None\n"
+        "        fallback = None\n"
+        "        icon = ''\n"
+        "        generic = ''\n"
+        "        nodisplay = False\n"
+        "        with open(path, errors=\"replace\") as handler:\n"
+        "            for line in handler:\n"
+        "                stripped = line.strip()\n"
+        "                if stripped.startswith(\"NoDisplay=true\"):\n"
+        "                    nodisplay = True\n"
+        "                    break\n"
+        "                if stripped.startswith(\"Name[en]=\"):\n"
+        "                    english = stripped[8:]\n"
+        "                elif stripped.startswith(\"Name=\"):\n"
+        "                    fallback = stripped[5:]\n"
+        "                elif stripped.startswith(\"Icon=\"):\n"
+        "                    icon = stripped[5:]\n"
+        "                elif stripped.startswith(\"GenericName=\"):\n"
+        "                    generic = stripped[12:]\n"
+        "        if nodisplay:\n"
+        "            continue\n"
+        "        basename = file_name[:-len(\".desktop\")]\n"
+        "        apps.append({\n"
+        "            \"basename\": basename,\n"
+        "            \"name\": english or fallback or basename,\n"
+        "            \"icon\": icon,\n"
+        "            \"genericName\": generic,\n"
+        "            \"sourceFile\": path,\n"
+        "        })\n"
+        "\n"
+        "icon_data = {}\n"
+        "for app in apps:\n"
+        "    icon_path = resolve_icon(app[\"icon\"])\n"
+        "    app[\"iconPath\"] = icon_path\n"
+        "    if icon_path and icon_path not in icon_data:\n"
+        "        try:\n"
+        "            with open(icon_path, \"rb\") as handler:\n"
+        "                icon_data[icon_path] = base64.b64encode(handler.read()).decode(\"ascii\")\n"
+        "        except OSError:\n"
+        "            icon_data[icon_path] = ''\n"
+        "    app[\"iconData\"] = icon_data.get(icon_path, '') if icon_path else ''\n"
+        "\n"
+        "print(json.dumps(apps))\n"
+        "PY");
+
+    bool success = false;
+    const QString output = runContainerCommand(container, pythonScript, success);
+
+    QJsonParseError parseError;
+    const QJsonDocument doc = QJsonDocument::fromJson(output.trimmed().toUtf8(), &parseError);
+    if (!success || parseError.error != QJsonParseError::NoError || !doc.isArray()) {
+        qWarning() << "allApps batch query failed for container:" << container;
+        return allAppsWithoutIcons(container);
     }
 
-    for (const QString &line : raw.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
-        if (!line.endsWith(QStringLiteral(".desktop"))) {
-            continue;
-        }
+    const QString cacheDirectory = ensureIconCacheDirectory(container);
 
-        // Extract basename from the full path
-        QString basename = line;
-        if (basename.startsWith(QStringLiteral("/usr/share/applications/"))) {
-            basename.remove(0, 24);
-        }
-        if (basename.endsWith(QStringLiteral(".desktop"))) {
-            basename.chop(8);
-        }
+    for (const QJsonValue &value : doc.array()) {
+        const QJsonObject obj = value.toObject();
 
-        // Read desktop file from container
-        QString readCmd = QStringLiteral("cat %1").arg(KShell::quoteArg(line));
-        QString desktopOutput = u"distrobox enter %1 -- sh -c %2"_s.arg(container, KShell::quoteArg(readCmd));
-        bool readSuccess = false;
-        QString desktopContent = DistroboxCli::runCommand(desktopOutput, readSuccess);
-        desktopContent = stripContainerStartupNoise(desktopContent, container);
-
-        if (!readSuccess) {
-            continue;
-        }
-
-        // Parse desktop file content with proper localization handling
         QVariantMap app;
+        const QString basename = obj[QStringLiteral("basename")].toString();
         app[QStringLiteral("basename")] = basename;
+        app[QStringLiteral("name")] = obj[QStringLiteral("name")].toString();
+        app[QStringLiteral("icon")] = obj[QStringLiteral("icon")].toString();
+        app[QStringLiteral("genericName")] = obj[QStringLiteral("genericName")].toString();
+        app[QStringLiteral("sourceFile")] = obj[QStringLiteral("sourceFile")].toString();
 
-        QString name = basename;
-        QString icon;
-        QString genericName; // For debugging
+        const QString iconPath = obj[QStringLiteral("iconPath")].toString();
+        const QString iconData = obj[QStringLiteral("iconData")].toString();
+        if (!iconPath.isEmpty() && !iconData.isEmpty() && !cacheDirectory.isEmpty()) {
+            QString suffix = QFileInfo(iconPath).suffix();
+            if (suffix.isEmpty()) {
+                suffix = QStringLiteral("png");
+            }
 
-        // Prefer English name, fall back to generic name
-        QString englishName;
+            const QString localPath = QDir(cacheDirectory).filePath(basename + QLatin1Char('.') + suffix);
+            if (!QFile::exists(localPath)) {
+                const QByteArray binaryData = QByteArray::fromBase64(iconData.toUtf8());
+                QFile localFile(localPath);
+                if (localFile.open(QIODevice::WriteOnly)) {
+                    localFile.write(binaryData);
+                    localFile.close();
+                }
+            }
 
-        for (const QString &desktopLine : desktopContent.split(QChar::fromLatin1('\n'), Qt::SkipEmptyParts)) {
-            if (desktopLine.startsWith(QStringLiteral("Name[en]="))) {
-                englishName = desktopLine.mid(8); // Remove "Name[en]="
-            } else if (desktopLine.startsWith(QStringLiteral("Name=")) && name == basename) {
-                name = desktopLine.mid(5); // Remove "Name=" (only use as fallback)
-            } else if (desktopLine.startsWith(QStringLiteral("Icon="))) {
-                icon = desktopLine.mid(5); // Remove "Icon="
-            } else if (desktopLine.startsWith(QStringLiteral("GenericName="))) {
-                genericName = desktopLine.mid(12); // For debugging
+            if (QFile::exists(localPath)) {
+                app[QStringLiteral("iconSource")] = QUrl::fromLocalFile(localPath).toString();
             }
         }
 
-        // Prefer English name if available
-        if (!englishName.isEmpty()) {
-            name = englishName;
-        }
-
-        app[QStringLiteral("name")] = name;
-        app[QStringLiteral("icon")] = icon;
-        app[QStringLiteral("genericName")] = genericName; // For debugging
-        app[QStringLiteral("sourceFile")] = line; // For debugging
-
-        const QString iconSource = cacheIconFromContainer(container, basename, icon);
-        if (!iconSource.isEmpty()) {
-            app[QStringLiteral("iconSource")] = iconSource;
-        }
-
-        qDebug() << "App:" << name << "| Basename:" << basename << "| Generic:" << genericName << "| Source:" << line;
         list << app;
     }
 
-    qDebug() << "Total apps found:" << list.size();
+    return list;
+}
+
+QVariantList DistroboxManager::allAppsWithoutIcons(const QString &container)
+{
+    QVariantList list;
+
+    const QString script = QStringLiteral(
+        "find /usr/share/applications -type f -name '*.desktop' ! -exec grep -q '^NoDisplay=true' {} \\; -print | while IFS= read -r f; do printf '@@@%s\\n' "
+        "\"$f\"; cat \"$f\"; done");
+
+    bool success = false;
+    const QString output = runContainerCommand(container, script, success);
+    if (!success) {
+        return list;
+    }
+
+    QVariantMap app;
+    bool hasApp = false;
+    const auto flushApp = [&list, &app, &hasApp]() {
+        if (hasApp) {
+            list << app;
+            app = QVariantMap();
+            hasApp = false;
+        }
+    };
+
+    QString englishName;
+    QString fallbackName;
+
+    for (const QString &line : output.split(QChar::fromLatin1('\n'))) {
+        if (line.startsWith(QStringLiteral("@@@"))) {
+            flushApp();
+            hasApp = true;
+            englishName.clear();
+            fallbackName.clear();
+
+            const QString path = line.mid(3);
+            QString basename = path;
+            if (basename.startsWith(QStringLiteral("/usr/share/applications/"))) {
+                basename.remove(0, 24);
+            }
+            if (basename.endsWith(QStringLiteral(".desktop"))) {
+                basename.chop(8);
+            }
+            app[QStringLiteral("basename")] = basename;
+            app[QStringLiteral("sourceFile")] = path;
+            app[QStringLiteral("icon")] = QString();
+            continue;
+        }
+
+        if (!hasApp) {
+            continue;
+        }
+
+        if (line.startsWith(QStringLiteral("Name[en]="))) {
+            englishName = line.mid(8);
+        } else if (line.startsWith(QStringLiteral("Name="))) {
+            fallbackName = line.mid(5);
+        } else if (line.startsWith(QStringLiteral("Icon="))) {
+            app[QStringLiteral("icon")] = line.mid(5);
+        } else if (line.startsWith(QStringLiteral("GenericName="))) {
+            app[QStringLiteral("genericName")] = line.mid(12);
+        }
+
+        const QString name = !englishName.isEmpty() ? englishName : (!fallbackName.isEmpty() ? fallbackName : app[QStringLiteral("basename")].toString());
+        app[QStringLiteral("name")] = name;
+    }
+    flushApp();
+
     return list;
 }
 
