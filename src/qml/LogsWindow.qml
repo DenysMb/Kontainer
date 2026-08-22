@@ -16,8 +16,6 @@ Kirigami.ApplicationWindow {
     property bool follow: true
     property bool timestamps: false
     property string levelFilter: "all" // all | error | warn
-    property string searchText: ""
-    property bool searching: false
     property var rawLines: []
     property string pendingChunk: ""
 
@@ -38,13 +36,9 @@ Kirigami.ApplicationWindow {
             if (root.levelFilter !== "all" && line.toLowerCase().indexOf(root.levelFilter) < 0) {
                 return false;
             }
-            if (root.searchText !== "" && line.toLowerCase().indexOf(root.searchText.toLowerCase()) < 0) {
-                return false;
-            }
             return true;
         });
         logArea.text = filtered.join("\n");
-        statusText.text = i18np("%1 line · %2", "%1 lines · %2", root.rawLines.length, formatSize(logArea.text.length));
         if (root.follow) {
             scrollToEnd();
         }
@@ -52,16 +46,6 @@ Kirigami.ApplicationWindow {
 
     function scrollToEnd() {
         scrollView.ScrollBar.vertical.position = 1.0 - scrollView.ScrollBar.vertical.size;
-    }
-
-    function formatSize(size) {
-        if (size < 1024) {
-            return size + " B";
-        }
-        if (size < 1024 * 1024) {
-            return (size / 1024).toFixed(1) + " KB";
-        }
-        return (size / (1024 * 1024)).toFixed(1) + " MB";
     }
 
     function appendChunk(text) {
@@ -120,12 +104,6 @@ Kirigami.ApplicationWindow {
                 }
             },
             Kirigami.Action {
-                text: i18n("Search…")
-                icon.name: "edit-find"
-                shortcut: "Ctrl+F"
-                onTriggered: root.searching = !root.searching
-            },
-            Kirigami.Action {
                 text: i18n("More options")
                 icon.name: "view-more-symbolic"
                 Kirigami.Action {
@@ -166,52 +144,20 @@ Kirigami.ApplicationWindow {
             }
         ]
 
-        footer: Controls.ToolBar {
-            visible: root.searching
+        padding: 0
 
-            Kirigami.SearchField {
-                anchors.fill: parent
-                placeholderText: i18n("Search logs…")
-                onTextChanged: root.searchText = text
-                Keys.onEscapePressed: root.searching = false
+        Controls.ScrollView {
+            id: scrollView
 
-                onVisibleChanged: {
-                    if (visible) {
-                        forceActiveFocus();
-                    } else if (text !== "") {
-                        text = "";
-                    }
-                }
-            }
-        }
-
-        ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.smallSpacing
-            spacing: Kirigami.Units.smallSpacing
 
-            Controls.ScrollView {
-                id: scrollView
+            Controls.TextArea {
+                id: logArea
 
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                Controls.TextArea {
-                    id: logArea
-
-                    readOnly: true
-                    wrapMode: TextEdit.NoWrap
-                    selectByMouse: true
-                    font: Kirigami.Theme.fixedFont
-                }
-            }
-
-            Controls.Label {
-                id: statusText
-
-                Layout.fillWidth: true
-                font.pointSize: Kirigami.Theme.smallFont.pointSize
-                opacity: 0.7
+                readOnly: true
+                wrapMode: TextEdit.NoWrap
+                selectByMouse: true
+                font: Kirigami.Theme.fixedFont
             }
         }
     }
@@ -232,7 +178,6 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    onSearchTextChanged: rebuildText()
     onLevelFilterChanged: rebuildText()
 
     Component.onCompleted: restartStream()
