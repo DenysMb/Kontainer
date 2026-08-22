@@ -123,6 +123,40 @@ jobs:
           print(f"Extracted {len(items)} changelog item(s) for {version} from {files[0]}")
           PYEOF
 
+      - name: Collect merged PR contributors
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PREV_TAG=$(git tag --list "${TAG_PREFIX}[0-9]*" --sort=-v:refname | head -n1)
+          if [[ -n "${PREV_TAG}" ]]; then
+            RANGE="${PREV_TAG}..HEAD"
+            echo "Collecting merged PRs in range: ${RANGE}"
+          else
+            RANGE="HEAD"
+            echo "No previous tag found, collecting merged PRs from all commits"
+          fi
+
+          found_prs=false
+          while IFS=$'\t' read -r login number title; do
+            [[ -z "${number}" ]] && continue
+            if [[ "${found_prs}" == false ]]; then
+              echo '' >> release_notes.md
+              echo '### Contributors' >> release_notes.md
+              found_prs=true
+            fi
+            echo "- ${title} by @${login} (#${number})" >> release_notes.md
+          done < <(
+            for sha in $(git rev-list "${RANGE}"); do
+              gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}/pulls" \
+                --jq '.[] | select(.merged_at != null) | [.user.login, .number, .title] | @tsv' 2>/dev/null || true
+            done | sort -t $'\t' -k2,2 -u -n
+          )
+
+          if [[ "${found_prs}" == false ]]; then
+            echo 'No merged PRs found in range, keeping release notes as-is.'
+          fi
+
       - name: Create tag and GitHub release
         if: steps.check.outputs.exists == 'false'
         env:
