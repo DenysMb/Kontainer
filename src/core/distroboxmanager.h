@@ -272,6 +272,18 @@ public Q_SLOTS:
     Q_INVOKABLE QString resolveHostPath(const QString &path) const;
 
     /**
+     * @brief Opens the container's $HOME directory in the default file manager
+     *
+     * Resolves the container's home directory from the podman container
+     * inspection data (handles containers with custom home directories)
+     * and opens the matching host path. Falls back to the container's manual
+     * HOME environment variable, then to the host home directory.
+     * @param name Name of the container
+     * @return true if the file manager was successfully opened, false otherwise
+     */
+    Q_INVOKABLE bool openFileManager(const QString &name);
+
+    /**
      * @brief Requests container resource stats asynchronously
      *
      * Runs podman stats --no-stream --format json in the background.

@@ -25,6 +25,7 @@ Kirigami.ScrollablePage {
     signal manageApplicationsRequested(string containerName)
     signal manageBinariesRequested(string containerName)
     signal openTerminalRequested(string containerName)
+    signal openFileManagerRequested(string containerName)
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
     signal removeContainerRequested(string containerName)
@@ -88,6 +89,9 @@ Kirigami.ScrollablePage {
                 }
                 onOpenTerminalRequested: function (containerName) {
                     page.openTerminalRequested(containerName);
+                }
+                onOpenFileManagerRequested: function (containerName) {
+                    page.openFileManagerRequested(containerName);
                 }
                 onUpgradeContainerRequested: function (containerName) {
                     page.upgradeContainerRequested(containerName);

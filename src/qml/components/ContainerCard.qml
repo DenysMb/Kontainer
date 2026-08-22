@@ -20,6 +20,7 @@ Kirigami.AbstractCard {
     signal manageApplicationsRequested(string containerName)
     signal manageBinariesRequested(string containerName)
     signal openTerminalRequested(string containerName)
+    signal openFileManagerRequested(string containerName)
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
     signal removeContainerRequested(string containerName)
@@ -118,6 +119,9 @@ Kirigami.AbstractCard {
                     }
                     onOpenTerminalRequested: function(containerName) {
                         card.openTerminalRequested(containerName)
+                    }
+                    onOpenFileManagerRequested: function(containerName) {
+                        card.openFileManagerRequested(containerName)
                     }
                     onUpgradeContainerRequested: function(containerName) {
                         card.upgradeContainerRequested(containerName)

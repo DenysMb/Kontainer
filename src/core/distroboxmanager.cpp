@@ -520,6 +520,51 @@ bool DistroboxManager::isContainerEngineAvailable() const
     return false;
 }
 
+bool DistroboxManager::openFileManager(const QString &name)
+{
+    bool success = false;
+    const QString output = DistroboxCli::runCommand(QStringLiteral("podman inspect ") + KShell::quoteArg(name), success);
+    if (!success) {
+        return false;
+    }
+
+    QJsonParseError parseError;
+    const QJsonDocument doc = QJsonDocument::fromJson(output.toUtf8(), &parseError);
+    if (parseError.error != QJsonParseError::NoError || !doc.isArray() || doc.array().isEmpty()) {
+        return false;
+    }
+
+    const QJsonObject container = doc.array().first().toObject();
+
+    QString home = QDir::homePath();
+    const QJsonArray env = container[u"Config"_s].toObject()[u"Env"_s].toArray();
+    for (const QJsonValue &entry : env) {
+        const QString variable = entry.toString();
+        if (variable.startsWith(u"HOME="_s)) {
+            home = variable.mid(5);
+            break;
+        }
+    }
+
+    QString hostPath = home;
+    const QJsonArray mounts = container[u"Mounts"_s].toArray();
+    for (const QJsonValue &mountValue : mounts) {
+        const QJsonObject mount = mountValue.toObject();
+        if (mount[u"Destination"_s].toString() == home) {
+            hostPath = mount[u"Source"_s].toString();
+            break;
+        }
+    }
+
+    const QString command = u"xdg-open "_s + KShell::quoteArg(hostPath);
+    bool openSuccess = false;
+    DistroboxCli::runCommand(command, openSuccess);
+    if (!openSuccess) {
+        qWarning() << "openFileManager: failed to open" << hostPath << "for container" << name;
+    }
+    return openSuccess;
+}
+
 void DistroboxManager::requestContainerStats()
 {
     if (m_statsProcess) {

@@ -212,6 +212,11 @@ Kirigami.ApplicationWindow {
         onUpgradeContainerRequested: function(containerName) {
             distroBoxManager.upgradeContainer(containerName);
         }
+        onOpenFileManagerRequested: function(containerName) {
+            if (!distroBoxManager.openFileManager(containerName)) {
+                applicationWindow().showPassiveNotification(i18n("Could not open the container home folder"), "short");
+            }
+        }
         onCloneContainerRequested: function(containerName) {
             cloneDialog.openWithContainer(containerName);
         }
