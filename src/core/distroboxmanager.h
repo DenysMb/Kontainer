@@ -333,7 +333,7 @@ Q_SIGNALS:
 
     /**
      * @brief Emitted with container resource utilization stats.
-     * @param stats QVariantList of QVariantMap with keys: name, cpuPercent, memUsage, memPercent
+     * @param stats QVariantList of QVariantMap with keys: name, cpuPercent, memUsage, memPercent, netIo, blockIo, pids
      */
     void containerStatsReady(const QVariantList &stats);
 

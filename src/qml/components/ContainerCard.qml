@@ -80,7 +80,7 @@ Kirigami.AbstractCard {
                     }
 
                     Row {
-                        visible: card.showContainerStatus
+                        visible: card.showContainerStatus && card.stats
                         Layout.fillWidth: true
                         spacing: 0
 
@@ -91,7 +91,7 @@ Kirigami.AbstractCard {
                             opacity: 0.7
                         }
                         Controls.Label {
-                            text: card.stats ? card.stats.cpuPercent : "---"
+                            text: card.stats ? card.stats.cpuPercent : ""
                             font.pointSize: Kirigami.Theme.smallFont.pointSize
                             opacity: 0.7
                         }
@@ -108,7 +108,67 @@ Kirigami.AbstractCard {
                             opacity: 0.7
                         }
                         Controls.Label {
-                            text: card.stats ? card.stats.memUsage : "---"
+                            text: card.stats ? card.stats.memUsage : ""
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            opacity: 0.7
+                        }
+                    }
+
+                    Controls.Label {
+                        visible: card.showContainerStatus && !card.stats
+                        Layout.fillWidth: true
+                        text: i18n("Measuring container status…")
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        opacity: 0.7
+                    }
+
+                    Row {
+                        visible: card.showContainerStatus && card.stats
+                        Layout.fillWidth: true
+                        spacing: 0
+
+                        Controls.Label {
+                            text: i18n("NET: ")
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            font.bold: true
+                            opacity: 0.7
+                        }
+                        Controls.Label {
+                            text: card.stats ? String(card.stats.netIo).replace(/ /g, "") : ""
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            opacity: 0.7
+                        }
+
+                        Item {
+                            width: Kirigami.Units.smallSpacing * 2
+                            height: 1
+                        }
+
+                        Controls.Label {
+                            text: i18n("DISK: ")
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            font.bold: true
+                            opacity: 0.7
+                        }
+                        Controls.Label {
+                            text: card.stats ? String(card.stats.blockIo).replace(/ /g, "") : ""
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            opacity: 0.7
+                        }
+
+                        Item {
+                            width: Kirigami.Units.smallSpacing * 2
+                            height: 1
+                        }
+
+                        Controls.Label {
+                            text: i18n("PIDS: ")
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            font.bold: true
+                            opacity: 0.7
+                        }
+                        Controls.Label {
+                            text: card.stats ? card.stats.pids : ""
                             font.pointSize: Kirigami.Theme.smallFont.pointSize
                             opacity: 0.7
                         }

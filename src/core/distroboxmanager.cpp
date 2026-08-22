@@ -658,6 +658,9 @@ void DistroboxManager::requestContainerStats()
             entry[QStringLiteral("cpuPercent")] = obj[QStringLiteral("cpu_percent")].toString();
             entry[QStringLiteral("memUsage")] = obj[QStringLiteral("mem_usage")].toString();
             entry[QStringLiteral("memPercent")] = obj[QStringLiteral("mem_percent")].toString();
+            entry[QStringLiteral("netIo")] = obj[QStringLiteral("net_io")].toVariant().toString();
+            entry[QStringLiteral("blockIo")] = obj[QStringLiteral("block_io")].toVariant().toString();
+            entry[QStringLiteral("pids")] = obj[QStringLiteral("pids")].toVariant().toString();
             stats.append(entry);
         }
 
