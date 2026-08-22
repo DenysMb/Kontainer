@@ -3,6 +3,7 @@
  */
 
 import QtQuick
+import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
@@ -18,6 +19,8 @@ Kirigami.ScrollablePage {
     property bool showContainerStatus: false
     property string statusFilter: "all" // all | running | stopped
     property string sortMode: "name" // name | status
+    property string searchText: ""
+    property bool searching: false
     property var filteredContainers: []
 
     function updateView() {
@@ -33,6 +36,11 @@ Kirigami.ScrollablePage {
         } else if (page.statusFilter === "stopped") {
             list = list.filter(function (entry) {
                 return !isRunning(entry);
+            });
+        }
+        if (page.searchText !== "") {
+            list = list.filter(function (entry) {
+                return (entry.name || "").toLowerCase().indexOf(page.searchText.toLowerCase()) >= 0;
             });
         }
         if (page.sortMode === "status") {
@@ -53,6 +61,7 @@ Kirigami.ScrollablePage {
     onContainersListChanged: updateView()
     onStatusFilterChanged: updateView()
     onSortModeChanged: updateView()
+    onSearchTextChanged: updateView()
 
     signal createRequested
     signal upgradeAllRequested
@@ -75,6 +84,27 @@ Kirigami.ScrollablePage {
 
     title: i18n("Distrobox Containers")
 
+    footer: Controls.ToolBar {
+        visible: page.searching
+
+        Kirigami.SearchField {
+            id: searchField
+
+            anchors.fill: parent
+            placeholderText: i18n("Search containers…")
+            onTextChanged: page.searchText = text
+            Keys.onEscapePressed: page.searching = false
+
+            onVisibleChanged: {
+                if (visible) {
+                    forceActiveFocus();
+                } else if (text !== "") {
+                    text = "";
+                }
+            }
+        }
+    }
+
     supportsRefreshing: true
     onRefreshingChanged: if (refreshing)
         page.refreshRequested()
@@ -83,19 +113,29 @@ Kirigami.ScrollablePage {
         Kirigami.Action {
             text: i18n("Create…")
             icon.name: "list-add"
+            shortcut: "Ctrl+N"
             enabled: page.containerEngineAvailable
             onTriggered: page.createRequested()
         },
         Kirigami.Action {
             text: i18n("Upgrade all…")
             icon.name: "system-software-update"
+            shortcut: "Ctrl+U"
             enabled: page.containerEngineAvailable
             onTriggered: page.upgradeAllRequested()
         },
         Kirigami.Action {
             text: i18n("Refresh")
             icon.name: "view-refresh"
+            shortcut: "F5"
             onTriggered: page.refreshRequested()
+        },
+        Kirigami.Action {
+            text: i18n("Search containers…")
+            icon.name: "edit-find"
+            shortcut: "Ctrl+F"
+            displayHint: Kirigami.DisplayHint.AlwaysHide
+            onTriggered: page.searching = !page.searching
         },
         Kirigami.Action {
             text: i18n("Filter")
