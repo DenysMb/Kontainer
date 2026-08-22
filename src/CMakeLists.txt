@@ -39,6 +39,7 @@ ecm_target_qml_sources(kontainer
     qml/components/ContainerBadge.qml
     qml/components/ContainerCard.qml
     qml/components/ContainerListStatus.qml
+    qml/components/ContainerStatusBadge.qml
     qml/components/MainContainersPage.qml
     qml/components/MainGlobalDrawer.qml
     qml/About.qml

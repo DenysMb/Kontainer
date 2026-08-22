@@ -67,6 +67,17 @@ Kirigami.AbstractCard {
                         opacity: 0.7
                     }
 
+                    ContainerStatusBadge {
+                        status: card.container.status || ""
+                        onToggleRequested: {
+                            if (status.toLowerCase().startsWith("up") || status.toLowerCase().indexOf("paus") >= 0) {
+                                card.stopContainerRequested(card.container.name || "");
+                            } else {
+                                card.startContainerRequested(card.container.name || "");
+                            }
+                        }
+                    }
+
                     Row {
                         visible: card.showContainerStatus
                         Layout.fillWidth: true

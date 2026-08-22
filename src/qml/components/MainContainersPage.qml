@@ -16,6 +16,43 @@ Kirigami.ScrollablePage {
     property var pendingContainers: ({}) // Map of containerName -> bool
     property var containerStats: ({})
     property bool showContainerStatus: false
+    property string statusFilter: "all" // all | running | stopped
+    property string sortMode: "name" // name | status
+    property var filteredContainers: []
+
+    function updateView() {
+        function isRunning(entry) {
+            var status = (entry.status || "").toLowerCase();
+            return status.startsWith("up") || status.indexOf("paus") >= 0;
+        }
+        var list = page.containersList.slice();
+        if (page.statusFilter === "running") {
+            list = list.filter(function (entry) {
+                return isRunning(entry);
+            });
+        } else if (page.statusFilter === "stopped") {
+            list = list.filter(function (entry) {
+                return !isRunning(entry);
+            });
+        }
+        if (page.sortMode === "status") {
+            list.sort(function (a, b) {
+                if (isRunning(a) === isRunning(b)) {
+                    return (a.name || "").localeCompare(b.name || "");
+                }
+                return isRunning(a) ? -1 : 1;
+            });
+        } else {
+            list.sort(function (a, b) {
+                return (a.name || "").localeCompare(b.name || "");
+            });
+        }
+        page.filteredContainers = list;
+    }
+
+    onContainersListChanged: updateView()
+    onStatusFilterChanged: updateView()
+    onSortModeChanged: updateView()
 
     signal createRequested
     signal upgradeAllRequested
@@ -59,6 +96,44 @@ Kirigami.ScrollablePage {
             text: i18n("Refresh")
             icon.name: "view-refresh"
             onTriggered: page.refreshRequested()
+        },
+        Kirigami.Action {
+            text: i18n("Filter")
+            icon.name: "view-filter"
+            Kirigami.Action {
+                text: i18n("All statuses")
+                checkable: true
+                checked: page.statusFilter === "all"
+                onTriggered: page.statusFilter = "all"
+            }
+            Kirigami.Action {
+                text: i18n("Running")
+                checkable: true
+                checked: page.statusFilter === "running"
+                onTriggered: page.statusFilter = "running"
+            }
+            Kirigami.Action {
+                text: i18n("Stopped")
+                checkable: true
+                checked: page.statusFilter === "stopped"
+                onTriggered: page.statusFilter = "stopped"
+            }
+        },
+        Kirigami.Action {
+            text: i18n("Sort")
+            icon.name: "view-sort-ascending"
+            Kirigami.Action {
+                text: i18n("By name")
+                checkable: true
+                checked: page.sortMode === "name"
+                onTriggered: page.sortMode = "name"
+            }
+            Kirigami.Action {
+                text: i18n("By status")
+                checkable: true
+                checked: page.sortMode === "status"
+                onTriggered: page.sortMode = "status"
+            }
         }
     ]
 
@@ -70,7 +145,7 @@ Kirigami.ScrollablePage {
             id: containersListView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: page.containersList
+            model: page.filteredContainers
 
             delegate: ContainerCard {
                 container: modelData
@@ -114,7 +189,7 @@ Kirigami.ScrollablePage {
             }
 
             ContainerListStatus {
-                isEmpty: containersListView.count === 0
+                isEmpty: page.containersList.length === 0
                 isRefreshing: page.appRefreshing
                 containerEngineAvailable: page.containerEngineAvailable
                 onCreateRequested: page.createRequested()
@@ -122,5 +197,8 @@ Kirigami.ScrollablePage {
         }
     }
 
-    Component.onCompleted: page.initialLoadRequested()
+    Component.onCompleted: {
+        updateView();
+        page.initialLoadRequested();
+    }
 }
