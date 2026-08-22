@@ -51,6 +51,7 @@ ecm_target_qml_sources(kontainer
     qml/DistroboxShortcutDialog.qml
     qml/ErrorDialog.qml
     qml/FilePickerDialog.qml
+    qml/LogsWindow.qml
 )
 
 target_link_libraries(kontainer

@@ -217,6 +217,17 @@ Kirigami.ApplicationWindow {
                 applicationWindow().showPassiveNotification(i18n("Could not open the container home folder"), "short");
             }
         }
+        onViewLogsRequested: function(containerName) {
+            var component = Qt.createComponent("LogsWindow.qml");
+            if (component.status === Component.Ready) {
+                var window = component.createObject(root, {
+                    containerName: containerName
+                });
+                window.show();
+            } else {
+                console.error("Error loading LogsWindow:", component.errorString());
+            }
+        }
         onCloneContainerRequested: function(containerName) {
             cloneDialog.openWithContainer(containerName);
         }

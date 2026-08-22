@@ -20,6 +20,7 @@ Kirigami.ActionToolBar {
     signal manageBinariesRequested(string containerName)
     signal openTerminalRequested(string containerName)
     signal openFileManagerRequested(string containerName)
+    signal viewLogsRequested(string containerName)
     signal upgradeContainerRequested(string containerName)
     signal cloneContainerRequested(string containerName)
     signal removeContainerRequested(string containerName)
@@ -64,6 +65,11 @@ Kirigami.ActionToolBar {
             text: i18n("More options")
             icon.name: "view-more-symbolic"
             enabled: !toolbar.isPending
+            Kirigami.Action {
+                icon.name: "utilities-log-viewer"
+                text: i18n("View Logs")
+                onTriggered: toolbar.viewLogsRequested(toolbar.containerName)
+            }
             Kirigami.Action {
                 icon.name: "document-open-folder"
                 text: i18n("Open File Manager")

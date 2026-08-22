@@ -284,6 +284,31 @@ public Q_SLOTS:
     Q_INVOKABLE bool openFileManager(const QString &name);
 
     /**
+     * @brief Starts streaming a container's logs asynchronously
+     *
+     * Runs podman logs --follow in the background and emits
+     * containerLogsReceived as new chunks arrive. Only one stream can be
+     * active at a time; starting a new one stops the previous stream.
+     * @param name Name of the container
+     * @param timestamps Whether to prefix each line with a timestamp
+     * @param maxLines Maximum number of past lines to fetch initially
+     */
+    Q_INVOKABLE void startLogsStream(const QString &name, bool timestamps, int maxLines);
+
+    /**
+     * @brief Stops the active container logs stream, if any
+     */
+    Q_INVOKABLE void stopLogsStream();
+
+    /**
+     * @brief Saves text content to a file
+     * @param content Text to write
+     * @param path Destination file path (document portal paths are supported)
+     * @return true if the file was written successfully, false otherwise
+     */
+    Q_INVOKABLE bool exportTextToFile(const QString &content, const QString &path);
+
+    /**
      * @brief Requests container resource stats asynchronously
      *
      * Runs podman stats --no-stream --format json in the background.
@@ -312,10 +337,22 @@ Q_SIGNALS:
      */
     void containerStatsReady(const QVariantList &stats);
 
+    /**
+     * @brief Emitted when a new chunk of container log output is available.
+     * @param text Raw log text (may contain multiple lines or partial lines)
+     */
+    void containerLogsReceived(const QString &text);
+
+    /**
+     * @brief Emitted when the active logs stream process finishes.
+     */
+    void logsStreamFinished();
+
 private:
     QStringList m_availableImages; ///< List of available container base images
     QStringList m_fullImageNames; ///< List of full image names/URLs
     QPointer<QProcess> m_statsProcess; ///< Active stats fetch process, null when idle
+    QPointer<QProcess> m_logsProcess; ///< Active logs stream process, null when idle
 
     /**
      * @brief Checks if an application with the given basename is exported by other containers

@@ -520,6 +520,60 @@ bool DistroboxManager::isContainerEngineAvailable() const
     return false;
 }
 
+void DistroboxManager::startLogsStream(const QString &name, bool timestamps, int maxLines)
+{
+    stopLogsStream();
+
+    auto *process = new QProcess(this);
+    m_logsProcess = process;
+
+    QObject::connect(process, &QProcess::readyReadStandardOutput, this, [this, process]() {
+        Q_EMIT containerLogsReceived(QString::fromUtf8(process->readAllStandardOutput()));
+    });
+    QObject::connect(process, &QProcess::readyReadStandardError, this, [this, process]() {
+        Q_EMIT containerLogsReceived(QString::fromUtf8(process->readAllStandardError()));
+    });
+    QObject::connect(process, &QProcess::finished, this, [this, process](int, QProcess::ExitStatus) {
+        process->deleteLater();
+        if (m_logsProcess == process) {
+            m_logsProcess.clear();
+        }
+        Q_EMIT logsStreamFinished();
+    });
+
+    const QString flags = timestamps ? u"--timestamps "_s : QString();
+    QString command = u"podman logs %1--follow --tail %2 %3"_s.arg(flags).arg(maxLines).arg(KShell::quoteArg(name));
+    if (DistroboxCli::isFlatpak()) {
+        command = u"flatpak-spawn --host /usr/bin/env "_s + command;
+    }
+
+    process->start(u"sh"_s, QStringList() << QLatin1String("-c") << command);
+}
+
+void DistroboxManager::stopLogsStream()
+{
+    if (!m_logsProcess) {
+        return;
+    }
+
+    QProcess *process = m_logsProcess;
+    m_logsProcess.clear();
+    QObject::disconnect(process, nullptr, this, nullptr);
+    process->kill();
+    process->deleteLater();
+}
+
+bool DistroboxManager::exportTextToFile(const QString &content, const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    file.write(content.toUtf8());
+    return true;
+}
+
 bool DistroboxManager::openFileManager(const QString &name)
 {
     bool success = false;
