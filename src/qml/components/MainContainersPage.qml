@@ -100,6 +100,7 @@ Kirigami.ScrollablePage {
         Kirigami.Action {
             text: i18n("Filter")
             icon.name: "view-filter"
+            displayHint: Kirigami.DisplayHint.AlwaysHide
             Kirigami.Action {
                 text: i18n("All statuses")
                 checkable: true
@@ -122,6 +123,7 @@ Kirigami.ScrollablePage {
         Kirigami.Action {
             text: i18n("Sort")
             icon.name: "view-sort-ascending"
+            displayHint: Kirigami.DisplayHint.AlwaysHide
             Kirigami.Action {
                 text: i18n("By name")
                 checkable: true
