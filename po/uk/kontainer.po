@@ -1,0 +1,762 @@
+# Kontainer translations.
+# Copyright (C) 2025 Kontainer contributors
+# This file is distributed under the same license as the Kontainer package.
+# SPDX-FileCopyrightText: 2026 Andrii Butsvin <58703326+andreysey@users.noreply.github.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kontainer 1.3.0\n"
+"Report-Msgid-Bugs-To: https://github.com/DenysMb/Kontainer \n"
+"POT-Creation-Date: 2025-12-22 20:24+0000\n"
+"PO-Revision-Date: 2026-11-03 21:32+0100\n"
+"Last-Translator: Andrii Butsvin "
+"<58703326+andreysey@users.noreply.github.com>\n"
+"Language-Team: Ukrainian\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: io.github.DenysMb.Kontainer.desktop:5 src/qml/Main.qml:19
+#, kde-format
+msgid "Kontainer"
+msgstr "Kontainer"
+
+#: io.github.DenysMb.Kontainer.desktop:11
+msgid "container;podman;distrobox;"
+msgstr "container;podman;distrobox;контейнер;"
+
+#: io.github.DenysMb.Kontainer.desktop:12 src/main.cpp:46
+#, kde-format
+msgid "Manage Distrobox containers"
+msgstr "Керування контейнерами Distrobox"
+
+#: po/rc.cpp:1 src/main.cpp:55 rc.cpp:1
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Andrii Butsvin"
+
+#: po/rc.cpp:2 src/main.cpp:55 rc.cpp:2
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "58703326+andreysey@users.noreply.github.com"
+
+#: src/core/distroboxmanager.cpp:308 src/core/distroboxmanager.cpp:338
+#: src/core/distroboxmanager.cpp:358 src/core/distroboxmanager.cpp:367
+#: src/core/distroboxmanager.cpp:442
+#, kde-format
+msgid "Press any key to close this terminal…"
+msgstr "Натисніть будь-яку клавішу, щоб закрити цей термінал…"
+
+#: src/core/distroboxmanager.cpp:426
+#, kde-format
+msgid ""
+"Cannot automatically install packages for this distribution.\n"
+"Please enter the distrobox manually and install it using the appropriate "
+"package manager."
+msgstr ""
+"Неможливо автоматично встановити пакунки для цього дистрибутива.\n"
+"Увійдіть у контейнер distrobox вручну та встановіть пакунок відповідним "
+"менеджером пакунків."
+
+#: src/main.cpp:42
+#, kde-format
+msgctxt "@title"
+msgid "Kontainer"
+msgstr "Kontainer"
+
+#: src/main.cpp:50
+#, kde-format
+msgid "Denys Madureira (c) 2025"
+msgstr "Denys Madureira (c) 2025"
+
+#: src/main.cpp:51
+#, kde-format
+msgctxt "@info:credit"
+msgid "Denys Madureira"
+msgstr "Denys Madureira"
+
+#: src/main.cpp:52
+#, kde-format
+msgctxt "@info:credit"
+msgid "Author"
+msgstr "Автор"
+
+#: src/qml/ApplicationsWindow.qml:19
+#, kde-format
+msgid "Applications Management - %1"
+msgstr "Керування програмами — %1"
+
+#: src/qml/ApplicationsWindow.qml:126
+#: src/qml/components/MainContainersPage.qml:55
+#, kde-format
+msgid "Refresh"
+msgstr "Оновити"
+
+#: src/qml/ApplicationsWindow.qml:143
+#, kde-format
+msgid "Exported Applications (%1)"
+msgstr "Експортовані програми (%1)"
+
+#: src/qml/ApplicationsWindow.qml:151
+#, kde-format
+msgid "All Applications (%1)"
+msgstr "Усі програми (%1)"
+
+#: src/qml/ApplicationsWindow.qml:180
+#, kde-format
+msgid "Search exported applications..."
+msgstr "Шукати серед експортованих програм…"
+
+#: src/qml/ApplicationsWindow.qml:214
+#, kde-format
+msgid "Search available applications..."
+msgstr "Шукати серед доступних програм…"
+
+#: src/qml/ApplicationsWindow.qml:241
+#, kde-format
+msgid "No exported applications found matching '%1'"
+msgstr "Не знайдено експортованих програм, що відповідають «%1»"
+
+#: src/qml/ApplicationsWindow.qml:241
+#, kde-format
+msgid "No exported applications found"
+msgstr "Експортованих програм не знайдено"
+
+#: src/qml/ApplicationsWindow.qml:248
+#, kde-format
+msgid "No applications found matching '%1'"
+msgstr "Не знайдено програм, що відповідають «%1»"
+
+#: src/qml/ApplicationsWindow.qml:248
+#, kde-format
+msgid "No applications found in container"
+msgstr "У контейнері не знайдено програм"
+
+#: src/qml/ApplicationsWindow.qml:249
+#, kde-format
+msgid ""
+"This container might not have desktop applications installed or they might "
+"not be detectable."
+msgstr ""
+"Можливо, у цьому контейнері не встановлено графічних програм або їх не "
+"вдається виявити."
+
+#: src/qml/ApplicationsWindow.qml:290 src/qml/ApplicationsWindow.qml:350
+#, kde-format
+msgid "Unexport"
+msgstr "Скасувати експорт"
+
+#: src/qml/ApplicationsWindow.qml:301 src/qml/ApplicationsWindow.qml:362
+#, kde-format
+msgid "Failed to unexport application"
+msgstr "Не вдалося скасувати експорт програми"
+
+#: src/qml/ApplicationsWindow.qml:350
+#, kde-format
+msgid "Export"
+msgstr "Експортувати"
+
+#: src/qml/ApplicationsWindow.qml:362
+#, kde-format
+msgid "Failed to export application"
+msgstr "Не вдалося експортувати програму"
+
+#: src/qml/ApplicationsWindow.qml:379
+#, kde-format
+msgid "%1 selected"
+msgstr "Вибрано: %1"
+
+#: src/qml/ApplicationsWindow.qml:385
+#, kde-format
+msgid "Unexport Selected"
+msgstr "Скасувати експорт вибраних"
+
+#: src/qml/ApplicationsWindow.qml:385
+#, kde-format
+msgid "Export Selected"
+msgstr "Експортувати вибрані"
+
+#: src/qml/ApplicationsWindow.qml:400
+#, kde-format
+msgid "%1 applications"
+msgstr "Програм: %1"
+
+#: src/qml/ApplicationsWindow.qml:407
+#, kde-format
+msgid "Clear Selection"
+msgstr "Зняти позначення"
+
+#: src/qml/components/ContainerActionsToolbar.qml:39
+#, kde-format
+msgid "Stop Container"
+msgstr "Зупинити контейнер"
+
+#: src/qml/components/ContainerActionsToolbar.qml:39
+#, kde-format
+msgid "Start Container"
+msgstr "Запустити контейнер"
+
+#: src/qml/components/ContainerActionsToolbar.qml:51
+#, kde-format
+msgid "Manage Applications"
+msgstr "Керувати програмами"
+
+#: src/qml/components/ContainerActionsToolbar.qml:57
+#, kde-format
+msgid "Open Terminal"
+msgstr "Відкрити термінал"
+
+#: src/qml/components/ContainerActionsToolbar.qml:62
+#, kde-format
+msgid "More options"
+msgstr "Додаткові параметри"
+
+#: src/qml/components/ContainerActionsToolbar.qml:67
+#, kde-format
+msgid "Install Package"
+msgstr "Встановити пакунок"
+
+#: src/qml/components/ContainerActionsToolbar.qml:73
+#, kde-format
+msgid "Reboot Container"
+msgstr "Перезапустити контейнер"
+
+#: src/qml/components/ContainerActionsToolbar.qml:79
+#, kde-format
+msgid "Upgrade Container"
+msgstr "Оновити контейнер"
+
+#: src/qml/components/ContainerActionsToolbar.qml:85
+#, kde-format
+msgid "Clone Container"
+msgstr "Клонувати контейнер"
+
+#: src/qml/components/ContainerActionsToolbar.qml:91
+#, kde-format
+msgid "Remove Container"
+msgstr "Вилучити контейнер"
+
+#: src/qml/components/ContainerListStatus.qml:24
+#, kde-format
+msgid "Container engine not found"
+msgstr "Не знайдено рушія контейнерів"
+
+#: src/qml/components/ContainerListStatus.qml:25
+#, kde-format
+msgid ""
+"Podman or Docker is required to use Kontainer.\n"
+"Please install one of them and click 'Refresh' (or restart the application)."
+msgstr ""
+"Для роботи Kontainer потрібен Podman або Docker.\n"
+"Встановіть один із них і натисніть «Оновити» (або перезапустіть програму)."
+
+#: src/qml/components/ContainerListStatus.qml:31
+#, kde-format
+msgid "No containers found. Create a new container now?"
+msgstr "Контейнерів не знайдено. Створити новий контейнер?"
+
+#: src/qml/components/ContainerListStatus.qml:33
+#, kde-format
+msgid "Create Container"
+msgstr "Створити контейнер"
+
+#: src/qml/components/MainContainersPage.qml:35
+#, kde-format
+msgid "Distrobox Containers"
+msgstr "Контейнери Distrobox"
+
+#: src/qml/components/MainContainersPage.qml:43
+#, kde-format
+msgid "Create…"
+msgstr "Створити…"
+
+#: src/qml/components/MainContainersPage.qml:49
+#, kde-format
+msgid "Upgrade all…"
+msgstr "Оновити всі…"
+
+#: src/qml/components/MainGlobalDrawer.qml:24
+#, kde-format
+msgid "Create Container…"
+msgstr "Створити контейнер…"
+
+#: src/qml/components/MainGlobalDrawer.qml:29
+#, kde-format
+msgid "Create Distrobox Shortcut…"
+msgstr "Створити ярлик Distrobox…"
+
+#: src/qml/components/MainGlobalDrawer.qml:38
+#, kde-format
+msgid "Show Container Icons"
+msgstr "Показувати піктограми контейнерів"
+
+#: src/qml/components/MainGlobalDrawer.qml:45
+#, kde-format
+msgid "Clone Container…"
+msgstr "Клонувати контейнер…"
+
+#: src/qml/components/MainGlobalDrawer.qml:54
+#, kde-format
+msgid "Open Distrobox Documentation"
+msgstr "Відкрити документацію Distrobox"
+
+#: src/qml/components/MainGlobalDrawer.qml:59
+#, kde-format
+msgid "Open Distrobox Useful Tips"
+msgstr "Відкрити корисні поради Distrobox"
+
+#: src/qml/components/MainGlobalDrawer.qml:67
+#, kde-format
+msgid "About Kontainer"
+msgstr "Про Kontainer"
+
+#: src/qml/DistroboxCloneDialog.qml:14
+#, kde-format
+msgid "Clone container"
+msgstr "Клонування контейнера"
+
+#: src/qml/DistroboxCloneDialog.qml:32
+#, kde-format
+msgid "No containers available to clone."
+msgstr "Немає контейнерів, які можна клонувати."
+
+#: src/qml/DistroboxCloneDialog.qml:62
+#, kde-format
+msgid "Select a container to clone."
+msgstr "Виберіть контейнер для клонування."
+
+#: src/qml/DistroboxCloneDialog.qml:68
+#, kde-format
+msgid "Choose a name for the cloned container."
+msgstr "Виберіть назву для клонованого контейнера."
+
+#: src/qml/DistroboxCloneDialog.qml:74
+#, kde-format
+msgid "Failed to launch clone command. Check your setup and try again."
+msgstr ""
+"Не вдалося запустити команду клонування. Перевірте налаштування й повторіть "
+"спробу."
+
+#: src/qml/DistroboxCloneDialog.qml:89
+#, kde-format
+msgid "Container"
+msgstr "Контейнер"
+
+#: src/qml/DistroboxCloneDialog.qml:107 src/qml/DistroboxCreateDialog.qml:436
+#, kde-format
+msgid "Name"
+msgstr "Назва"
+
+#: src/qml/DistroboxCloneDialog.qml:108
+#, kde-format
+msgid "fedora-clone"
+msgstr "fedora-clone"
+
+#: src/qml/DistroboxCreateDialog.qml:15
+#, kde-format
+msgid "Select image"
+msgstr "Виберіть образ"
+
+#: src/qml/DistroboxCreateDialog.qml:15
+#, kde-format
+msgid "Create new container"
+msgstr "Створення контейнера"
+
+#: src/qml/DistroboxCreateDialog.qml:35
+#, kde-format
+msgctxt "Short name of advanced option"
+msgid "arguments"
+msgstr "аргументи"
+
+#: src/qml/DistroboxCreateDialog.qml:39
+#, kde-format
+msgctxt "Short name of advanced option"
+msgid "custom home"
+msgstr "власна домашня тека"
+
+#: src/qml/DistroboxCreateDialog.qml:43
+#, kde-format
+msgid "%1 volume"
+msgid_plural "%1 volumes"
+msgstr[0] "%1 том"
+msgstr[1] "%1 томи"
+msgstr[2] "%1 томів"
+
+#: src/qml/DistroboxCreateDialog.qml:46
+#, kde-format
+msgctxt "Separator between enabled advanced options"
+msgid ", "
+msgstr ", "
+
+#: src/qml/DistroboxCreateDialog.qml:65
+#, kde-format
+msgid "Choose .ini file"
+msgstr "Виберіть файл .ini"
+
+#: src/qml/DistroboxCreateDialog.qml:67
+#, kde-format
+msgid "INI files (*.ini)"
+msgstr "Файли INI (*.ini)"
+
+#: src/qml/DistroboxCreateDialog.qml:75
+#, kde-format
+msgid "Select custom home directory"
+msgstr "Виберіть власну домашню теку"
+
+#: src/qml/DistroboxCreateDialog.qml:83
+#, kde-format
+msgid "Select volume directory"
+msgstr "Виберіть теку для тому"
+
+#: src/qml/DistroboxCreateDialog.qml:101
+#, kde-format
+msgid "Creating…"
+msgstr "Створення…"
+
+#: src/qml/DistroboxCreateDialog.qml:101
+#, kde-format
+msgid "Create"
+msgstr "Створити"
+
+#: src/qml/DistroboxCreateDialog.qml:108
+#, kde-format
+msgid "Assemble"
+msgstr "Зібрати"
+
+#: src/qml/DistroboxCreateDialog.qml:121
+#, kde-format
+msgid "Cancel"
+msgstr "Скасувати"
+
+#: src/qml/DistroboxCreateDialog.qml:195
+#, kde-format
+msgid "Use custom image: %1"
+msgstr "Використати власний образ: %1"
+
+#: src/qml/DistroboxCreateDialog.qml:267
+#, kde-format
+msgid "Name and Image fields are required"
+msgstr "Поля «Назва» та «Образ» є обов’язковими"
+
+#: src/qml/DistroboxCreateDialog.qml:320
+#, kde-format
+msgid "Failed to create container. Please check your input and try again."
+msgstr ""
+"Не вдалося створити контейнер. Перевірте введені дані й повторіть спробу."
+
+#: src/qml/DistroboxCreateDialog.qml:412
+#, kde-format
+msgid "Creating container…"
+msgstr "Створення контейнера…"
+
+#: src/qml/DistroboxCreateDialog.qml:418
+#, kde-format
+msgid "This may take a few minutes"
+msgstr "Це може тривати кілька хвилин"
+
+#: src/qml/DistroboxCreateDialog.qml:437
+#, kde-format
+msgid "Fedora"
+msgstr "Fedora"
+
+#: src/qml/DistroboxCreateDialog.qml:451
+#, kde-format
+msgid "Image"
+msgstr "Образ"
+
+#: src/qml/DistroboxCreateDialog.qml:459
+#, kde-format
+msgid "Select container image…"
+msgstr "Виберіть образ контейнера…"
+
+#: src/qml/DistroboxCreateDialog.qml:474
+#, kde-format
+msgid "Custom image: %1"
+msgstr "Власний образ: %1"
+
+#: src/qml/DistroboxCreateDialog.qml:483
+#, kde-format
+msgid "Additional Options"
+msgstr "Додаткові параметри"
+
+#: src/qml/DistroboxCreateDialog.qml:484
+#, kde-format
+msgid "Enable systemd init support"
+msgstr "Увімкнути підтримку systemd як init"
+
+#: src/qml/DistroboxCreateDialog.qml:491
+#, kde-format
+msgid "Enable NVIDIA GPU support"
+msgstr "Увімкнути підтримку відеокарт NVIDIA"
+
+#: src/qml/DistroboxCreateDialog.qml:505
+#, kde-format
+msgid "Hide advanced options"
+msgstr "Сховати розширені параметри"
+
+#: src/qml/DistroboxCreateDialog.qml:505
+#, kde-format
+msgid "Show advanced options"
+msgstr "Показати розширені параметри"
+
+#: src/qml/DistroboxCreateDialog.qml:510
+#, kde-format
+msgid "Some advanced options are set"
+msgstr "Деякі розширені параметри задано"
+
+#: src/qml/DistroboxCreateDialog.qml:521
+#, kde-format
+msgid "Using advanced options: %1"
+msgstr "Використовуються розширені параметри: %1"
+
+#: src/qml/DistroboxCreateDialog.qml:521
+#, kde-format
+msgid "No advanced options set"
+msgstr "Розширені параметри не задано"
+
+#: src/qml/DistroboxCreateDialog.qml:532
+#, kde-format
+msgid "Arguments"
+msgstr "Аргументи"
+
+#: src/qml/DistroboxCreateDialog.qml:533
+#, kde-format
+msgid "Additional arguments (optional)"
+msgstr "Додаткові аргументи (необов’язково)"
+
+#: src/qml/DistroboxCreateDialog.qml:538
+#, kde-format
+msgid "Custom Home"
+msgstr "Власна домашня тека"
+
+#: src/qml/DistroboxCreateDialog.qml:549
+#, kde-format
+msgid "Use custom home directory"
+msgstr "Використовувати власну домашню теку"
+
+#: src/qml/DistroboxCreateDialog.qml:560
+#, kde-format
+msgid "Clear custom home directory"
+msgstr "Очистити власну домашню теку"
+
+#: src/qml/DistroboxCreateDialog.qml:568
+#, kde-format
+msgid "By default, the container will use your home directory"
+msgstr "Типово контейнер використовуватиме вашу домашню теку"
+
+#: src/qml/DistroboxCreateDialog.qml:576
+#, kde-format
+msgid "Additional Volumes"
+msgstr "Додаткові томи"
+
+#: src/qml/DistroboxCreateDialog.qml:613
+#, kde-format
+msgid "Remove volume"
+msgstr "Вилучити том"
+
+#: src/qml/DistroboxCreateDialog.qml:623
+#, kde-format
+msgid "Add Volume"
+msgstr "Додати том"
+
+#: src/qml/DistroboxCreateDialog.qml:631
+#, kde-format
+msgid "Mount additional directories inside the container"
+msgstr "Змонтувати додаткові теки всередині контейнера"
+
+#: src/qml/DistroboxCreateDialog.qml:645
+#, kde-format
+msgid ""
+"Use Assemble to pick a distrobox.ini manifest. Kontainer will run "
+"\"distrobox assemble create --file <manifest>\" to build every container "
+"listed there."
+msgstr ""
+"Скористайтеся кнопкою «Зібрати», щоб вибрати маніфест distrobox.ini. "
+"Kontainer виконає \"distrobox assemble create --file <manifest>\", щоб "
+"створити всі контейнери, перелічені в ньому."
+
+#: src/qml/DistroboxCreateDialog.qml:659
+#, kde-format
+msgid "Command preview"
+msgstr "Попередній перегляд команди"
+
+#: src/qml/DistroboxCreateDialog.qml:685
+#, kde-format
+msgid "Search images…"
+msgstr "Шукати образи…"
+
+#: src/qml/DistroboxCreateDialog.qml:763
+#, kde-format
+msgid "Type to search for images"
+msgstr "Почніть вводити, щоб шукати образи"
+
+#: src/qml/DistroboxRemoveDialog.qml:15
+#, kde-format
+msgid "Remove container"
+msgstr "Вилучення контейнера"
+
+#: src/qml/DistroboxRemoveDialog.qml:36
+#, kde-format
+msgid "Failed to remove container"
+msgstr "Не вдалося вилучити контейнер"
+
+#: src/qml/DistroboxRemoveDialog.qml:47
+#, kde-format
+msgid "Are you sure you want to remove %1?"
+msgstr "Ви справді хочете вилучити %1?"
+
+#: src/qml/DistroboxRemoveDialog.qml:53
+#, kde-format
+msgid "This action cannot be undone."
+msgstr "Цю дію неможливо скасувати."
+
+#: src/qml/DistroboxShortcutDialog.qml:19
+#, kde-format
+msgid "Create Distrobox Shortcuts"
+msgstr "Створення ярликів Distrobox"
+
+#: src/qml/DistroboxShortcutDialog.qml:38
+#, kde-format
+msgid "Create shortcuts for all containers"
+msgstr "Створити ярлики для всіх контейнерів"
+
+#: src/qml/DistroboxShortcutDialog.qml:48
+#, kde-format
+msgid "Alternatively, select a specific container:"
+msgstr "Або виберіть окремий контейнер:"
+
+#: src/qml/ErrorDialog.qml:15
+#, kde-format
+msgid "Error"
+msgstr "Помилка"
+
+#: src/qml/ErrorDialog.qml:19
+#, kde-format
+msgid ""
+"Failed to create container.\n"
+"Please check your input and try again."
+msgstr ""
+"Не вдалося створити контейнер.\n"
+"Перевірте введені дані й повторіть спробу."
+
+#: src/qml/FilePickerDialog.qml:12
+#, kde-format
+msgid "Choose Package"
+msgstr "Виберіть пакунок"
+
+#: src/qml/FilePickerDialog.qml:13
+#, kde-format
+msgid "Package files"
+msgstr "Файли пакунків"
+
+#: src/qml/About.qml:14
+#, kde-format
+msgid "Backend"
+msgstr "Модуль"
+
+#: src/qml/About.qml:19
+#, kde-format
+msgid "Distrobox version"
+msgstr "Версія Distrobox"
+
+#: src/qml/About.qml:20 src/qml/About.qml:25
+#, kde-format
+msgid "Not available"
+msgstr "Недоступно"
+
+#: src/qml/About.qml:24
+#, kde-format
+msgid "Distrobox path"
+msgstr "Шлях до Distrobox"
+
+#: src/qml/BinariesWindow.qml:18
+#, kde-format
+msgid "Binaries Management - %1"
+msgstr "Керування виконуваними файлами — %1"
+
+#: src/qml/BinariesWindow.qml:110
+#, kde-format
+msgid "Exported Binaries (%1)"
+msgstr "Експортовані виконувані файли (%1)"
+
+#: src/qml/BinariesWindow.qml:118
+#, kde-format
+msgid "Available Binaries (%1)"
+msgstr "Доступні виконувані файли (%1)"
+
+#: src/qml/BinariesWindow.qml:146
+#, kde-format
+msgid "Search exported binaries..."
+msgstr "Шукати серед експортованих виконуваних файлів…"
+
+#: src/qml/BinariesWindow.qml:178
+#, kde-format
+msgid "Search available binaries..."
+msgstr "Шукати серед доступних виконуваних файлів…"
+
+#: src/qml/BinariesWindow.qml:203
+#, kde-format
+msgid "No exported binaries found matching '%1'"
+msgstr "Не знайдено експортованих виконуваних файлів, що відповідають «%1»"
+
+#: src/qml/BinariesWindow.qml:203
+#, kde-format
+msgid "No exported binaries found"
+msgstr "Експортованих виконуваних файлів не знайдено"
+
+#: src/qml/BinariesWindow.qml:210
+#, kde-format
+msgid "No binaries found matching '%1'"
+msgstr "Не знайдено виконуваних файлів, що відповідають «%1»"
+
+#: src/qml/BinariesWindow.qml:210
+#, kde-format
+msgid "No binaries found in container"
+msgstr "У контейнері не знайдено виконуваних файлів"
+
+#: src/qml/BinariesWindow.qml:211
+#, kde-format
+msgid "This container might not have binaries in /usr/bin or /usr/local/bin."
+msgstr ""
+"Можливо, у цьому контейнері немає виконуваних файлів у /usr/bin або /usr/"
+"local/bin."
+
+#: src/qml/BinariesWindow.qml:266 src/qml/BinariesWindow.qml:329
+#, kde-format
+msgid "Failed to unexport binary"
+msgstr "Не вдалося скасувати експорт виконуваного файлу"
+
+#: src/qml/BinariesWindow.qml:329
+#, kde-format
+msgid "Failed to export binary"
+msgstr "Не вдалося експортувати виконуваний файл"
+
+#: src/qml/components/ContainerActionsToolbar.qml:74
+#, kde-format
+msgid "Manage Binaries"
+msgstr "Керувати виконуваними файлами"
+
+#: src/qml/components/ContainerCard.qml:75
+#, kde-format
+msgid "CPU: "
+msgstr "Процесор: "
+
+#: src/qml/components/ContainerCard.qml:92
+#, kde-format
+msgid "RAM: "
+msgstr "Пам’ять: "
+
+#: src/qml/components/MainGlobalDrawer.qml:47
+#, kde-format
+msgid "Show Container Status"
+msgstr "Показувати стан контейнерів"
+
+#: src/qml/DistroboxCreateDialog.qml:685
+#, kde-format
+msgid "Search or type a custom image…"
+msgstr "Шукати або ввести власний образ…"
