@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName(u"DenysMb"_s);
     QApplication::setOrganizationDomain(u"io.github.DenysMb"_s);
     QApplication::setApplicationName(u"Kontainer"_s);
-    QApplication::setDesktopFileName(u"io.github.DenysMb.Kontainer"_s);
 
     KAboutData aboutData(
         // The program name used internally.
@@ -50,6 +49,7 @@ int main(int argc, char *argv[])
         i18n("Denys Madureira (c) 2025"));
     aboutData.addAuthor(i18nc("@info:credit", "Denys Madureira"), i18nc("@info:credit", "Author"), u"denysmb@zoho.com"_s, u"https://invent.kde.org/denysmb"_s);
     aboutData.setTranslator(i18nc("NAME OF TRANSLATORS", "Your names"), i18nc("EMAIL OF TRANSLATORS", "Your emails"));
+    aboutData.setDesktopFileName(u"io.github.DenysMb.Kontainer"_s);
     KAboutData::setApplicationData(aboutData);
 
     QGuiApplication::setWindowIcon(QIcon::fromTheme(u"io.github.DenysMb.Kontainer"_s));
